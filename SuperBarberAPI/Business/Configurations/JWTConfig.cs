@@ -1,4 +1,4 @@
-﻿namespace SuperBarber.Configurations
+﻿namespace Business.Configurations
 {
     public class JWTConfig
     {

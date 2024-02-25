@@ -1,10 +1,13 @@
+using Business.Configurations;
+using Business.Implementations;
+using Business.Interfaces;
 using Business.Models.Exceptions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Persistence.Contexts;
-using SuperBarber.Configurations;
+using Persistence.Implementations;
+using Persistence.Interfaces;
 using SuperBarber.Extensions;
 using System.Text;
 
@@ -42,6 +45,13 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// Services
+builder.Services.AddScoped<IValidatorService, ValidatorService>();
+builder.Services.AddScoped<IUserService, UserService>();
+
+// Repositories
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 var app = builder.Build();
 
