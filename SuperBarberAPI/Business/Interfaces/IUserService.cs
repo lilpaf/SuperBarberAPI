@@ -1,8 +1,9 @@
 ﻿using Business.Models.Requests;
+using Business.Models.Responses;
 namespace Business.Interfaces
 {
     public interface IUserService
     {
-        Task RegisterUser(RegisterRequest request);
+        Task<AuthenticationResponse> RegisterUser(RegisterRequest request);
     }
 }

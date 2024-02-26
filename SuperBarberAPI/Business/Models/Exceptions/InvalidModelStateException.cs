@@ -1,6 +1,8 @@
-﻿namespace Business.Models.Exceptions
+﻿using Business.Models.Exceptions.General;
+
+namespace Business.Models.Exceptions
 {
-    public class InvalidModelStateException : Exception
+    public class InvalidModelStateException : ClientSideException
     {
         public string[] Errors { get; }
 

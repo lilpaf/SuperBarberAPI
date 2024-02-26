@@ -1,6 +1,8 @@
-﻿namespace Business.Models.Exceptions
+﻿using Business.Models.Exceptions.General;
+
+namespace Business.Models.Exceptions
 {
-    public class NotConfiguredException : Exception
+    public class NotConfiguredException : ServerSideException
     {
         public NotConfiguredException(string message) : base(message) 
         {

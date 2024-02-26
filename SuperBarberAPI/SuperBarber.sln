@@ -5,9 +5,9 @@ VisualStudioVersion = 17.9.34607.119
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SuperBarber", "SuperBarber\SuperBarber.csproj", "{1C5CA275-69FE-41A0-A532-0C6AC08F0FB2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Persistence", "Persistence\Persistence.csproj", "{6C45CF8F-6446-46D4-912E-64FC5EF21146}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Persistence", "Persistence\Persistence.csproj", "{6C45CF8F-6446-46D4-912E-64FC5EF21146}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Business", "Business\Business.csproj", "{7ED5249D-36A9-4D56-88AA-45FB27C15207}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Business", "Business\Business.csproj", "{7ED5249D-36A9-4D56-88AA-45FB27C15207}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

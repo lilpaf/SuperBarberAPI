@@ -3,22 +3,28 @@ using Business.Implementations;
 using Business.Interfaces;
 using Business.Models.Exceptions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Persistence.Contexts;
+using Persistence.Entities;
 using Persistence.Implementations;
 using Persistence.Interfaces;
 using SuperBarber.Extensions;
+using SuperBarber.Middlewares;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+/* 
+ * ToDo add response handling middleware - meta data, response, and errors 
+*/
 // Add services to the container.
 
 builder.Services.AddDbContext<SuperBarberDbContext>(
             optionsBuilder => optionsBuilder.UseSqlServer(builder.Configuration.GetConnectionString("SuperBarber")));
 
-builder.Services.Configure<JWTConfig>(builder.Configuration.GetSection("JWTConfig"));
+builder.Services.Configure<JwtConfig>(builder.Configuration.GetSection("JwtConfig"));
 
 builder.Services.AddAuthentication(options =>
 {
@@ -27,8 +33,11 @@ builder.Services.AddAuthentication(options =>
     options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
 }).AddJwtBearer(jwt =>
 {
-    byte[] key = Encoding.UTF8.GetBytes(builder.Configuration.GetSection("JWTConfig:Secret").Value) 
-        ?? throw new NotConfiguredException("JWTConfig is not configured correctly or it is missing");
+    string keyValue = builder.Configuration.GetSection("JwtConfig:Secret").Value ??
+        throw new NotConfiguredException("JwtConfig is not configured correctly or it is missing");
+    
+    byte[] key = Encoding.UTF8.GetBytes(keyValue);
+  
     jwt.SaveToken = true;
     jwt.TokenValidationParameters = new TokenValidationParameters()
     {
@@ -41,6 +50,21 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+builder.Services.AddDefaultIdentity<User>(options =>
+{
+    //ToDo uncomment this when you want to use the mailing service
+    //options.SignIn.RequireConfirmedAccount = true;
+    options.User.RequireUniqueEmail = true;
+    options.Password.RequireDigit = false;  //ToDo fix it
+    options.Password.RequireLowercase = false; //ToDo fix it
+    options.Password.RequireNonAlphanumeric = false; //ToDo fix it
+    options.Password.RequireUppercase = false; //ToDo fix it
+    options.Lockout.AllowedForNewUsers = true;
+    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+    options.Lockout.MaxFailedAccessAttempts = 5;
+})
+.AddRoles<IdentityRole>()
+.AddEntityFrameworkStores<SuperBarberDbContext>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -71,5 +95,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.Run();

@@ -4,8 +4,6 @@ namespace Persistence.Interfaces
 {
     public interface IUserRepository
     {
-        Task SaveUserAsync();
-
-        Task AddUserAsync(User user);
+        Task<bool> FindUserByEmailAsync(string email);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Business.Constants;
+using Business.Constants.Messages;
 using Business.Interfaces;
 using Business.Models.Exceptions;
 using Microsoft.Extensions.Logging;
@@ -8,7 +9,6 @@ namespace Business.Implementations
 {
     public class ValidatorService : IValidatorService
     {
-        private const string ErrorDelimiter = ". ";
         private readonly ILogger<ValidatorService> _logger;
         
         public ValidatorService(ILogger<ValidatorService> logger)
@@ -30,7 +30,7 @@ namespace Business.Implementations
             if (!Validator.TryValidateObject(model, context, errors, true))
             {
                 string[] errorMessages = errors.Select(x => x.ErrorMessage).ToArray();
-                string message = string.Join(ErrorDelimiter, errorMessages);
+                string message = string.Join(ErrorConstants.ErrorDelimiter, errorMessages);
 
                 throw new InvalidModelStateException(message, errorMessages);
             }

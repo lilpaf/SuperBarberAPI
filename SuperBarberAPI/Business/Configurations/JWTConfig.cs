@@ -1,6 +1,6 @@
 ﻿namespace Business.Configurations
 {
-    public class JWTConfig
+    public class JwtConfig
     {
         public string Secret { get; set; }
     }
