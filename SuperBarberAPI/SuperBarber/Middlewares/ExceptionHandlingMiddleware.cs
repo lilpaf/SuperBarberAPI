@@ -1,7 +1,5 @@
 ﻿using Business.Constants;
 using Business.Models.Exceptions.General;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using SuperBarber.Models;
 
 namespace SuperBarber.Middlewares
@@ -27,9 +25,10 @@ namespace SuperBarber.Middlewares
             }
             catch (Exception exception)
             {
-                _logger.LogError(exception, "Exception occurred: {Message}", exception.Message);
-
                 string message = exception.Message;
+
+                _logger.LogError(exception, "Exception occurred: {Message}", message);
+
                 int statusCode = StatusCodes.Status500InternalServerError;
                 int errorCode = ErrorConstants.ServerSideErrorCode;
 
@@ -46,11 +45,10 @@ namespace SuperBarber.Middlewares
 
                 ResponseContent response = new()
                 {
-                    Error = new(exception.Message, statusCode, errorCode)
+                    Error = new(message, statusCode, errorCode)
                 };
 
                 context.Response.StatusCode = response.Error.StatusCode;
-
                 await context.Response.WriteAsJsonAsync(response);
             }
         }

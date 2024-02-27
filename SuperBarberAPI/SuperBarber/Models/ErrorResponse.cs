@@ -1,4 +1,6 @@
-﻿namespace SuperBarber.Models
+﻿using System.Text.Json.Serialization;
+
+namespace SuperBarber.Models
 {
     public class ErrorResponse
     {
@@ -6,11 +8,15 @@
         public int StatusCode { get; }
         public int ErrorCode { get; }
 
-        public ErrorResponse(string errorMessage, int statusCode, int errorCode)
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string[]? ErrorsMessages { get; }
+
+        public ErrorResponse(string errorMessage, int statusCode, int errorCode, string[]? errorsMessages = null)
         {
             ErrorMessage = errorMessage;
             StatusCode = statusCode;
             ErrorCode = errorCode;
+            ErrorsMessages = errorsMessages;
         }
     }
 }

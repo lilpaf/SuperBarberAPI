@@ -24,9 +24,24 @@ namespace SuperBarber.Controllers
         [Produces(MediaTypeNames.Application.Json)]
         [ProducesResponseType(typeof(ResponseContent<AuthenticationResponse>), 200)]
         [ProducesDefaultResponseType(typeof(ResponseContent))]
-        public async Task<ResponseContent<AuthenticationResponse>> Register([FromBody] RegisterRequest request)
+        public async Task<ResponseContent<AuthenticationResponse>> Register([FromBody] UserRegisterRequest request)
         {
             AuthenticationResponse response = await _userService.RegisterUser(request);
+            
+            return new ResponseContent<AuthenticationResponse>()
+            {
+                Result = response
+            };
+        }
+        
+        [HttpPost]
+        [Route("login")]
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(typeof(ResponseContent<AuthenticationResponse>), 200)]
+        [ProducesDefaultResponseType(typeof(ResponseContent))]
+        public async Task<ResponseContent<AuthenticationResponse>> Login([FromBody] UserLoginRequest request)
+        {
+            AuthenticationResponse response = await _userService.LoginUser(request);
             
             return new ResponseContent<AuthenticationResponse>()
             {

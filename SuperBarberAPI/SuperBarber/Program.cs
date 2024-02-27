@@ -4,6 +4,7 @@ using Business.Interfaces;
 using Business.Models.Exceptions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Persistence.Contexts;
@@ -11,14 +12,12 @@ using Persistence.Entities;
 using Persistence.Implementations;
 using Persistence.Interfaces;
 using SuperBarber.Extensions;
+using SuperBarber.Filters;
 using SuperBarber.Middlewares;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-/* 
- * ToDo add response handling middleware - meta data, response, and errors 
-*/
 // Add services to the container.
 
 builder.Services.AddDbContext<SuperBarberDbContext>(
@@ -66,6 +65,10 @@ builder.Services.AddDefaultIdentity<User>(options =>
 .AddRoles<IdentityRole>()
 .AddEntityFrameworkStores<SuperBarberDbContext>();
 
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+                //This is needed in order to use the ValidateModelStateFilter
+                options.SuppressModelStateInvalidFilter = true);
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -76,6 +79,12 @@ builder.Services.AddScoped<IUserService, UserService>();
 
 // Repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+
+//Filters
+builder.Services.AddMvc(options =>
+{
+    options.Filters.Add<ValidateModelStateFilter>(0);
+});
 
 var app = builder.Build();
 
@@ -96,6 +105,10 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+// Middlewares
+app.UseMiddleware<LogMetaDataMiddleware>();
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.Run();
+
+

@@ -1,4 +1,6 @@
-﻿namespace SuperBarber.Models
+﻿#pragma warning disable CS8618
+
+namespace SuperBarber.Models
 {
     public class ResponseContent<TResponse> : ResponseContent
     {

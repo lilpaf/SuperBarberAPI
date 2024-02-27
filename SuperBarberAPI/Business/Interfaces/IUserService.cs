@@ -4,6 +4,8 @@ namespace Business.Interfaces
 {
     public interface IUserService
     {
-        Task<AuthenticationResponse> RegisterUser(RegisterRequest request);
+        Task<AuthenticationResponse> RegisterUser(UserRegisterRequest request);
+        
+        Task<AuthenticationResponse> LoginUser(UserLoginRequest request);
     }
 }

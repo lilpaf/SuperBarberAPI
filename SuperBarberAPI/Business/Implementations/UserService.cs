@@ -36,7 +36,7 @@ namespace Business.Implementations
             _userRepository = userRepository;
         }
 
-        public async Task<AuthenticationResponse> RegisterUser(RegisterRequest request)
+        public async Task<AuthenticationResponse> RegisterUser(UserRegisterRequest request)
         {
             bool userExists = await _userRepository.FindUserByEmailAsync(request.Email);
 
@@ -69,9 +69,13 @@ namespace Business.Implementations
 
             return new AuthenticationResponse()
             {
-                Result = true,
                 Token = token
             };
+        }
+
+        public Task<AuthenticationResponse> LoginUser(UserLoginRequest request)
+        {
+            throw new NotImplementedException();
         }
 
         private string GenerateJwtToken(User user)
@@ -85,8 +89,8 @@ namespace Business.Implementations
                 Subject = new ClaimsIdentity(new[]
                 {
                     new Claim("Id", user.Id),
-                    new Claim(JwtRegisteredClaimNames.Sub, user.Email),
-                    new Claim(JwtRegisteredClaimNames.Email, user.Email),
+                    new Claim(JwtRegisteredClaimNames.Sub, user.Email!),
+                    new Claim(JwtRegisteredClaimNames.Email, user.Email!),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                     new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()),
                 }),
