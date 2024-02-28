@@ -34,16 +34,16 @@ namespace SuperBarber.Middlewares
 
                 if (exception is ClientSideException clientException)
                 {
-                    message = exception.Message;
+                    message = clientException.Message;
                     statusCode = clientException.StatusCode;
                     errorCode = clientException.ErrorCode;
                 }
-                //This is not needed for now
-                //else if (exception is ServerSideException serverException)
-                //{
-                //    statusCode = serverException.StatusCode;
-                //    errorCode = serverException.ErrorCode;
-                //}
+                else if (exception is ServerSideException serverException)
+                {
+                    message = serverException.Message;
+                    statusCode = serverException.StatusCode;
+                    errorCode = serverException.ErrorCode;
+                }
 
                 ResponseContent response = new()
                 {
