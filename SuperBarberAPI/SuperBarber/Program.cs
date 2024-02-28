@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Persistence.Contexts;
 using Persistence.Entities;
@@ -15,6 +16,7 @@ using SuperBarber.Extensions;
 using SuperBarber.Filters;
 using SuperBarber.Middlewares;
 using System.Text;
+using BarberShopService = Business.Implementations.BarberShopService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,7 +25,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<SuperBarberDbContext>(
             optionsBuilder => optionsBuilder.UseSqlServer(builder.Configuration.GetConnectionString("SuperBarber")));
 
-builder.Services.Configure<JwtConfig>(builder.Configuration.GetSection("JwtConfig"));
+builder.Services.Configure<JwtConfig>(builder.Configuration.GetSection(nameof(JwtConfig)));
 
 builder.Services.AddAuthentication(options =>
 {
@@ -32,10 +34,10 @@ builder.Services.AddAuthentication(options =>
     options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
 }).AddJwtBearer(jwt =>
 {
-    string keyValue = builder.Configuration.GetSection("JwtConfig:Secret").Value ??
+    JwtConfig jwtConfig = builder.Configuration.GetSection(nameof(JwtConfig)).Get<JwtConfig>() ??
         throw new NotConfiguredException("JwtConfig is not configured correctly or it is missing");
     
-    byte[] key = Encoding.UTF8.GetBytes(keyValue);
+    byte[] key = Encoding.UTF8.GetBytes(jwtConfig.Secret);
   
     jwt.SaveToken = true;
     jwt.TokenValidationParameters = new TokenValidationParameters()
@@ -45,7 +47,9 @@ builder.Services.AddAuthentication(options =>
         ValidateIssuer = true,
         ValidateAudience = true,
         RequireExpirationTime = false, // ToDo fix it
-        ValidateLifetime = true
+        ValidateLifetime = true,
+        ValidIssuer = jwtConfig.Issuer,
+        ValidAudience = jwtConfig.Audience,
     };
 });
 
@@ -65,9 +69,8 @@ builder.Services.AddDefaultIdentity<User>(options =>
 .AddRoles<IdentityRole>()
 .AddEntityFrameworkStores<SuperBarberDbContext>();
 
-builder.Services.Configure<ApiBehaviorOptions>(options =>
-                //This is needed in order to use the ValidateModelStateFilter
-                options.SuppressModelStateInvalidFilter = true);
+//This is needed in order to use the ValidateModelStateFilter
+builder.Services.Configure<ApiBehaviorOptions>(options => options.SuppressModelStateInvalidFilter = true);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -76,9 +79,11 @@ builder.Services.AddSwaggerGen();
 // Services
 builder.Services.AddScoped<IValidatorService, ValidatorService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IBarberShopService, BarberShopService>();
 
 // Repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IBarberShopRepository, BarberShopRepository>();
 
 //Filters
 builder.Services.AddMvc(options =>

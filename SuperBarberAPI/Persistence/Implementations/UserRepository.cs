@@ -18,9 +18,9 @@ namespace Persistence.Implementations
             _logger = logger;
         }
 
-        public async Task<bool> FindUserByEmailAsync(string email)
+        public async Task<bool> UserExistsByEmailAsync(string email)
         {
-            _logger.LogInformation("Getting user with {email}", email);
+            _logger.LogInformation("Checking for user with {email}", email);
 
             return await _context.Users.AnyAsync(u => u.Email == email);
         }

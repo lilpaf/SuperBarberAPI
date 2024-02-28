@@ -26,7 +26,7 @@ namespace SuperBarber.Controllers
         [ProducesDefaultResponseType(typeof(ResponseContent))]
         public async Task<ResponseContent<AuthenticationResponse>> Register([FromBody] UserRegisterRequest request)
         {
-            AuthenticationResponse response = await _userService.RegisterUser(request);
+            AuthenticationResponse response = await _userService.RegisterUserAsync(request);
             
             return new ResponseContent<AuthenticationResponse>()
             {
@@ -41,7 +41,7 @@ namespace SuperBarber.Controllers
         [ProducesDefaultResponseType(typeof(ResponseContent))]
         public async Task<ResponseContent<AuthenticationResponse>> Login([FromBody] UserLoginRequest request)
         {
-            AuthenticationResponse response = await _userService.LoginUser(request);
+            AuthenticationResponse response = await _userService.LoginUserAsync(request);
             
             return new ResponseContent<AuthenticationResponse>()
             {

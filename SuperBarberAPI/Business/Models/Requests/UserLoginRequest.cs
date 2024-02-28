@@ -5,10 +5,11 @@ namespace Business.Models.Requests
     public class UserLoginRequest
     {
         [Required]
-        public string Email { get; set; } = null!;
+        [EmailAddress]
+        public string Email { get; init; } = null!;
 
         [Required]
         [DataType(DataType.Password)]
-        public string Password { get; set; } = null!;
+        public string Password { get; init; } = null!;
     }
 }

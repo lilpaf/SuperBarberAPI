@@ -7,8 +7,6 @@ namespace SuperBarber.Models
         public string ErrorMessage { get; }
         public int StatusCode { get; }
         public int ErrorCode { get; }
-
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string[]? ErrorsMessages { get; }
 
         public ErrorResponse(string errorMessage, int statusCode, int errorCode, string[]? errorsMessages = null)

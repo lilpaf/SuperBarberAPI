@@ -1,4 +1,5 @@
 ﻿using Business.Constants;
+using Business.Constants.Messages;
 using Business.Models.Exceptions.General;
 using SuperBarber.Models;
 
@@ -25,23 +26,24 @@ namespace SuperBarber.Middlewares
             }
             catch (Exception exception)
             {
-                string message = exception.Message;
+                _logger.LogError(exception, "Exception occurred: {Message}", exception.Message);
 
-                _logger.LogError(exception, "Exception occurred: {Message}", message);
-
+                string message = Messages.GeneralErrorMessage;
                 int statusCode = StatusCodes.Status500InternalServerError;
                 int errorCode = ErrorConstants.ServerSideErrorCode;
 
                 if (exception is ClientSideException clientException)
                 {
+                    message = exception.Message;
                     statusCode = clientException.StatusCode;
                     errorCode = clientException.ErrorCode;
                 }
-                else if (exception is ServerSideException serverException)
-                {
-                    statusCode = serverException.StatusCode;
-                    errorCode = serverException.ErrorCode;
-                }
+                //This is not needed for now
+                //else if (exception is ServerSideException serverException)
+                //{
+                //    statusCode = serverException.StatusCode;
+                //    errorCode = serverException.ErrorCode;
+                //}
 
                 ResponseContent response = new()
                 {

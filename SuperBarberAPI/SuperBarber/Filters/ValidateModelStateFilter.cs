@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.Filters;
 using SuperBarber.Models;
 using Business.Constants;
+using Business.Constants.Messages;
 
 namespace SuperBarber.Filters
 {
@@ -15,7 +16,7 @@ namespace SuperBarber.Filters
                     .Select(x => x.ErrorMessage)
                     .ToArray();
 
-                string message = ErrorConstants.ModelStateValidationErrorMessage;
+                string message = Messages.ModelStateValidationErrorMessage;
                 int statusCode = StatusCodes.Status400BadRequest;
                 int errorCode = ErrorConstants.ClientSideErrorCode;
 

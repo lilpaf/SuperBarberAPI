@@ -36,14 +36,14 @@ namespace Business.Implementations
             _userRepository = userRepository;
         }
 
-        public async Task<AuthenticationResponse> RegisterUser(UserRegisterRequest request)
+        public async Task<AuthenticationResponse> RegisterUserAsync(UserRegisterRequest request)
         {
-            bool userExists = await _userRepository.FindUserByEmailAsync(request.Email);
+            bool userExists = await _userRepository.UserExistsByEmailAsync(request.Email);
 
             if (userExists) 
             {
                 _logger.LogError("User with this {email} already exists", request.Email);
-                throw new InvalidArgumentException(String.Format(Messages.UserExists, request.Email));
+                throw new InvalidArgumentException(Messages.UserExists);
             }
 
             User user = new()
@@ -65,17 +65,38 @@ namespace Business.Implementations
                 throw new ErrorCreatingUserException(Messages.ErrorCreatingUser);
             }
 
-            string token = GenerateJwtToken(user);
+            string jwtToken = GenerateJwtToken(user);
 
             return new AuthenticationResponse()
             {
-                Token = token
+                Token = jwtToken
             };
         }
 
-        public Task<AuthenticationResponse> LoginUser(UserLoginRequest request)
+        public async Task<AuthenticationResponse> LoginUserAsync(UserLoginRequest request)
         {
-            throw new NotImplementedException();
+            User? user = await _userManager.FindByEmailAsync(request.Email);
+
+            if (user is null)
+            {
+                _logger.LogError("User with this {email} dose not exists", request.Email);
+                throw new InvalidArgumentException(Messages.WrongCredentials);
+            }
+
+            bool isCorrect = await _userManager.CheckPasswordAsync(user, request.Password);
+
+            if (!isCorrect)
+            {
+                _logger.LogError("Wrong password provided for user");
+                throw new InvalidArgumentException(Messages.WrongCredentials);
+            }
+
+            string jwtToken = GenerateJwtToken(user);
+
+            return new AuthenticationResponse() 
+            { 
+                Token = jwtToken
+            };
         }
 
         private string GenerateJwtToken(User user)
@@ -95,6 +116,8 @@ namespace Business.Implementations
                     new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()),
                 }),
 
+                Issuer = _jwtConfig.Issuer,
+                Audience = _jwtConfig.Audience,
                 Expires = DateTime.UtcNow.AddHours(1),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256)
             };

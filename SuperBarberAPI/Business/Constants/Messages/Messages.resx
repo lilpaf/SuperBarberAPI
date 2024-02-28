@@ -102,9 +102,18 @@
 		<value>You have entered an invalid information</value>
 	</data>
 	<data name="UserExists" xml:space="preserve">
-		<value>User with email {0} exists already</value>
+		<value>User with this email already exists</value>
 	</data>
 	<data name="ErrorCreatingUser" xml:space="preserve">
 		<value>There was an error when creating the user</value>
+	</data>
+	<data name="WrongCredentials" xml:space="preserve">
+		<value>Wrong email or password</value>
+	</data>
+	<data name="ModelStateValidationErrorMessage" xml:space="preserve">
+		<value>One or more validation errors occurred</value>
+	</data>
+	<data name="GeneralErrorMessage" xml:space="preserve">
+		<value>Something went wrong, please try again later</value>
 	</data>
 </root>

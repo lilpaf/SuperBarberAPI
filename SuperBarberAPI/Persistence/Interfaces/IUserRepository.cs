@@ -4,6 +4,6 @@ namespace Persistence.Interfaces
 {
     public interface IUserRepository
     {
-        Task<bool> FindUserByEmailAsync(string email);
+        Task<bool> UserExistsByEmailAsync(string email);
     }
 }

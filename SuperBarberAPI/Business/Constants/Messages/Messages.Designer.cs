@@ -22,7 +22,7 @@ namespace Business.Constants.Messages {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Messages {
+    public class Messages {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -36,7 +36,7 @@ namespace Business.Constants.Messages {
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
+        public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Business.Constants.Messages.Messages", typeof(Messages).Assembly);
@@ -51,7 +51,7 @@ namespace Business.Constants.Messages {
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
+        public static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -63,27 +63,54 @@ namespace Business.Constants.Messages {
         /// <summary>
         ///   Looks up a localized string similar to There was an error when creating the user.
         /// </summary>
-        internal static string ErrorCreatingUser {
+        public static string ErrorCreatingUser {
             get {
                 return ResourceManager.GetString("ErrorCreatingUser", resourceCulture);
             }
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Something went wrong, please try again later.
+        /// </summary>
+        public static string GeneralErrorMessage {
+            get {
+                return ResourceManager.GetString("GeneralErrorMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to You have entered an invalid information.
         /// </summary>
-        internal static string InvalidValidationObject {
+        public static string InvalidValidationObject {
             get {
                 return ResourceManager.GetString("InvalidValidationObject", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to User with email {0} exists already.
+        ///   Looks up a localized string similar to One or more validation errors occurred.
         /// </summary>
-        internal static string UserExists {
+        public static string ModelStateValidationErrorMessage {
+            get {
+                return ResourceManager.GetString("ModelStateValidationErrorMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to User with this email already exists.
+        /// </summary>
+        public static string UserExists {
             get {
                 return ResourceManager.GetString("UserExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Wrong email or password.
+        /// </summary>
+        public static string WrongCredentials {
+            get {
+                return ResourceManager.GetString("WrongCredentials", resourceCulture);
             }
         }
     }
