@@ -5,6 +5,7 @@ using Business.Interfaces;
 using Business.Models.Exceptions;
 using Business.Models.Requests;
 using Business.Models.Responses;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -23,20 +24,23 @@ namespace Business.Implementations
         private readonly IUserRepository _userRepository;
         private readonly JwtConfig _jwtConfig;
         private readonly ILogger<UserService> _logger;
+        private readonly IEmailService _emailService;
 
         public UserService(
             UserManager<User> userManager,
             ILogger<UserService> logger,
             IOptions<JwtConfig> jwtConfig,
-            IUserRepository userRepository)
+            IUserRepository userRepository,
+            IEmailService emailService)
         {
             _userManager = userManager;
             _logger = logger;
             _jwtConfig = jwtConfig.Value;
             _userRepository = userRepository;
+            _emailService = emailService;
         }
 
-        public async Task<AuthenticationResponse> RegisterUserAsync(UserRegisterRequest request)
+        public async Task<AuthenticationResponse> RegisterUserAsync(UserRegisterRequest request, string routeTemplate, string emailConformationAction)
         {
             bool userExists = await _userRepository.UserExistsByEmailAsync(request.Email);
 
@@ -52,7 +56,8 @@ namespace Business.Implementations
                 LastName = request.LastName,
                 UserName = request.Email,
                 Email = request.Email,
-                PhoneNumber = request.PhoneNumber
+                PhoneNumber = request.PhoneNumber,
+                EmailConfirmed = false
             };
 
             IdentityResult isUserCreated = await _userManager.CreateAsync(user, request.Password);
@@ -64,6 +69,12 @@ namespace Business.Implementations
                 _logger.LogError("There was an error when creating the user. Error messages: {errorMessages}", String.Join(ErrorConstants.ErrorDelimiter, errorMessages));
                 throw new ErrorCreatingUserException(Messages.ErrorCreatingUser);
             }
+
+            //ToDo email conformation
+
+            string code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+
+            await _emailService.SendConformationEmail(routeTemplate, emailConformationAction, user, code);
 
             string jwtToken = GenerateJwtToken(user);
 

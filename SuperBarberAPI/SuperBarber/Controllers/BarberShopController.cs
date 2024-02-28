@@ -22,7 +22,6 @@ namespace SuperBarber.Controllers
             _barberShopService = barberShopService;
         }
 
-        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)] //ToDo remove it 
         [Authorize] //ToDo remove it 
         [HttpGet]
         [Route("all")]

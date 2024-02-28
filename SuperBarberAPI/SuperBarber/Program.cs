@@ -26,6 +26,7 @@ builder.Services.AddDbContext<SuperBarberDbContext>(
             optionsBuilder => optionsBuilder.UseSqlServer(builder.Configuration.GetConnectionString("SuperBarber")));
 
 builder.Services.Configure<JwtConfig>(builder.Configuration.GetSection(nameof(JwtConfig)));
+builder.Services.Configure<EmailConfig>(builder.Configuration.GetSection(nameof(EmailConfig)));
 
 builder.Services.AddAuthentication(options =>
 {
@@ -69,6 +70,8 @@ builder.Services.AddDefaultIdentity<User>(options =>
 .AddRoles<IdentityRole>()
 .AddEntityFrameworkStores<SuperBarberDbContext>();
 
+builder.Services.AddHttpContextAccessor();
+
 //This is needed in order to use the ValidateModelStateFilter
 builder.Services.Configure<ApiBehaviorOptions>(options => options.SuppressModelStateInvalidFilter = true);
 
@@ -80,6 +83,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IValidatorService, ValidatorService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IBarberShopService, BarberShopService>();
+builder.Services.AddSingleton<IEmailService, EmailService>();
 
 // Repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();

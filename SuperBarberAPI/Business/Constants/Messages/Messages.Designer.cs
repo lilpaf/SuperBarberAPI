@@ -70,6 +70,15 @@ namespace Business.Constants.Messages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to There was an error sending the conformation email.
+        /// </summary>
+        public static string ErrorSendingConformationEmail {
+            get {
+                return ResourceManager.GetString("ErrorSendingConformationEmail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Something went wrong, please try again later.
         /// </summary>
         public static string GeneralErrorMessage {
