@@ -80,7 +80,6 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // Services
-builder.Services.AddScoped<IValidatorService, ValidatorService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IBarberShopService, BarberShopService>();
 builder.Services.AddSingleton<IEmailService, EmailService>();

@@ -64,9 +64,9 @@ namespace Business.Implementations
 
             if (!isUserCreated.Succeeded)
             {
-                string[] errorMessages = isUserCreated.Errors.Select(e => e.Description).ToArray();
+                string[] errorsMessages = isUserCreated.Errors.Select(e => e.Description).ToArray();
                 
-                _logger.LogError("There was an error when creating the user. Error messages: {errorMessages}", String.Join(ErrorConstants.ErrorDelimiter, errorMessages));
+                _logger.LogError("There was an error when creating the user. Error messages: {errorMessages}", String.Join(ErrorConstants.ErrorDelimiter, errorsMessages));
                 throw new ErrorCreatingUserException(Messages.ErrorCreatingUser);
             }
 

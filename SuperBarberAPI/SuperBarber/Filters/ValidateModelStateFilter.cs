@@ -7,6 +7,12 @@ namespace SuperBarber.Filters
 {
     public class ValidateModelStateFilter : IAsyncActionFilter
     {
+        private readonly ILogger<ValidateModelStateFilter> _logger;
+        public ValidateModelStateFilter(ILogger<ValidateModelStateFilter> logger)
+        {
+            _logger = logger;
+        }
+
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
             if (!context.ModelState.IsValid)
@@ -28,6 +34,7 @@ namespace SuperBarber.Filters
                 context.HttpContext.Response.StatusCode = statusCode;
                 await context.HttpContext.Response.WriteAsJsonAsync(response);
 
+                _logger.LogError("Invalid model state error with errors: {errors}", string.Join(ErrorConstants.ErrorDelimiter, errorsMessages));
                 return;
             }
 
