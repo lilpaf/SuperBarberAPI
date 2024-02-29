@@ -1,5 +1,4 @@
 ﻿using Persistence.Dtos;
-using Persistence.Entities;
 
 namespace Persistence.Interfaces
 {

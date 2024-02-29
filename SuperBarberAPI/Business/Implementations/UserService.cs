@@ -5,7 +5,6 @@ using Business.Interfaces;
 using Business.Models.Exceptions;
 using Business.Models.Requests;
 using Business.Models.Responses;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -21,6 +20,7 @@ namespace Business.Implementations
     public class UserService : IUserService
     {
         private readonly UserManager<User> _userManager;
+        private readonly SignInManager<User> _signInManager;
         private readonly IUserRepository _userRepository;
         private readonly JwtConfig _jwtConfig;
         private readonly ILogger<UserService> _logger;
@@ -31,18 +31,20 @@ namespace Business.Implementations
             ILogger<UserService> logger,
             IOptions<JwtConfig> jwtConfig,
             IUserRepository userRepository,
-            IEmailService emailService)
+            IEmailService emailService,
+            SignInManager<User> signInManager)
         {
             _userManager = userManager;
             _logger = logger;
             _jwtConfig = jwtConfig.Value;
             _userRepository = userRepository;
             _emailService = emailService;
+            _signInManager = signInManager;
         }
 
-        public async Task<AuthenticationResponse> RegisterUserAsync(UserRegisterRequest request, string routeTemplate, string emailConformationAction)
+        public async Task<AuthenticationResponse> RegisterUserAsync(UserRegisterRequest request, string controllerRouteTemplate, string emailConformationRouteTemplate)
         {
-            bool userExists = await _userRepository.UserExistsByEmailAsync(request.Email);
+            bool userExists = await _userRepository.UserIsActiveAndExistsByEmailAsync(request.Email);
 
             if (userExists) 
             {
@@ -65,16 +67,14 @@ namespace Business.Implementations
             if (!isUserCreated.Succeeded)
             {
                 string[] errorsMessages = isUserCreated.Errors.Select(e => e.Description).ToArray();
-                
+
                 _logger.LogError("There was an error when creating the user. Error messages: {errorMessages}", String.Join(ErrorConstants.ErrorDelimiter, errorsMessages));
                 throw new ErrorCreatingUserException(Messages.ErrorCreatingUser);
             }
 
-            //ToDo email conformation
-
             string code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
 
-            await _emailService.SendConformationEmail(routeTemplate, emailConformationAction, user, code);
+            await _emailService.SendConformationEmail(controllerRouteTemplate, emailConformationRouteTemplate, user, code);
 
             string jwtToken = GenerateJwtToken(user);
 
@@ -88,15 +88,20 @@ namespace Business.Implementations
         {
             User? user = await _userManager.FindByEmailAsync(request.Email);
 
-            if (user is null)
+            if (user is null || user.IsDeleted)
             {
-                _logger.LogError("User with this {email} dose not exists", request.Email);
+                _logger.LogError("User with this email {email} dose not exists", request.Email);
                 throw new InvalidArgumentException(Messages.WrongCredentials);
             }
 
-            bool isCorrect = await _userManager.CheckPasswordAsync(user, request.Password);
+            SignInResult result = await _signInManager.PasswordSignInAsync(request.Email, request.Password, request.RememberMe, true);
 
-            if (!isCorrect)
+            if (result.IsLockedOut)
+            {
+                _logger.LogError("User account locked out");
+                throw new InvalidArgumentException(Messages.UserIsLockedOut);
+            }
+            if (!result.Succeeded)
             {
                 _logger.LogError("Wrong password provided for user");
                 throw new InvalidArgumentException(Messages.WrongCredentials);
@@ -107,6 +112,38 @@ namespace Business.Implementations
             return new AuthenticationResponse() 
             { 
                 Token = jwtToken
+            };
+        }
+        
+        public async Task<EmailConfirmationResponse> ConfirmEmailAsync(EmailConfirmationRequest request)
+        {
+            User? user = await _userManager.FindByIdAsync(request.UserId);
+
+            if (user is null || user.IsDeleted)
+            {
+                _logger.LogError("User with this id {id} dose not exists", request.UserId);
+                throw new InvalidArgumentException(Messages.UserDoesNotExist);
+            }
+            
+            // Decodes the token since when it is html encoded
+            string code = request.Code.Replace(" ", "+");
+
+            IdentityResult emailIsConfirmed = await _userManager.ConfirmEmailAsync(user, code);
+           
+            string message = emailIsConfirmed.Succeeded ? Messages.EmailConfirmationSucceeded : Messages.ErrorConfirmingEmail;
+
+            if (!emailIsConfirmed.Succeeded)
+            {
+                string[] errorsMessages = emailIsConfirmed.Errors.Select(e => e.Description).ToArray();
+
+                _logger.LogError("There was an error when confirming the user {userId} email {userEmail}. Error messages: {errorMessages}", 
+                    user.Id, user.Email, String.Join(ErrorConstants.ErrorDelimiter, errorsMessages));
+                throw new ErrorCreatingUserException(Messages.ErrorConfirmingEmail);
+            }
+
+            return new EmailConfirmationResponse()
+            { 
+                Message = message
             };
         }
 

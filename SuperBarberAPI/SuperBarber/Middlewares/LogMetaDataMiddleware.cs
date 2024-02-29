@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using SuperBarber.Models;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 
 namespace SuperBarber.Middlewares
 {

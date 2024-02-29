@@ -18,11 +18,11 @@ namespace Persistence.Implementations
             _logger = logger;
         }
 
-        public async Task<bool> UserExistsByEmailAsync(string email)
+        public async Task<bool> UserIsActiveAndExistsByEmailAsync(string email)
         {
             _logger.LogInformation("Checking for user with {email}", email);
 
-            return await _context.Users.AnyAsync(u => u.Email == email);
+            return await _context.Users.AnyAsync(u => u.Email == email && !u.IsDeleted);
         }
     }
 }

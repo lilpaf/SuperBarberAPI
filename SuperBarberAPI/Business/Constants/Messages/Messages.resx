@@ -116,7 +116,22 @@
 	<data name="GeneralErrorMessage" xml:space="preserve">
 		<value>Something went wrong, please try again later</value>
 	</data>
-	<data name="ErrorSendingConformationEmail" xml:space="preserve">
-		<value>There was an error sending the conformation email</value>
+	<data name="ErrorSendingEmail" xml:space="preserve">
+		<value>There was an error sending the email</value>
+	</data>
+	<data name="RouteTemplateNotConfigured" xml:space="preserve">
+		<value>Route template is not congigured</value>
+	</data>
+	<data name="UserDoesNotExist" xml:space="preserve">
+		<value>Invalid user</value>
+	</data>
+	<data name="ErrorConfirmingEmail" xml:space="preserve">
+		<value>There was an error when confirming the email</value>
+	</data>
+	<data name="EmailConfirmationSucceeded" xml:space="preserve">
+		<value>Thank you for confirming your email</value>
+	</data>
+	<data name="UserIsLockedOut" xml:space="preserve">
+		<value>Your account is locked out, please try again later</value>
 	</data>
 </root>

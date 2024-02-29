@@ -11,5 +11,7 @@ namespace Business.Models.Requests
         [Required]
         [DataType(DataType.Password)]
         public string Password { get; init; } = null!;
+        
+        public bool RememberMe { get; init; }
     }
 }

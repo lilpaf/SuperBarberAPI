@@ -1,22 +1,14 @@
-﻿using Azure.Core;
-using Business.Configurations;
+﻿using Business.Configurations;
 using Business.Constants.Messages;
 using Business.Interfaces;
 using Business.Models.Exceptions;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Persistence.Entities;
-using Persistence.Interfaces;
-using RestSharp;
-using RestSharp.Authenticators;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Net.Mail;
 using System.Text;
-using System.Text.Encodings.Web;
-using System.Threading.Tasks;
+using System.Net;
 
 namespace Business.Implementations
 {
@@ -24,59 +16,67 @@ namespace Business.Implementations
     {
         private const string ConformationEmailSubject = "Email Verification";
         private readonly ILogger<EmailService> _logger;
-        private readonly EmailConfig _emailConfig;
+        private readonly SmtpConfig _smtpConfig;
         private readonly IHttpContextAccessor _httpContextAccessor;
-
 
         public EmailService(
             ILogger<EmailService> logger,
             IHttpContextAccessor httpContextAccessor,
-            IOptions<EmailConfig> emailConfig)
+            IOptions<SmtpConfig> smtpConfig)
         {
             _logger = logger;
             _httpContextAccessor = httpContextAccessor;
-            _emailConfig = emailConfig.Value;
+            _smtpConfig = smtpConfig.Value;
         }
 
-        public async Task SendConformationEmail(string routeTemplate, string emailConformationAction, User user, string code)
+        public async Task SendConformationEmail(string controllerRouteTemplate, string emailConformationRouteTemplate, User user, string code)
         {
-            string scheme = _httpContextAccessor.HttpContext.Request.Scheme;
+            string scheme = _httpContextAccessor.HttpContext!.Request.Scheme;
             string host = _httpContextAccessor.HttpContext.Request.Host.Value;
 
-            string callbackUrl = HtmlEncoder.Default.Encode($"{scheme}://{host}/{routeTemplate}/{emailConformationAction}?userId={user.Id}&code={code}");
+            string callbackUrl = $"{scheme}://{host}/{controllerRouteTemplate}/{emailConformationRouteTemplate}?userId={user.Id}&code={code}";
 
-            string emailBody = $"Please confirm your email address <a href=\"{callbackUrl}\">CLick here</a>";
+            string message = $"Please confirm your email address <a href=\"{callbackUrl}\">Click here</a>";
 
-            await SendEmail(user.Email!, ConformationEmailSubject, emailBody);
-        }
-
-        private async Task SendEmail(string recipient, string subject, string body)
-        {
-            RestClientOptions options = new RestClientOptions(_emailConfig.MailGunUrl)
+            List<string> recipients = new ()
             {
-                Authenticator = new HttpBasicAuthenticator("api", _emailConfig.ApiKey)
+                user.Email! // User email will not be null
             };
 
-            RestClient client = new RestClient(options);
+            await SendEmail(recipients, ConformationEmailSubject, message);
+        }
 
-            RestRequest request = new RestRequest(string.Empty, Method.Post);
-
-            request.AddParameter("domain", _emailConfig.MailGunDomain, ParameterType.UrlSegment);
-            request.Resource = "{domain}/messages";
-            request.AddParameter("from", "Super Barber Mailgun Sandbox"); //<postmaster@sandbox6140dc4e97064290a6e64916a405da20.mailgun.org>
-            request.AddParameter("to", recipient);
-            request.AddParameter("subject", subject);
-            request.AddParameter("text", body);
-
-            RestResponse response = await client.ExecuteAsync(request);
-            
-            if(!response.IsSuccessful)
+        private async Task SendEmail(IList<string> recipients, string subject, string message)
+        {
+            try
             {
-                _logger.LogError("Error sending email to {recipient}. Error message: {message}", recipient, response.ErrorMessage);
-                throw new ErrorSendingEmailException(Messages.ErrorSendingConformationEmail);
-            }
+                MailMessage mailMessage = new()
+                {
+                    From = new MailAddress(_smtpConfig.SmtpUsername),
+                    Subject = subject,
+                    Body = message,
+                    SubjectEncoding = Encoding.UTF8,
+                    IsBodyHtml = true
+                };
 
-            _logger.LogInformation("Successfully sent email to {recipient}", recipient);
+                mailMessage.To.Add(string.Join(", ", recipients));
+
+                using SmtpClient client = new(_smtpConfig.SmtpServer, _smtpConfig.SmtpPort)
+                {
+                    Credentials = new NetworkCredential(_smtpConfig.SmtpUsername, _smtpConfig.SmtpPassword),
+                    EnableSsl = _smtpConfig.EnableSSL
+                };
+
+                await client.SendMailAsync(mailMessage);
+
+                _logger.LogInformation("Successfully sent email to {recipient}", mailMessage.To);
+            }
+            catch (Exception exception)
+            {
+                _logger.LogError(exception, "Exception occurred when sending the email: {Message}", exception.Message);
+
+                throw new ErrorSendingEmailException(Messages.ErrorSendingEmail);
+            }
         }
     }
 }

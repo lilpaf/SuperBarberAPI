@@ -1,9 +1,7 @@
-﻿using Persistence.Entities;
-
-namespace Persistence.Interfaces
+﻿namespace Persistence.Interfaces
 {
     public interface IUserRepository
     {
-        Task<bool> UserExistsByEmailAsync(string email);
+        Task<bool> UserIsActiveAndExistsByEmailAsync(string email);
     }
 }

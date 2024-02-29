@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
-namespace SuperBarber.Models
+﻿namespace SuperBarber.Models
 {
     public class ErrorResponse
     {

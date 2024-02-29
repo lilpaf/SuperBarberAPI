@@ -61,6 +61,24 @@ namespace Business.Constants.Messages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Thank you for confirming your email.
+        /// </summary>
+        public static string EmailConfirmationSucceeded {
+            get {
+                return ResourceManager.GetString("EmailConfirmationSucceeded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to There was an error when confirming the email.
+        /// </summary>
+        public static string ErrorConfirmingEmail {
+            get {
+                return ResourceManager.GetString("ErrorConfirmingEmail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to There was an error when creating the user.
         /// </summary>
         public static string ErrorCreatingUser {
@@ -70,11 +88,11 @@ namespace Business.Constants.Messages {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to There was an error sending the conformation email.
+        ///   Looks up a localized string similar to There was an error sending the email.
         /// </summary>
-        public static string ErrorSendingConformationEmail {
+        public static string ErrorSendingEmail {
             get {
-                return ResourceManager.GetString("ErrorSendingConformationEmail", resourceCulture);
+                return ResourceManager.GetString("ErrorSendingEmail", resourceCulture);
             }
         }
         
@@ -106,11 +124,38 @@ namespace Business.Constants.Messages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Route template is not congigured.
+        /// </summary>
+        public static string RouteTemplateNotConfigured {
+            get {
+                return ResourceManager.GetString("RouteTemplateNotConfigured", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid user.
+        /// </summary>
+        public static string UserDoesNotExist {
+            get {
+                return ResourceManager.GetString("UserDoesNotExist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to User with this email already exists.
         /// </summary>
         public static string UserExists {
             get {
                 return ResourceManager.GetString("UserExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Your account is locked out, please try again later.
+        /// </summary>
+        public static string UserIsLockedOut {
+            get {
+                return ResourceManager.GetString("UserIsLockedOut", resourceCulture);
             }
         }
         

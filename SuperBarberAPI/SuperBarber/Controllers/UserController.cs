@@ -1,4 +1,6 @@
-﻿using Business.Interfaces;
+﻿using Business.Constants.Messages;
+using Business.Interfaces;
+using Business.Models.Exceptions;
 using Business.Models.Requests;
 using Business.Models.Responses;
 using Microsoft.AspNetCore.Mvc;
@@ -14,11 +16,16 @@ namespace SuperBarber.Controllers
     {
         private readonly IUserService _userService;
         private readonly ILogger<UserController> _logger;
-        private readonly string _routeTemplate;
-
+        private readonly string _controllerRouteTemplate;
+        private readonly string _emailConfirmationRouteTemplate;
+        
+            
         public UserController(IUserService authenticationService, ILogger<UserController> logger)
         {
-            _routeTemplate = GetType().GetCustomAttribute<RouteAttribute>()!.Template;
+            _controllerRouteTemplate = GetType().GetCustomAttribute<RouteAttribute>()?.Template ??
+                throw new NotConfiguredException(Messages.RouteTemplateNotConfigured);
+            _emailConfirmationRouteTemplate = typeof(UserController).GetMethod(nameof(EmailConfirmation))?.GetCustomAttribute<RouteAttribute>()?.Template ??
+                throw new NotConfiguredException(Messages.RouteTemplateNotConfigured);
             _userService = authenticationService;
             _logger = logger;
         }
@@ -30,7 +37,7 @@ namespace SuperBarber.Controllers
         [ProducesDefaultResponseType(typeof(ResponseContent))]
         public async Task<ResponseContent<AuthenticationResponse>> Register([FromBody] UserRegisterRequest request)
         {
-            AuthenticationResponse response = await _userService.RegisterUserAsync(request, _routeTemplate, string.Empty);
+            AuthenticationResponse response = await _userService.RegisterUserAsync(request, _controllerRouteTemplate, _emailConfirmationRouteTemplate);
 
             return new ResponseContent<AuthenticationResponse>()
             {
@@ -48,6 +55,22 @@ namespace SuperBarber.Controllers
             AuthenticationResponse response = await _userService.LoginUserAsync(request);
 
             return new ResponseContent<AuthenticationResponse>()
+            {
+                Result = response
+            };
+        }
+
+        //[Authorize] //ToDo Uncomment when we finish 
+        [HttpGet]
+        [Route("email-confirmation")]
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(typeof(ResponseContent<EmailConfirmationResponse>), 200)]
+        [ProducesDefaultResponseType(typeof(ResponseContent))]
+        public async Task<ResponseContent<EmailConfirmationResponse>> EmailConfirmation([FromQuery] EmailConfirmationRequest request) 
+        {
+            EmailConfirmationResponse response = await _userService.ConfirmEmailAsync(request);
+
+            return new ResponseContent<EmailConfirmationResponse>()
             {
                 Result = response
             };

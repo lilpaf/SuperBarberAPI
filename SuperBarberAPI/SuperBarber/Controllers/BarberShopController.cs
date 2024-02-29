@@ -1,21 +1,19 @@
 ﻿using Business.Interfaces;
-using Business.Models.Requests;
 using Business.Models.Responses;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SuperBarber.Models;
 using System.Net.Mime;
 
 namespace SuperBarber.Controllers
 {
-    [Route("barber_shop")]
+    [Route("barber-shop")]
     [ApiController]
     public class BarberShopController : ControllerBase
     {
         private readonly IBarberShopService _barberShopService;
         private readonly ILogger<UserController> _logger;
+
         public BarberShopController(ILogger<UserController> logger, IBarberShopService barberShopService)
         {
             _logger = logger;

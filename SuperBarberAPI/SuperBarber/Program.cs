@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Persistence.Contexts;
 using Persistence.Entities;
@@ -20,13 +19,16 @@ using BarberShopService = Business.Implementations.BarberShopService;
 
 var builder = WebApplication.CreateBuilder(args);
 
+/*
+ * ToDo check if email is confirmed before making orders or registering as barber
+ */
 // Add services to the container.
 
 builder.Services.AddDbContext<SuperBarberDbContext>(
             optionsBuilder => optionsBuilder.UseSqlServer(builder.Configuration.GetConnectionString("SuperBarber")));
 
 builder.Services.Configure<JwtConfig>(builder.Configuration.GetSection(nameof(JwtConfig)));
-builder.Services.Configure<EmailConfig>(builder.Configuration.GetSection(nameof(EmailConfig)));
+builder.Services.Configure<SmtpConfig>(builder.Configuration.GetSection(nameof(SmtpConfig)));
 
 builder.Services.AddAuthentication(options =>
 {
@@ -36,7 +38,7 @@ builder.Services.AddAuthentication(options =>
 }).AddJwtBearer(jwt =>
 {
     JwtConfig jwtConfig = builder.Configuration.GetSection(nameof(JwtConfig)).Get<JwtConfig>() ??
-        throw new NotConfiguredException("JwtConfig is not configured correctly or it is missing");
+        throw new NotConfiguredException("The JWT config is not configured correctly");
     
     byte[] key = Encoding.UTF8.GetBytes(jwtConfig.Secret);
   
@@ -57,7 +59,7 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddDefaultIdentity<User>(options =>
 {
     //ToDo uncomment this when you want to use the mailing service
-    //options.SignIn.RequireConfirmedAccount = true;
+    //options.SignIn.RequireConfirmedEmail = true;
     options.User.RequireUniqueEmail = true;
     options.Password.RequireDigit = false;  //ToDo fix it
     options.Password.RequireLowercase = false; //ToDo fix it
@@ -65,10 +67,14 @@ builder.Services.AddDefaultIdentity<User>(options =>
     options.Password.RequireUppercase = false; //ToDo fix it
     options.Lockout.AllowedForNewUsers = true;
     options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
-    options.Lockout.MaxFailedAccessAttempts = 5;
+    options.Lockout.MaxFailedAccessAttempts = 7;
 })
 .AddRoles<IdentityRole>()
-.AddEntityFrameworkStores<SuperBarberDbContext>();
+.AddEntityFrameworkStores<SuperBarberDbContext>()
+.AddDefaultTokenProviders();
+
+builder.Services.Configure<DataProtectionTokenProviderOptions>(
+    options => options.TokenLifespan = TimeSpan.FromHours(3));
 
 builder.Services.AddHttpContextAccessor();
 
@@ -82,7 +88,7 @@ builder.Services.AddSwaggerGen();
 // Services
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IBarberShopService, BarberShopService>();
-builder.Services.AddSingleton<IEmailService, EmailService>();
+builder.Services.AddTransient<IEmailService, EmailService>();
 
 // Repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
