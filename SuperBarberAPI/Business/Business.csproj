@@ -20,6 +20,10 @@
 		<FrameworkReference Include="Microsoft.AspNetCore.App" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <PackageReference Include="MailKit" Version="4.3.0" />
+	</ItemGroup>
+
   <ItemGroup>
     <Compile Update="Constants\Messages\Messages.Designer.cs">
       <DesignTime>True</DesignTime>

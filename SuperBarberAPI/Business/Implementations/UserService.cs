@@ -6,6 +6,7 @@ using Business.Models.Exceptions;
 using Business.Models.Requests;
 using Business.Models.Responses;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -63,16 +64,19 @@ namespace Business.Implementations
             };
 
             IdentityResult isUserCreated = await _userManager.CreateAsync(user, request.Password);
-
+            
             if (!isUserCreated.Succeeded)
             {
                 string[] errorsMessages = isUserCreated.Errors.Select(e => e.Description).ToArray();
-
+            
                 _logger.LogError("There was an error when creating the user. Error messages: {errorMessages}", String.Join(ErrorConstants.ErrorDelimiter, errorsMessages));
                 throw new ErrorCreatingUserException(Messages.ErrorCreatingUser);
             }
 
             string code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+
+            //Encode the code
+            code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
 
             await _emailService.SendConformationEmail(controllerRouteTemplate, emailConformationRouteTemplate, user, code);
 
@@ -124,9 +128,9 @@ namespace Business.Implementations
                 _logger.LogError("User with this id {id} dose not exists", request.UserId);
                 throw new InvalidArgumentException(Messages.UserDoesNotExist);
             }
-            
-            // Decodes the token since when it is html encoded
-            string code = request.Code.Replace(" ", "+");
+
+            //Decode the code
+            string code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(request.Code));
 
             IdentityResult emailIsConfirmed = await _userManager.ConfirmEmailAsync(user, code);
            

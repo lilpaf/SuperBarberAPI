@@ -88,7 +88,7 @@ builder.Services.AddSwaggerGen();
 // Services
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IBarberShopService, BarberShopService>();
-builder.Services.AddTransient<IEmailService, EmailService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 // Repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();

@@ -6,15 +6,15 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Persistence.Entities;
-using System.Net.Mail;
-using System.Text;
-using System.Net;
+using MimeKit;
+using MimeKit.Text;
+using SmtpClient = MailKit.Net.Smtp.SmtpClient;
+using Business.Constants;
 
 namespace Business.Implementations
 {
     public class EmailService : IEmailService
     {
-        private const string ConformationEmailSubject = "Email Verification";
         private readonly ILogger<EmailService> _logger;
         private readonly SmtpConfig _smtpConfig;
         private readonly IHttpContextAccessor _httpContextAccessor;
@@ -38,38 +38,39 @@ namespace Business.Implementations
 
             string message = $"Please confirm your email address <a href=\"{callbackUrl}\">Click here</a>";
 
-            List<string> recipients = new ()
+            List<string> recipients = new()
             {
-                user.Email! // User email will not be null
+                user.Email!, // User email will not be null
             };
 
-            await SendEmail(recipients, ConformationEmailSubject, message);
+            await SendEmail(recipients, EmailConstants.ConformationEmailSubject, message);
         }
 
-        private async Task SendEmail(IList<string> recipients, string subject, string message)
+        private async Task SendEmail(IList<string> recipientsEmails, string subject, string message)
         {
             try
             {
-                MailMessage mailMessage = new()
+                InternetAddressList recipients = new ();
+
+                foreach (var email in recipientsEmails)
                 {
-                    From = new MailAddress(_smtpConfig.SmtpUsername),
-                    Subject = subject,
-                    Body = message,
-                    SubjectEncoding = Encoding.UTF8,
-                    IsBodyHtml = true
-                };
+                    recipients.Add(MailboxAddress.Parse(email));
+                }
 
-                mailMessage.To.Add(string.Join(", ", recipients));
+                MimeMessage mailMessage = new ();
+                mailMessage.From.Add(MailboxAddress.Parse(_smtpConfig.SmtpUsername));
+                mailMessage.To.AddRange(recipients);
+                mailMessage.Subject = subject;
+                mailMessage.Body = new TextPart(TextFormat.Html) { Text = message };
 
-                using SmtpClient client = new(_smtpConfig.SmtpServer, _smtpConfig.SmtpPort)
-                {
-                    Credentials = new NetworkCredential(_smtpConfig.SmtpUsername, _smtpConfig.SmtpPassword),
-                    EnableSsl = _smtpConfig.EnableSSL
-                };
+                using SmtpClient client = new();
 
-                await client.SendMailAsync(mailMessage);
+                await client.ConnectAsync(_smtpConfig.SmtpServer, _smtpConfig.SmtpPort);
+                await client.AuthenticateAsync(_smtpConfig.SmtpUsername, _smtpConfig.SmtpPassword);
 
-                _logger.LogInformation("Successfully sent email to {recipient}", mailMessage.To);
+                await client.SendAsync(mailMessage);
+                
+                _logger.LogInformation("Successfully sent email to {recipient}", string.Join(EmailConstants.RecipientsDelimiter, mailMessage.To));
             }
             catch (Exception exception)
             {
