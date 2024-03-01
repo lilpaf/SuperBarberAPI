@@ -19,6 +19,7 @@ namespace Persistence.Contexts
         public DbSet<ServiceCategory> ServiceCategories { get; set; }
         public DbSet<City> Cities { get; set; }
         public DbSet<District> Districts { get; set; }
+        public DbSet<UserRefreshToken> UserRefreshTokens { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -147,6 +148,11 @@ namespace Persistence.Contexts
             modelBuilder.Entity<User>()
                 .HasMany(u => u.Reservations)
                 .WithOne(r => r.User)
+                .OnDelete(DeleteBehavior.Restrict);
+            
+            modelBuilder.Entity<UserRefreshToken>()
+                .HasOne(u => u.User)
+                .WithOne()
                 .OnDelete(DeleteBehavior.Restrict);
             
             base.OnModelCreating(modelBuilder);

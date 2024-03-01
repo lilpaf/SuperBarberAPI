@@ -1,6 +1,7 @@
 ﻿using Business.Configurations;
 using Business.Constants;
 using Business.Constants.Messages;
+using Business.Helpers;
 using Business.Interfaces;
 using Business.Models.Exceptions;
 using Business.Models.Requests;
@@ -26,6 +27,7 @@ namespace Business.Implementations
         private readonly JwtConfig _jwtConfig;
         private readonly ILogger<UserService> _logger;
         private readonly IEmailService _emailService;
+        private readonly TokenValidationParameters _tokenValidationParameters;
 
         public UserService(
             UserManager<User> userManager,
@@ -33,7 +35,8 @@ namespace Business.Implementations
             IOptions<JwtConfig> jwtConfig,
             IUserRepository userRepository,
             IEmailService emailService,
-            SignInManager<User> signInManager)
+            SignInManager<User> signInManager,
+            TokenValidationParameters tokenValidationParameters)
         {
             _userManager = userManager;
             _logger = logger;
@@ -41,6 +44,7 @@ namespace Business.Implementations
             _userRepository = userRepository;
             _emailService = emailService;
             _signInManager = signInManager;
+            _tokenValidationParameters = tokenValidationParameters;
         }
 
         public async Task<AuthenticationResponse> RegisterUserAsync(UserRegisterRequest request, string controllerRouteTemplate, string emailConformationRouteTemplate)
@@ -80,12 +84,9 @@ namespace Business.Implementations
 
             await _emailService.SendConformationEmail(controllerRouteTemplate, emailConformationRouteTemplate, user, code);
 
-            string jwtToken = GenerateJwtToken(user);
+            AuthenticationResponse response = await GenerateJwtTokenAsync(user);
 
-            return new AuthenticationResponse()
-            {
-                Token = jwtToken
-            };
+            return response;
         }
 
         public async Task<AuthenticationResponse> LoginUserAsync(UserLoginRequest request)
@@ -111,12 +112,9 @@ namespace Business.Implementations
                 throw new InvalidArgumentException(Messages.WrongCredentials);
             }
 
-            string jwtToken = GenerateJwtToken(user);
+            AuthenticationResponse response = await GenerateJwtTokenAsync(user);
 
-            return new AuthenticationResponse() 
-            { 
-                Token = jwtToken
-            };
+            return response;
         }
         
         public async Task<EmailConfirmationResponse> ConfirmEmailAsync(EmailConfirmationRequest request)
@@ -151,7 +149,7 @@ namespace Business.Implementations
             };
         }
 
-        private string GenerateJwtToken(User user)
+        private async Task<AuthenticationResponse> GenerateJwtTokenAsync(User user)
         {
             JwtSecurityTokenHandler jwtTokenHandler = new();
 
@@ -170,12 +168,35 @@ namespace Business.Implementations
 
                 Issuer = _jwtConfig.Issuer,
                 Audience = _jwtConfig.Audience,
-                Expires = DateTime.UtcNow.AddHours(1),
+                Expires = DateTime.UtcNow.AddHours(_jwtConfig.AccessTokenHoursLifetime),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256)
             };
 
             SecurityToken token = jwtTokenHandler.CreateToken(tokenDescriptor);
-            return jwtTokenHandler.WriteToken(token);
+            string jwtToken = jwtTokenHandler.WriteToken(token);
+
+            UserRefreshToken refreshToken = new ()
+            {
+                JwtId = token.Id,
+                Token = StringHelper.RandomStringGenerator(_jwtConfig.RefreshTokenLength),
+                CreatedDate = DateTime.UtcNow,
+                ExpiryDate = DateTime.UtcNow.AddHours(_jwtConfig.RefreshTokenHoursLifetime),
+                IsRevoked = false,
+                IsUsed = false,
+                UserId = user.Id
+            };
+
+            await _userRepository.AddUserRefreshTokenAsync(refreshToken);
+
+            await _userRepository.SaveChangesAsync();
+
+            return new AuthenticationResponse()
+            {
+                Token = jwtToken,
+                RefreshToken = refreshToken.Token
+            };
         }
+
+        
     }
 }

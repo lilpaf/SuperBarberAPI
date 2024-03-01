@@ -7,12 +7,12 @@ namespace Persistence.Entities
         public int BarberShopId { get; set; }
 
         [ForeignKey(nameof(BarberShopId))]
-        public BarberShop BarberShop { get; set; }
+        public BarberShop BarberShop { get; set; } = null!;
 
         public int BarberId { get; set; }
 
         [ForeignKey(nameof(BarberId))]
-        public Barber Barber { get; set; }
+        public Barber Barber { get; set; } = null!;
 
         public bool IsOwner { get; set; }
 

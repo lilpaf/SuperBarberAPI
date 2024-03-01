@@ -7,11 +7,11 @@ namespace Persistence.Entities
         public Guid OrderId { get; set; }
 
         [ForeignKey(nameof(OrderId))]
-        public Order Order { get; set; }
+        public Order Order { get; set; } = null!;
 
         public int BarberId { get; set; }
 
         [ForeignKey(nameof(BarberId))]
-        public Barber Barber { get; set; }
+        public Barber Barber { get; set; } = null!;
     }
 }

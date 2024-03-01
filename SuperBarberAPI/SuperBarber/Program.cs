@@ -29,52 +29,9 @@ builder.Services.AddDbContext<SuperBarberDbContext>(
 
 builder.Services.Configure<JwtConfig>(builder.Configuration.GetSection(nameof(JwtConfig)));
 builder.Services.Configure<SmtpConfig>(builder.Configuration.GetSection(nameof(SmtpConfig)));
+builder.Services.Configure<DataProtectionConfig>(builder.Configuration.GetSection(nameof(DataProtectionConfig)));
 
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-}).AddJwtBearer(jwt =>
-{
-    JwtConfig jwtConfig = builder.Configuration.GetSection(nameof(JwtConfig)).Get<JwtConfig>() ??
-        throw new NotConfiguredException("The JWT config is not configured correctly");
-    
-    byte[] key = Encoding.UTF8.GetBytes(jwtConfig.Secret);
-  
-    jwt.SaveToken = true;
-    jwt.TokenValidationParameters = new TokenValidationParameters()
-    {
-        ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(key),
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        RequireExpirationTime = false, // ToDo fix it
-        ValidateLifetime = true,
-        ValidIssuer = jwtConfig.Issuer,
-        ValidAudience = jwtConfig.Audience,
-    };
-});
-
-builder.Services.AddDefaultIdentity<User>(options =>
-{
-    //ToDo uncomment this when you want to use the mailing service
-    //options.SignIn.RequireConfirmedEmail = true;
-    options.User.RequireUniqueEmail = true;
-    options.Password.RequireDigit = false;  //ToDo fix it
-    options.Password.RequireLowercase = false; //ToDo fix it
-    options.Password.RequireNonAlphanumeric = false; //ToDo fix it
-    options.Password.RequireUppercase = false; //ToDo fix it
-    options.Lockout.AllowedForNewUsers = true;
-    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
-    options.Lockout.MaxFailedAccessAttempts = 7;
-})
-.AddRoles<IdentityRole>()
-.AddEntityFrameworkStores<SuperBarberDbContext>()
-.AddDefaultTokenProviders();
-
-builder.Services.Configure<DataProtectionTokenProviderOptions>(
-    options => options.TokenLifespan = TimeSpan.FromHours(3));
+builder.AddCustomAuthentication();
 
 builder.Services.AddHttpContextAccessor();
 

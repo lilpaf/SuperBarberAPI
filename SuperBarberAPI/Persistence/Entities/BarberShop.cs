@@ -8,20 +8,20 @@ namespace Persistence.Entities
         public int Id { get; set; }
 
         [Required]
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
 
         public int CityId { get; set; }
 
         [ForeignKey(nameof(CityId))]
-        public City City { get; set; }
+        public City City { get; set; } = null!;
 
         public int DistrictId { get; set; }
 
         [ForeignKey(nameof(DistrictId))]
-        public District District { get; set; }
+        public District District { get; set; } = null!;
 
         [Required]
-        public string Street { get; set; }
+        public string Street { get; set; } = null!;
 
         public TimeSpan StartHour { get; set; }
 
