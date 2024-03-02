@@ -34,7 +34,7 @@ namespace SuperBarber.Filters
                 context.HttpContext.Response.StatusCode = statusCode;
                 await context.HttpContext.Response.WriteAsJsonAsync(response);
 
-                _logger.LogError("Invalid model state error with errors: {errors}", string.Join(ErrorConstants.ErrorDelimiter, errorsMessages));
+                _logger.LogError("Invalid model state error with errors: {Errors}", string.Join(ErrorConstants.ErrorDelimiter, errorsMessages));
                 return;
             }
 

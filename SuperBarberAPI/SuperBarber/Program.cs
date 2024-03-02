@@ -29,7 +29,7 @@ builder.Services.AddDbContext<SuperBarberDbContext>(
 
 builder.Services.Configure<JwtConfig>(builder.Configuration.GetSection(nameof(JwtConfig)));
 builder.Services.Configure<SmtpConfig>(builder.Configuration.GetSection(nameof(SmtpConfig)));
-builder.Services.Configure<DataProtectionConfig>(builder.Configuration.GetSection(nameof(DataProtectionConfig)));
+builder.Services.Configure<IdentityConfig>(builder.Configuration.GetSection(nameof(IdentityConfig)));
 
 builder.AddCustomAuthentication();
 

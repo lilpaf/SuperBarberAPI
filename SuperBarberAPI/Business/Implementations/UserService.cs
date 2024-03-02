@@ -51,9 +51,9 @@ namespace Business.Implementations
         {
             bool userExists = await _userRepository.UserIsActiveAndExistsByEmailAsync(request.Email);
 
-            if (userExists) 
+            if (userExists)
             {
-                _logger.LogError("User with this {email} already exists", request.Email);
+                _logger.LogError("User with this {Email} already exists", request.Email);
                 throw new InvalidArgumentException(Messages.UserExists);
             }
 
@@ -68,12 +68,12 @@ namespace Business.Implementations
             };
 
             IdentityResult isUserCreated = await _userManager.CreateAsync(user, request.Password);
-            
+
             if (!isUserCreated.Succeeded)
             {
                 string[] errorsMessages = isUserCreated.Errors.Select(e => e.Description).ToArray();
-            
-                _logger.LogError("There was an error when creating the user. Error messages: {errorMessages}", String.Join(ErrorConstants.ErrorDelimiter, errorsMessages));
+
+                _logger.LogError("There was an error when creating the user. Error messages: {ErrorMessages}", String.Join(ErrorConstants.ErrorDelimiter, errorsMessages));
                 throw new ErrorCreatingUserException(Messages.ErrorCreatingUser);
             }
 
@@ -95,7 +95,7 @@ namespace Business.Implementations
 
             if (user is null || user.IsDeleted)
             {
-                _logger.LogError("User with this email {email} dose not exists", request.Email);
+                _logger.LogError("User with this email {Email} dose not exists", request.Email);
                 throw new InvalidArgumentException(Messages.WrongCredentials);
             }
 
@@ -116,14 +116,14 @@ namespace Business.Implementations
 
             return response;
         }
-        
+
         public async Task<EmailConfirmationResponse> ConfirmEmailAsync(EmailConfirmationRequest request)
         {
             User? user = await _userManager.FindByIdAsync(request.UserId);
 
             if (user is null || user.IsDeleted)
             {
-                _logger.LogError("User with this id {id} dose not exists", request.UserId);
+                _logger.LogError("User with this id {Id} dose not exists", request.UserId);
                 throw new InvalidArgumentException(Messages.UserDoesNotExist);
             }
 
@@ -131,22 +131,83 @@ namespace Business.Implementations
             string code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(request.Code));
 
             IdentityResult emailIsConfirmed = await _userManager.ConfirmEmailAsync(user, code);
-           
+
             string message = emailIsConfirmed.Succeeded ? Messages.EmailConfirmationSucceeded : Messages.ErrorConfirmingEmail;
 
             if (!emailIsConfirmed.Succeeded)
             {
                 string[] errorsMessages = emailIsConfirmed.Errors.Select(e => e.Description).ToArray();
 
-                _logger.LogError("There was an error when confirming the user {userId} email {userEmail}. Error messages: {errorMessages}", 
+                _logger.LogError("There was an error when confirming the user {UserId} email {UserEmail}. Error messages: {ErrorMessages}",
                     user.Id, user.Email, String.Join(ErrorConstants.ErrorDelimiter, errorsMessages));
                 throw new ErrorCreatingUserException(Messages.ErrorConfirmingEmail);
             }
 
             return new EmailConfirmationResponse()
-            { 
+            {
                 Message = message
             };
+        }
+
+        public async Task<AuthenticationResponse> RefreshTokenAsync(RefreshTokenRequest request)
+        {
+            JwtSecurityTokenHandler jwtTokenHandler = new();
+
+            TokenValidationResult tokenVerificationResult = await jwtTokenHandler.ValidateTokenAsync(request.Token, _tokenValidationParameters);
+
+            if (!tokenVerificationResult.IsValid)
+            {
+                _logger.LogError("Token verification was unsuccessful for token: {Token}. Error: {Error}",
+                    request.Token, tokenVerificationResult.Exception.Message);
+                throw new InvalidArgumentException(Messages.InvalidJwtToken);
+            }
+
+            SecurityToken validatedToken = tokenVerificationResult.SecurityToken;
+
+            if (validatedToken.ValidTo < DateTime.UtcNow)
+            {
+                _logger.LogError("The validated token {Token} has expired", request.Token);
+                throw new InvalidArgumentException(Messages.InvalidJwtToken);
+            }
+
+            UserRefreshToken? userRefreshToken = await _userRepository.GetUserRefreshTokenWithUserByTokenAsync(request.RefreshToken);
+
+            if (userRefreshToken is null)
+            {
+                _logger.LogError("No refresh token exists that matches this token {Token}", request.Token);
+                throw new InvalidArgumentException(Messages.InvalidJwtToken);
+            }
+
+            if (userRefreshToken.IsUsed || userRefreshToken.IsRevoked)
+            {
+                _logger.LogError("Refresh token {TokenId} has been used or is revoked", userRefreshToken.Id);
+                throw new InvalidArgumentException(Messages.InvalidJwtToken);
+            }
+
+            string? jti = tokenVerificationResult.Claims.FirstOrDefault(c => c.Key == JwtRegisteredClaimNames.Jti).Value.ToString();
+
+            if (userRefreshToken.JwtId != jti)
+            {
+                _logger.LogError("Refresh token {TokenId} has invalid JwtId", userRefreshToken.Id);
+                throw new InvalidArgumentException(Messages.InvalidJwtToken);
+            }
+
+            if (userRefreshToken.ExpiryDate < DateTime.UtcNow)
+            {
+                _logger.LogError("The refresh token {TokenId} has expired", userRefreshToken.Id);
+                throw new InvalidArgumentException(Messages.InvalidJwtToken);
+            }
+
+            userRefreshToken.IsUsed = true;
+
+            _userRepository.UpdateUserRefreshToken(userRefreshToken);
+            await _userRepository.SaveChangesAsync();
+
+            User user = userRefreshToken.User;
+
+            AuthenticationResponse response = await GenerateJwtTokenAsync(user);
+
+            return response;
         }
 
         private async Task<AuthenticationResponse> GenerateJwtTokenAsync(User user)
@@ -159,7 +220,7 @@ namespace Business.Implementations
             {
                 Subject = new ClaimsIdentity(new[]
                 {
-                    new Claim("Id", user.Id),
+                    new Claim("user_id", user.Id),
                     new Claim(JwtRegisteredClaimNames.Sub, user.Email!),
                     new Claim(JwtRegisteredClaimNames.Email, user.Email!),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
@@ -175,28 +236,44 @@ namespace Business.Implementations
             SecurityToken token = jwtTokenHandler.CreateToken(tokenDescriptor);
             string jwtToken = jwtTokenHandler.WriteToken(token);
 
-            UserRefreshToken refreshToken = new ()
-            {
-                JwtId = token.Id,
-                Token = StringHelper.RandomStringGenerator(_jwtConfig.RefreshTokenLength),
-                CreatedDate = DateTime.UtcNow,
-                ExpiryDate = DateTime.UtcNow.AddHours(_jwtConfig.RefreshTokenHoursLifetime),
-                IsRevoked = false,
-                IsUsed = false,
-                UserId = user.Id
-            };
+            UserRefreshToken? userRefreshToken = await _userRepository.GetUserRefreshTokenByUserIdAsync(user.Id);
 
-            await _userRepository.AddUserRefreshTokenAsync(refreshToken);
+            if (userRefreshToken is null)
+            {
+                userRefreshToken = new()
+                {
+                    JwtId = token.Id,
+                    Token = StringHelper.RandomStringGenerator(_jwtConfig.RefreshTokenLength),
+                    CreatedDate = DateTime.UtcNow,
+                    ExpiryDate = DateTime.UtcNow.AddHours(_jwtConfig.RefreshTokenHoursLifetime),
+                    IsRevoked = false,
+                    IsUsed = false,
+                    UserId = user.Id
+                };
+
+                await _userRepository.AddUserRefreshTokenAsync(userRefreshToken);
+            }
+            else
+            {
+                userRefreshToken.JwtId = token.Id;
+                userRefreshToken.Token = StringHelper.RandomStringGenerator(_jwtConfig.RefreshTokenLength);
+                userRefreshToken.CreatedDate = DateTime.UtcNow;
+                userRefreshToken.ExpiryDate = DateTime.UtcNow.AddHours(_jwtConfig.RefreshTokenHoursLifetime);
+                userRefreshToken.IsRevoked = false;
+                userRefreshToken.IsUsed = false;
+
+                _userRepository.UpdateUserRefreshToken(userRefreshToken);
+            }
 
             await _userRepository.SaveChangesAsync();
 
             return new AuthenticationResponse()
             {
                 Token = jwtToken,
-                RefreshToken = refreshToken.Token
+                RefreshToken = userRefreshToken.Token
             };
         }
 
-        
+
     }
 }

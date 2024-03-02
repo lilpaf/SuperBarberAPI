@@ -70,7 +70,7 @@ namespace Business.Implementations
 
                 await client.SendAsync(mailMessage);
                 
-                _logger.LogInformation("Successfully sent email to {recipient}", string.Join(EmailConstants.RecipientsDelimiter, mailMessage.To));
+                _logger.LogInformation("Successfully sent email to {Recipients}", string.Join(EmailConstants.RecipientsDelimiter, mailMessage.To));
             }
             catch (Exception exception)
             {

@@ -9,5 +9,7 @@ namespace Business.Interfaces
         Task<AuthenticationResponse> LoginUserAsync(UserLoginRequest request);
 
         Task<EmailConfirmationResponse> ConfirmEmailAsync(EmailConfirmationRequest request);
+
+        Task<AuthenticationResponse> RefreshTokenAsync(RefreshTokenRequest request);
     }
 }

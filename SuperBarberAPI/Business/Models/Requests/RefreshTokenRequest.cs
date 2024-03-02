@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Business.Models.Requests
 {
-    public class TokenRequest
+    public class RefreshTokenRequest
     {
         [Required]
         public string Token { get; init; } = null!;

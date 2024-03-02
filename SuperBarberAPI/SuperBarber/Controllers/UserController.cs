@@ -3,6 +3,7 @@ using Business.Interfaces;
 using Business.Models.Exceptions;
 using Business.Models.Requests;
 using Business.Models.Responses;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SuperBarber.Models;
 using System.Net.Mime;
@@ -60,7 +61,7 @@ namespace SuperBarber.Controllers
             };
         }
 
-        //[Authorize] //ToDo Uncomment when we finish 
+        [Authorize]
         [HttpGet]
         [Route("email-confirmation")]
         [Produces(MediaTypeNames.Application.Json)]
@@ -71,6 +72,22 @@ namespace SuperBarber.Controllers
             EmailConfirmationResponse response = await _userService.ConfirmEmailAsync(request);
 
             return new ResponseContent<EmailConfirmationResponse>()
+            {
+                Result = response
+            };
+        }
+        
+        [Authorize]
+        [HttpPost]
+        [Route("refresh-token")]
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(typeof(ResponseContent<AuthenticationResponse>), 200)]
+        [ProducesDefaultResponseType(typeof(ResponseContent))]
+        public async Task<ResponseContent<AuthenticationResponse>> RefreshToken([FromBody] RefreshTokenRequest request) 
+        {
+            AuthenticationResponse response = await _userService.RefreshTokenAsync(request);
+
+            return new ResponseContent<AuthenticationResponse>()
             {
                 Result = response
             };

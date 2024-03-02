@@ -106,6 +106,15 @@ namespace Business.Constants.Messages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Invalid jwt token. You have to log in again.
+        /// </summary>
+        public static string InvalidJwtToken {
+            get {
+                return ResourceManager.GetString("InvalidJwtToken", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to You have entered an invalid information.
         /// </summary>
         public static string InvalidValidationObject {

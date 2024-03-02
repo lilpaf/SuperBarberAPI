@@ -16,6 +16,9 @@ namespace SuperBarber.Extensions
             JwtConfig jwtConfig = builder.Configuration.GetSection(nameof(JwtConfig)).Get<JwtConfig>() ??
                     throw new NotConfiguredException("The JWT config is not configured correctly");
 
+            IdentityConfig identityConfig = builder.Configuration.GetSection(nameof(IdentityConfig)).Get<IdentityConfig>() ??
+                    throw new NotConfiguredException("The identity config is not configured correctly");
+
             byte[] key = Encoding.UTF8.GetBytes(jwtConfig.Secret);
 
             TokenValidationParameters tokenValidationParams = new ()
@@ -50,8 +53,8 @@ namespace SuperBarber.Extensions
                 options.Password.RequireNonAlphanumeric = false; //ToDo fix it
                 options.Password.RequireUppercase = false; //ToDo fix it
                 options.Lockout.AllowedForNewUsers = true;
-                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
-                options.Lockout.MaxFailedAccessAttempts = 7;
+                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(identityConfig.LockoutMinutesTimeSpan);
+                options.Lockout.MaxFailedAccessAttempts = identityConfig.MaxFailedAccessAttempts;
             })
             .AddRoles<IdentityRole>()
             .AddEntityFrameworkStores<SuperBarberDbContext>()
@@ -59,11 +62,8 @@ namespace SuperBarber.Extensions
 
             builder.Services.AddSingleton(tokenValidationParams);
 
-            DataProtectionConfig dataProtectionConfig = builder.Configuration.GetSection(nameof(DataProtectionConfig)).Get<DataProtectionConfig>() ??
-                    throw new NotConfiguredException("The data protection config is not configured correctly");
-
             builder.Services.Configure<DataProtectionTokenProviderOptions>(
-                options => options.TokenLifespan = TimeSpan.FromHours(dataProtectionConfig.DataProtectionTokenHoursLifetime));
+                options => options.TokenLifespan = TimeSpan.FromHours(identityConfig.DataProtectionTokenHoursLifetime));
 
             return builder;
         }
