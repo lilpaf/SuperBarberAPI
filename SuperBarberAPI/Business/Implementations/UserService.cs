@@ -1,7 +1,6 @@
 ﻿using Business.Configurations;
 using Business.Constants;
 using Business.Constants.Messages;
-using Business.Helpers;
 using Business.Interfaces;
 using Business.Models.Exceptions;
 using Business.Models.Requests;
@@ -15,6 +14,7 @@ using Persistence.Entities;
 using Persistence.Interfaces;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace Business.Implementations
@@ -153,38 +153,39 @@ namespace Business.Implementations
         {
             JwtSecurityTokenHandler jwtTokenHandler = new();
 
-            TokenValidationResult tokenVerificationResult = await jwtTokenHandler.ValidateTokenAsync(request.Token, _tokenValidationParameters);
+            // We set the validate lifetime to false so we can validate the expired access token
+            _tokenValidationParameters.ValidateLifetime = false;
+
+            TokenValidationResult tokenVerificationResult = await jwtTokenHandler.ValidateTokenAsync(request.AccessToken, _tokenValidationParameters);
+
+            // Set validate lifetime back to true
+            _tokenValidationParameters.ValidateLifetime = true;
 
             if (!tokenVerificationResult.IsValid)
             {
                 _logger.LogError("Token verification was unsuccessful for token: {Token}. Error: {Error}",
-                    request.Token, tokenVerificationResult.Exception.Message);
+                    request.AccessToken, tokenVerificationResult.Exception.Message);
                 throw new InvalidArgumentException(Messages.InvalidJwtToken);
             }
 
             SecurityToken validatedToken = tokenVerificationResult.SecurityToken;
 
-            if (validatedToken.ValidTo < DateTime.UtcNow)
-            {
-                _logger.LogError("The validated token {Token} has expired", request.Token);
-                throw new InvalidArgumentException(Messages.InvalidJwtToken);
-            }
-
             UserRefreshToken? userRefreshToken = await _userRepository.GetUserRefreshTokenWithUserByTokenAsync(request.RefreshToken);
 
             if (userRefreshToken is null)
             {
-                _logger.LogError("No refresh token exists that matches this token {Token}", request.Token);
+                _logger.LogError("No refresh token exists that matches this token {Token}", request.AccessToken);
                 throw new InvalidArgumentException(Messages.InvalidJwtToken);
             }
 
-            if (userRefreshToken.IsUsed || userRefreshToken.IsRevoked)
+            if (userRefreshToken.IsUsed)
             {
-                _logger.LogError("Refresh token {TokenId} has been used or is revoked", userRefreshToken.Id);
+                _logger.LogError("Refresh token {TokenId} has been used", userRefreshToken.Id);
                 throw new InvalidArgumentException(Messages.InvalidJwtToken);
             }
 
-            string? jti = tokenVerificationResult.Claims.FirstOrDefault(c => c.Key == JwtRegisteredClaimNames.Jti).Value.ToString();
+            string? jti = tokenVerificationResult.Claims
+                .FirstOrDefault(c => c.Key == JwtRegisteredClaimNames.Jti).Value.ToString();
 
             if (userRefreshToken.JwtId != jti)
             {
@@ -192,7 +193,7 @@ namespace Business.Implementations
                 throw new InvalidArgumentException(Messages.InvalidJwtToken);
             }
 
-            if (userRefreshToken.ExpiryDate < DateTime.UtcNow)
+            if (userRefreshToken.ExpiryDate <= DateTime.UtcNow)
             {
                 _logger.LogError("The refresh token {TokenId} has expired", userRefreshToken.Id);
                 throw new InvalidArgumentException(Messages.InvalidJwtToken);
@@ -220,7 +221,7 @@ namespace Business.Implementations
             {
                 Subject = new ClaimsIdentity(new[]
                 {
-                    new Claim("user_id", user.Id),
+                    new Claim(JwtRegisteredClaimNames.NameId, user.Id),
                     new Claim(JwtRegisteredClaimNames.Sub, user.Email!),
                     new Claim(JwtRegisteredClaimNames.Email, user.Email!),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
@@ -238,15 +239,14 @@ namespace Business.Implementations
 
             UserRefreshToken? userRefreshToken = await _userRepository.GetUserRefreshTokenByUserIdAsync(user.Id);
 
-            if (userRefreshToken is null)
+            if (userRefreshToken is null || userRefreshToken.ExpiryDate <= DateTime.UtcNow)
             {
                 userRefreshToken = new()
                 {
                     JwtId = token.Id,
-                    Token = StringHelper.RandomStringGenerator(_jwtConfig.RefreshTokenLength),
+                    Token = GenerateRefreshToken(),
                     CreatedDate = DateTime.UtcNow,
-                    ExpiryDate = DateTime.UtcNow.AddHours(_jwtConfig.RefreshTokenHoursLifetime),
-                    IsRevoked = false,
+                    ExpiryDate = DateTime.UtcNow.AddDays(_jwtConfig.RefreshTokenDaysLifetime),
                     IsUsed = false,
                     UserId = user.Id
                 };
@@ -256,10 +256,7 @@ namespace Business.Implementations
             else
             {
                 userRefreshToken.JwtId = token.Id;
-                userRefreshToken.Token = StringHelper.RandomStringGenerator(_jwtConfig.RefreshTokenLength);
-                userRefreshToken.CreatedDate = DateTime.UtcNow;
-                userRefreshToken.ExpiryDate = DateTime.UtcNow.AddHours(_jwtConfig.RefreshTokenHoursLifetime);
-                userRefreshToken.IsRevoked = false;
+                userRefreshToken.Token = GenerateRefreshToken();
                 userRefreshToken.IsUsed = false;
 
                 _userRepository.UpdateUserRefreshToken(userRefreshToken);
@@ -269,11 +266,21 @@ namespace Business.Implementations
 
             return new AuthenticationResponse()
             {
-                Token = jwtToken,
+                AccessToken = jwtToken,
                 RefreshToken = userRefreshToken.Token
             };
         }
 
+        private string GenerateRefreshToken()
+        {
+            byte[] randomNumber = new byte[_jwtConfig.RefreshTokenLength];
 
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(randomNumber);
+
+                return Convert.ToBase64String(randomNumber);
+            }
+        }
     }
 }

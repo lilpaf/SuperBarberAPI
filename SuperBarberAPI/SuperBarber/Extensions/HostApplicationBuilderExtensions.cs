@@ -30,7 +30,9 @@ namespace SuperBarber.Extensions
                 RequireExpirationTime = true,
                 ValidateLifetime = true,
                 ValidIssuer = jwtConfig.Issuer,
-                ValidAudience = jwtConfig.Audience
+                ValidAudience = jwtConfig.Audience,
+                RefreshBeforeValidation = true,
+                ClockSkew = TimeSpan.Zero,
             };
 
             builder.Services.AddAuthentication(options =>

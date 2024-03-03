@@ -77,7 +77,6 @@ namespace SuperBarber.Controllers
             };
         }
         
-        [Authorize]
         [HttpPost]
         [Route("refresh-token")]
         [Produces(MediaTypeNames.Application.Json)]

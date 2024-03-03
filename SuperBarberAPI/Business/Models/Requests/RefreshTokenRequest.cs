@@ -10,7 +10,7 @@ namespace Business.Models.Requests
     public class RefreshTokenRequest
     {
         [Required]
-        public string Token { get; init; } = null!;
+        public string AccessToken { get; init; } = null!;
         
         [Required]
         public string RefreshToken { get; init; } = null!;

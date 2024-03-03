@@ -153,7 +153,7 @@ namespace Persistence.Contexts
             modelBuilder.Entity<UserRefreshToken>()
                 .HasOne(u => u.User)
                 .WithOne()
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Restrict); //ToDo may need change when we delete a user we will delete its token
             
             base.OnModelCreating(modelBuilder);
         }

@@ -13,6 +13,6 @@ namespace Persistence.Entities
         public int CityId { get; set; }
         
         [ForeignKey(nameof(CityId))]
-        public City City { get; set; }
+        public City City { get; set; } = null!;
     }
 }

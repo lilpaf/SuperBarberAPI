@@ -16,6 +16,6 @@
 
         public required string FinishHour { get; init; }
 
-        public required string ImageName { get; init; }
+        public required string? ImageName { get; init; }
     }
 }
