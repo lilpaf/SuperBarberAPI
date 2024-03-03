@@ -40,7 +40,24 @@ namespace Business.Implementations
 
             List<string> recipients = new()
             {
-                user.Email!, // User email will not be null
+                user.Email! // User email will not be null
+            };
+
+            await SendEmail(recipients, EmailConstants.ConformationEmailSubject, message);
+        }
+        
+        public async Task SendPasswordResetEmail(string controllerRouteTemplate, string passwordResetRouteTemplate, User user, string code)
+        {
+            string scheme = _httpContextAccessor.HttpContext!.Request.Scheme;
+            string host = _httpContextAccessor.HttpContext.Request.Host.Value;
+
+            string callbackUrl = $"{scheme}://{host}/{controllerRouteTemplate}/{passwordResetRouteTemplate}?code={code}";
+
+            string message = $"Reset password link <a href=\"{callbackUrl}\">Click here</a>. If you did not request a reset password link, please ignore this email.";
+
+            List<string> recipients = new()
+            {
+                user.Email! // User email will not be null
             };
 
             await SendEmail(recipients, EmailConstants.ConformationEmailSubject, message);

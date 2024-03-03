@@ -19,13 +19,15 @@ namespace SuperBarber.Controllers
         private readonly ILogger<UserController> _logger;
         private readonly string _controllerRouteTemplate;
         private readonly string _emailConfirmationRouteTemplate;
+        private readonly string _resetPasswordRouteTemplate;
         
-            
         public UserController(IUserService authenticationService, ILogger<UserController> logger)
         {
             _controllerRouteTemplate = GetType().GetCustomAttribute<RouteAttribute>()?.Template ??
                 throw new NotConfiguredException(Messages.RouteTemplateNotConfigured);
             _emailConfirmationRouteTemplate = typeof(UserController).GetMethod(nameof(EmailConfirmation))?.GetCustomAttribute<RouteAttribute>()?.Template ??
+                throw new NotConfiguredException(Messages.RouteTemplateNotConfigured);
+            _resetPasswordRouteTemplate = typeof(UserController).GetMethod(nameof(ResetPassword))?.GetCustomAttribute<RouteAttribute>()?.Template ??
                 throw new NotConfiguredException(Messages.RouteTemplateNotConfigured);
             _userService = authenticationService;
             _logger = logger;
@@ -85,6 +87,38 @@ namespace SuperBarber.Controllers
         public async Task<ResponseContent<AuthenticationResponse>> RefreshToken([FromBody] RefreshTokenRequest request) 
         {
             AuthenticationResponse response = await _userService.RefreshTokenAsync(request);
+
+            return new ResponseContent<AuthenticationResponse>()
+            {
+                Result = response
+            };
+        }
+
+        [Authorize]
+        [HttpPost]
+        [Route("send-reset-password-email")]
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(typeof(ResponseContent<PasswordResetEmailResponse>), 200)]
+        [ProducesDefaultResponseType(typeof(ResponseContent))]
+        public async Task<ResponseContent<PasswordResetEmailResponse>> SendResetPasswordEmail()
+        {
+            PasswordResetEmailResponse response = await _userService.SendPasswordResetEmailAsync(_controllerRouteTemplate, _resetPasswordRouteTemplate);
+
+            return new ResponseContent<PasswordResetEmailResponse>()
+            {
+                Result = response
+            };
+        }
+        
+        [Authorize]
+        [HttpPost]
+        [Route("reset-password")]
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(typeof(ResponseContent<AuthenticationResponse>), 200)]
+        [ProducesDefaultResponseType(typeof(ResponseContent))]
+        public async Task<ResponseContent<AuthenticationResponse>> ResetPassword([FromBody] ResetPasswordRequest request)
+        {
+            AuthenticationResponse response = await _userService.ResetPasswordAsync(request);
 
             return new ResponseContent<AuthenticationResponse>()
             {

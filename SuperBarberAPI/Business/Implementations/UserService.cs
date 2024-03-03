@@ -138,13 +138,53 @@ namespace Business.Implementations
 
                 _logger.LogError("There was an error when confirming the user {UserId} email {UserEmail}. Error messages: {ErrorMessages}",
                     user.Id, user.Email, String.Join(ErrorConstants.ErrorDelimiter, errorsMessages));
-                throw new ErrorCreatingUserException(Messages.ErrorConfirmingEmail);
+                throw new InvalidArgumentException(Messages.ErrorConfirmingEmail);
             }
 
             return new EmailConfirmationResponse()
             {
                 Message = message
             };
+        }
+        
+        public async Task<PasswordResetEmailResponse> SendPasswordResetEmailAsync(string controllerRouteTemplate, string passwordResetRouteTemplate) 
+        {
+            User user = await GetUserByUserClaimIdAsync();
+
+            string code = await _userManager.GeneratePasswordResetTokenAsync(user);
+
+            //Encode the code
+            code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+
+            await _emailService.SendPasswordResetEmail(controllerRouteTemplate, passwordResetRouteTemplate, user, code);
+
+            return new PasswordResetEmailResponse()
+            {
+                Message = Messages.EmailPasswordResetLinkSent
+            };
+        }
+
+        public async Task<AuthenticationResponse> ResetPasswordAsync(ResetPasswordRequest request)
+        {
+            User user = await GetUserByUserClaimIdAsync();
+
+            //Decode the code
+            string code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(request.Code));
+            
+            IdentityResult resetPasswordResult = await _userManager.ResetPasswordAsync(user, code, request.NewPassword);
+
+            if (!resetPasswordResult.Succeeded)
+            {
+                string[] errorsMessages = resetPasswordResult.Errors.Select(e => e.Description).ToArray();
+
+                _logger.LogError("There was an error when resetting the password for user {UserId}. Error messages: {ErrorMessages}",
+                    user.Id, String.Join(ErrorConstants.ErrorDelimiter, errorsMessages));
+                throw new InvalidArgumentException(Messages.ErrorResetingPassword);
+            }
+
+            AuthenticationResponse response = await GenerateJwtTokenAsync(user);
+
+            return response;
         }
 
         public async Task<AuthenticationResponse> RefreshTokenAsync(RefreshTokenRequest request)

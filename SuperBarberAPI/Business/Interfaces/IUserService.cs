@@ -11,5 +11,9 @@ namespace Business.Interfaces
         Task<EmailConfirmationResponse> ConfirmEmailAsync(EmailConfirmationRequest request);
 
         Task<AuthenticationResponse> RefreshTokenAsync(RefreshTokenRequest request);
+
+        Task<PasswordResetEmailResponse> SendPasswordResetEmailAsync(string controllerRouteTemplate, string passwordResetRouteTemplate);
+
+        Task<AuthenticationResponse> ResetPasswordAsync(ResetPasswordRequest request);
     }
 }

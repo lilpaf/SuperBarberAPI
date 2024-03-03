@@ -61,7 +61,7 @@ namespace Business.Constants.Messages {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Thank you for confirming your email.
+        ///   Looks up a localized string similar to Thank you for confirming your email..
         /// </summary>
         public static string EmailConfirmationSucceeded {
             get {
@@ -70,7 +70,16 @@ namespace Business.Constants.Messages {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to There was an error when confirming the email.
+        ///   Looks up a localized string similar to Password reset email sent successfully. Check your inbox..
+        /// </summary>
+        public static string EmailPasswordResetLinkSent {
+            get {
+                return ResourceManager.GetString("EmailPasswordResetLinkSent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to There was an error when confirming the email..
         /// </summary>
         public static string ErrorConfirmingEmail {
             get {
@@ -79,7 +88,7 @@ namespace Business.Constants.Messages {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to There was an error when creating the user.
+        ///   Looks up a localized string similar to There was an error when creating the user..
         /// </summary>
         public static string ErrorCreatingUser {
             get {
@@ -88,7 +97,16 @@ namespace Business.Constants.Messages {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to There was an error sending the email.
+        ///   Looks up a localized string similar to There was an error when reseting your password..
+        /// </summary>
+        public static string ErrorResetingPassword {
+            get {
+                return ResourceManager.GetString("ErrorResetingPassword", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to There was an error sending the email..
         /// </summary>
         public static string ErrorSendingEmail {
             get {
@@ -97,7 +115,7 @@ namespace Business.Constants.Messages {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Something went wrong, please try again later.
+        ///   Looks up a localized string similar to Something went wrong, please try again later..
         /// </summary>
         public static string GeneralErrorMessage {
             get {
@@ -106,7 +124,7 @@ namespace Business.Constants.Messages {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Invalid authentication, please log in again.
+        ///   Looks up a localized string similar to Invalid authentication, please log in again..
         /// </summary>
         public static string InvalidJwtToken {
             get {
@@ -115,7 +133,7 @@ namespace Business.Constants.Messages {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to You have entered an invalid information.
+        ///   Looks up a localized string similar to You have entered an invalid information..
         /// </summary>
         public static string InvalidValidationObject {
             get {
@@ -124,7 +142,7 @@ namespace Business.Constants.Messages {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to One or more validation errors occurred.
+        ///   Looks up a localized string similar to One or more validation errors occurred..
         /// </summary>
         public static string ModelStateValidationErrorMessage {
             get {
@@ -133,7 +151,7 @@ namespace Business.Constants.Messages {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Route template is not congigured.
+        ///   Looks up a localized string similar to Route template is not congigured..
         /// </summary>
         public static string RouteTemplateNotConfigured {
             get {
@@ -142,7 +160,7 @@ namespace Business.Constants.Messages {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Invalid user.
+        ///   Looks up a localized string similar to Invalid user..
         /// </summary>
         public static string UserDoesNotExist {
             get {
@@ -151,7 +169,7 @@ namespace Business.Constants.Messages {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to User with this email already exists.
+        ///   Looks up a localized string similar to User with this email already exists..
         /// </summary>
         public static string UserExists {
             get {
@@ -160,7 +178,7 @@ namespace Business.Constants.Messages {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Your account is locked out, please try again later.
+        ///   Looks up a localized string similar to Your account is locked out, please try again later..
         /// </summary>
         public static string UserIsLockedOut {
             get {
@@ -169,7 +187,7 @@ namespace Business.Constants.Messages {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Wrong email or password.
+        ///   Looks up a localized string similar to Wrong email or password..
         /// </summary>
         public static string WrongCredentials {
             get {
