@@ -232,6 +232,7 @@ namespace Persistence.Migrations
                     Token = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     JwtId = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IsUsed = table.Column<bool>(type: "bit", nullable: false),
+                    IsRevoked = table.Column<bool>(type: "bit", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ExpiryDate = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },

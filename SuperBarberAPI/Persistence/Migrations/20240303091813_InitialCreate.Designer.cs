@@ -12,7 +12,7 @@ using Persistence.Contexts;
 namespace Persistence.Migrations
 {
     [DbContext(typeof(SuperBarberDbContext))]
-    [Migration("20240303080534_InitialCreate")]
+    [Migration("20240303091813_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -520,6 +520,9 @@ namespace Persistence.Migrations
 
                     b.Property<DateTime>("ExpiryDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsRevoked")
+                        .HasColumnType("bit");
 
                     b.Property<bool>("IsUsed")
                         .HasColumnType("bit");

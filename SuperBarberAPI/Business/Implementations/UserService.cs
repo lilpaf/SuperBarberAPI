@@ -99,7 +99,7 @@ namespace Business.Implementations
                 throw new InvalidArgumentException(Messages.WrongCredentials);
             }
 
-            SignInResult result = await _signInManager.PasswordSignInAsync(request.Email, request.Password, request.RememberMe, true);
+            SignInResult result = await _signInManager.PasswordSignInAsync(request.Email, request.Password, false, true);
 
             if (result.IsLockedOut)
             {
@@ -178,9 +178,9 @@ namespace Business.Implementations
                 throw new InvalidArgumentException(Messages.InvalidJwtToken);
             }
 
-            if (userRefreshToken.IsUsed)
+            if (userRefreshToken.IsUsed || userRefreshToken.IsRevoked)
             {
-                _logger.LogError("Refresh token {TokenId} has been used", userRefreshToken.Id);
+                _logger.LogError("Refresh token {TokenId} has been used or revoked", userRefreshToken.Id);
                 throw new InvalidArgumentException(Messages.InvalidJwtToken);
             }
 
@@ -248,6 +248,7 @@ namespace Business.Implementations
                     CreatedDate = DateTime.UtcNow,
                     ExpiryDate = DateTime.UtcNow.AddDays(_jwtConfig.RefreshTokenDaysLifetime),
                     IsUsed = false,
+                    IsRevoked = false,
                     UserId = user.Id
                 };
 
@@ -258,6 +259,7 @@ namespace Business.Implementations
                 userRefreshToken.JwtId = token.Id;
                 userRefreshToken.Token = GenerateRefreshToken();
                 userRefreshToken.IsUsed = false;
+                userRefreshToken.IsRevoked = false;
 
                 _userRepository.UpdateUserRefreshToken(userRefreshToken);
             }

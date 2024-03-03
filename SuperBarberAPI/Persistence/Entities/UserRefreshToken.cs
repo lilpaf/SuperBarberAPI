@@ -21,6 +21,8 @@ namespace Persistence.Entities
 
         public bool IsUsed { get; set; }
 
+        public bool IsRevoked { get; set; }
+
         public DateTime CreatedDate { get; set; }
 
         public DateTime ExpiryDate { get; set; }
