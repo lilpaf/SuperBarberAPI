@@ -135,6 +135,6 @@
 		<value>Your account is locked out, please try again later</value>
 	</data>
 	<data name="InvalidJwtToken" xml:space="preserve">
-		<value>Invalid jwt token. You have to log in again</value>
+		<value>Invalid authentication, please log in again</value>
 	</data>
 </root>

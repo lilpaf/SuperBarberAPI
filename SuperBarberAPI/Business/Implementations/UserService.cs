@@ -99,7 +99,7 @@ namespace Business.Implementations
 
             if (user is null || user.IsDeleted)
             {
-                _logger.LogError("User with this email {Email} dose not exists", request.Email);
+                _logger.LogError("User with this email {Email} dose not exists or is deleted", request.Email);
                 throw new InvalidArgumentException(Messages.WrongCredentials);
             }
 
@@ -252,7 +252,7 @@ namespace Business.Implementations
 
             if (user is null || user.IsDeleted)
             {
-                _logger.LogError("User with this id {Id} dose not exists", userId);
+                _logger.LogError("User with this id {Id} dose not exists or is deleted", userId);
                 throw new InvalidArgumentException(Messages.UserDoesNotExist);
             }
 
