@@ -34,7 +34,7 @@ namespace Business.Implementations
             string scheme = _httpContextAccessor.HttpContext!.Request.Scheme;
             string host = _httpContextAccessor.HttpContext.Request.Host.Value;
 
-            string callbackUrl = $"{scheme}://{host}/{controllerRouteTemplate}/{emailConformationRouteTemplate}?userId={user.Id}&code={code}";
+            string callbackUrl = $"{scheme}://{host}/{controllerRouteTemplate}/{emailConformationRouteTemplate}?code={code}";
 
             string message = $"Please confirm your email address <a href=\"{callbackUrl}\">Click here</a>";
 
