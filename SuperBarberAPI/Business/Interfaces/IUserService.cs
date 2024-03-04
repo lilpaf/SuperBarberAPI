@@ -15,5 +15,7 @@ namespace Business.Interfaces
         Task<PasswordResetEmailResponse> SendPasswordResetEmailAsync(string controllerRouteTemplate, string passwordResetRouteTemplate);
 
         Task<AuthenticationResponse> ResetPasswordAsync(ResetPasswordRequest request);
+
+        Task<AuthenticationResponse> LogOutAsync();
     }
 }

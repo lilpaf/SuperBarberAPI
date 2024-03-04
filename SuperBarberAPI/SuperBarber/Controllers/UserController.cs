@@ -1,11 +1,14 @@
-﻿using Business.Constants.Messages;
+﻿using Business.Constants;
+using Business.Constants.Messages;
 using Business.Interfaces;
 using Business.Models.Exceptions;
 using Business.Models.Requests;
 using Business.Models.Responses;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SuperBarber.Models;
+using System.Net.Http;
 using System.Net.Mime;
 using System.Reflection;
 
@@ -23,12 +26,20 @@ namespace SuperBarber.Controllers
         
         public UserController(IUserService authenticationService, ILogger<UserController> logger)
         {
-            _controllerRouteTemplate = GetType().GetCustomAttribute<RouteAttribute>()?.Template ??
+            _controllerRouteTemplate = GetType()
+                .GetCustomAttribute<RouteAttribute>()?.Template ??
                 throw new NotConfiguredException(Messages.RouteTemplateNotConfigured);
-            _emailConfirmationRouteTemplate = typeof(UserController).GetMethod(nameof(EmailConfirmation))?.GetCustomAttribute<RouteAttribute>()?.Template ??
+            
+            _emailConfirmationRouteTemplate = typeof(UserController)
+                .GetMethod(nameof(EmailConfirmation))?
+                .GetCustomAttribute<RouteAttribute>()?.Template ??
                 throw new NotConfiguredException(Messages.RouteTemplateNotConfigured);
-            _resetPasswordRouteTemplate = typeof(UserController).GetMethod(nameof(ResetPassword))?.GetCustomAttribute<RouteAttribute>()?.Template ??
+            //ToDo this needs to be removed later on
+            _resetPasswordRouteTemplate = typeof(UserController)
+                .GetMethod(nameof(ResetPassword))?
+                .GetCustomAttribute<RouteAttribute>()?.Template ??
                 throw new NotConfiguredException(Messages.RouteTemplateNotConfigured);
+            
             _userService = authenticationService;
             _logger = logger;
         }
@@ -102,6 +113,7 @@ namespace SuperBarber.Controllers
         [ProducesDefaultResponseType(typeof(ResponseContent))]
         public async Task<ResponseContent<PasswordResetEmailResponse>> SendResetPasswordEmail()
         {
+            //ToDo we need to fix the routes
             PasswordResetEmailResponse response = await _userService.SendPasswordResetEmailAsync(_controllerRouteTemplate, _resetPasswordRouteTemplate);
 
             return new ResponseContent<PasswordResetEmailResponse>()
@@ -119,6 +131,22 @@ namespace SuperBarber.Controllers
         public async Task<ResponseContent<AuthenticationResponse>> ResetPassword([FromBody] ResetPasswordRequest request)
         {
             AuthenticationResponse response = await _userService.ResetPasswordAsync(request);
+
+            return new ResponseContent<AuthenticationResponse>()
+            {
+                Result = response
+            };
+        }
+        
+        [Authorize]
+        [HttpPost]
+        [Route("logout")]
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(typeof(ResponseContent<AuthenticationResponse>), 200)]
+        [ProducesDefaultResponseType(typeof(ResponseContent))]
+        public async Task<ResponseContent<AuthenticationResponse>> LogOut()
+        {
+            AuthenticationResponse response = await _userService.LogOutAsync();
 
             return new ResponseContent<AuthenticationResponse>()
             {

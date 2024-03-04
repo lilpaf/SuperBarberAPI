@@ -1,4 +1,5 @@
-﻿using Business.Configurations;
+﻿using Azure;
+using Business.Configurations;
 using Business.Constants;
 using Business.Constants.Messages;
 using Business.Interfaces;
@@ -29,7 +30,9 @@ namespace Business.Implementations
         private readonly ILogger<UserService> _logger;
         private readonly IEmailService _emailService;
         private readonly TokenValidationParameters _tokenValidationParameters;
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        private static HttpContext _httpContext => new HttpContextAccessor().HttpContext ?? 
+            throw new NotConfiguredException(Messages.NoActiveHttpContext);
+        private static CookieOptions _cookieOptions => new() { HttpOnly = true, SameSite = SameSiteMode.None, Secure = true };
 
         public UserService(
             UserManager<User> userManager,
@@ -38,8 +41,7 @@ namespace Business.Implementations
             IUserRepository userRepository,
             IEmailService emailService,
             SignInManager<User> signInManager,
-            TokenValidationParameters tokenValidationParameters,
-            IHttpContextAccessor httpContextAccessor)
+            TokenValidationParameters tokenValidationParameters)
         {
             _userManager = userManager;
             _logger = logger;
@@ -48,7 +50,6 @@ namespace Business.Implementations
             _emailService = emailService;
             _signInManager = signInManager;
             _tokenValidationParameters = tokenValidationParameters;
-            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<AuthenticationResponse> RegisterUserAsync(UserRegisterRequest request, string controllerRouteTemplate, string emailConformationRouteTemplate)
@@ -89,6 +90,7 @@ namespace Business.Implementations
             await _emailService.SendConformationEmail(controllerRouteTemplate, emailConformationRouteTemplate, user, code);
 
             AuthenticationResponse response = await GenerateJwtTokenAsync(user);
+            response.Message = Messages.UserRegistrationSussesfuly;
 
             return response;
         }
@@ -117,6 +119,7 @@ namespace Business.Implementations
             }
 
             AuthenticationResponse response = await GenerateJwtTokenAsync(user);
+            response.Message = Messages.LogInSussesfuly;
 
             return response;
         }
@@ -182,13 +185,34 @@ namespace Business.Implementations
                 throw new InvalidArgumentException(Messages.ErrorResetingPassword);
             }
 
-            AuthenticationResponse response = await GenerateJwtTokenAsync(user);
+            return new AuthenticationResponse()
+            {
+                Message = Messages.PasswordResetSussesfuly
+            };
+        }
+        
+        public async Task<AuthenticationResponse> LogOutAsync()
+        {
+            await _signInManager.SignOutAsync();
 
-            return response;
+            await RevokeUserRefreshTokenAsync();
+
+            return new AuthenticationResponse()
+            {
+                Message = Messages.LogOutSussesfuly
+            };
         }
 
         public async Task<AuthenticationResponse> RefreshTokenAsync(RefreshTokenRequest request)
         {
+            string? refreshToken = _httpContext.Request.Cookies[AuthenticationConstants.RefreshTokenCookieKey];
+
+            if (string.IsNullOrEmpty(refreshToken))
+            {
+                _logger.LogError("Refresh token missing");
+                throw new InvalidArgumentException(Messages.InvalidJwtToken);
+            }
+
             try
             {
                 JwtSecurityTokenHandler jwtTokenHandler = new();
@@ -210,7 +234,7 @@ namespace Business.Implementations
 
                 SecurityToken validatedToken = tokenVerificationResult.SecurityToken;
 
-                UserRefreshToken? userRefreshToken = await _userRepository.GetUserRefreshTokenWithUserByTokenAsync(request.RefreshToken);
+                UserRefreshToken? userRefreshToken = await _userRepository.GetUserRefreshTokenWithUserByTokenAsync(refreshToken);
 
                 if (userRefreshToken is null)
                 {
@@ -247,7 +271,7 @@ namespace Business.Implementations
                 User user = userRefreshToken.User;
 
                 AuthenticationResponse response = await GenerateJwtTokenAsync(user);
-
+                
                 return response;
             }
             catch (Exception)
@@ -259,6 +283,8 @@ namespace Business.Implementations
 
         private async Task RevokeUserRefreshTokenAsync()
         {
+            _httpContext.Response.Cookies.Delete(AuthenticationConstants.RefreshTokenCookieKey);
+
             User user = await GetUserByUserClaimIdAsync();
 
             UserRefreshToken? userRefreshToken = await _userRepository.GetUserRefreshTokenByUserIdAsync(user.Id);
@@ -279,8 +305,8 @@ namespace Business.Implementations
 
         private async Task<User> GetUserByUserClaimIdAsync()
         {
-            string? userId = _httpContextAccessor.HttpContext?.User
-                .FindFirstValue(AuthenticationAuthorizationConstants.UserIdClaim);
+            string? userId = _httpContext.User
+                .FindFirstValue(AuthenticationConstants.UserIdClaim);
 
             if (string.IsNullOrEmpty(userId))
             {
@@ -309,7 +335,7 @@ namespace Business.Implementations
             {
                 Subject = new ClaimsIdentity(new[]
                 {
-                    new Claim(AuthenticationAuthorizationConstants.UserIdClaim, user.Id),
+                    new Claim(AuthenticationConstants.UserIdClaim, user.Id),
                     new Claim(JwtRegisteredClaimNames.Sub, user.Email!),
                     new Claim(JwtRegisteredClaimNames.Email, user.Email!),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
@@ -323,7 +349,7 @@ namespace Business.Implementations
             };
 
             SecurityToken token = jwtTokenHandler.CreateToken(tokenDescriptor);
-            string jwtToken = jwtTokenHandler.WriteToken(token);
+            string accessToken = jwtTokenHandler.WriteToken(token);
 
             UserRefreshToken? userRefreshToken = await _userRepository.GetUserRefreshTokenByUserIdAsync(user.Id);
 
@@ -360,10 +386,12 @@ namespace Business.Implementations
 
             await _userRepository.SaveChangesAsync();
 
+            _httpContext.Response.Cookies
+                .Append(AuthenticationConstants.RefreshTokenCookieKey, userRefreshToken.Token, _cookieOptions);
+
             return new AuthenticationResponse()
             {
-                AccessToken = jwtToken,
-                RefreshToken = userRefreshToken.Token
+                AccessToken = accessToken
             };
         }
 

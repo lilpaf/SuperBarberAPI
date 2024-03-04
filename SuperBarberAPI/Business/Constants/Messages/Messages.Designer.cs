@@ -142,11 +142,47 @@ namespace Business.Constants.Messages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Successfully loged in..
+        /// </summary>
+        public static string LogInSussesfuly {
+            get {
+                return ResourceManager.GetString("LogInSussesfuly", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Successfully loged out..
+        /// </summary>
+        public static string LogOutSussesfuly {
+            get {
+                return ResourceManager.GetString("LogOutSussesfuly", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to One or more validation errors occurred..
         /// </summary>
         public static string ModelStateValidationErrorMessage {
             get {
                 return ResourceManager.GetString("ModelStateValidationErrorMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No active Http context..
+        /// </summary>
+        public static string NoActiveHttpContext {
+            get {
+                return ResourceManager.GetString("NoActiveHttpContext", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Password reset successfully, please log in..
+        /// </summary>
+        public static string PasswordResetSussesfuly {
+            get {
+                return ResourceManager.GetString("PasswordResetSussesfuly", resourceCulture);
             }
         }
         
@@ -183,6 +219,15 @@ namespace Business.Constants.Messages {
         public static string UserIsLockedOut {
             get {
                 return ResourceManager.GetString("UserIsLockedOut", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You have been registered..
+        /// </summary>
+        public static string UserRegistrationSussesfuly {
+            get {
+                return ResourceManager.GetString("UserRegistrationSussesfuly", resourceCulture);
             }
         }
         
