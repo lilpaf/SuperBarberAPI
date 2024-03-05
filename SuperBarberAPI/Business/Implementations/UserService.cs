@@ -195,8 +195,6 @@ namespace Business.Implementations
 
         public async Task<AuthenticationResponse> LogOutAsync()
         {
-            //ToDo revoke access token too
-
             await RevokeUserRefreshTokenAsync();
 
             return new AuthenticationResponse()
@@ -388,7 +386,7 @@ namespace Business.Implementations
 
             await _userRepository.SaveChangesAsync();
 
-            SetRefreshTokenCookie(userRefreshToken.Token);
+            SetRefreshTokenCookie(userRefreshToken.Token, userRefreshToken.ExpiryDate);
 
             return new AuthenticationResponse()
             {
@@ -396,13 +394,14 @@ namespace Business.Implementations
             };
         }
 
-        private void SetRefreshTokenCookie(string refreshToken)
+        private void SetRefreshTokenCookie(string refreshToken, DateTime expirationDate)
         {
             CookieOptions cookieOptions = new()
             {
                 HttpOnly = true,
                 SameSite = SameSiteMode.Strict,
-                Secure = true
+                Secure = true,
+                Expires = expirationDate
             };
 
             _httpContext.Response.Cookies
