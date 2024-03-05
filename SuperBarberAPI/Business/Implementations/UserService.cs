@@ -24,15 +24,13 @@ namespace Business.Implementations
     public class UserService : IUserService
     {
         private readonly UserManager<User> _userManager;
-        private readonly SignInManager<User> _signInManager;
         private readonly IUserRepository _userRepository;
         private readonly JwtConfig _jwtConfig;
         private readonly ILogger<UserService> _logger;
         private readonly IEmailService _emailService;
         private readonly TokenValidationParameters _tokenValidationParameters;
-        private static HttpContext _httpContext => new HttpContextAccessor().HttpContext ?? 
+        private static HttpContext _httpContext => new HttpContextAccessor().HttpContext ??
             throw new NotConfiguredException(Messages.NoActiveHttpContext);
-        private static CookieOptions _cookieOptions => new() { HttpOnly = true, SameSite = SameSiteMode.None, Secure = true };
 
         public UserService(
             UserManager<User> userManager,
@@ -40,7 +38,6 @@ namespace Business.Implementations
             IOptions<JwtConfig> jwtConfig,
             IUserRepository userRepository,
             IEmailService emailService,
-            SignInManager<User> signInManager,
             TokenValidationParameters tokenValidationParameters)
         {
             _userManager = userManager;
@@ -48,7 +45,6 @@ namespace Business.Implementations
             _jwtConfig = jwtConfig.Value;
             _userRepository = userRepository;
             _emailService = emailService;
-            _signInManager = signInManager;
             _tokenValidationParameters = tokenValidationParameters;
         }
 
@@ -105,18 +101,24 @@ namespace Business.Implementations
                 throw new InvalidArgumentException(Messages.WrongCredentials);
             }
 
-            SignInResult result = await _signInManager.PasswordSignInAsync(request.Email, request.Password, false, true);
+            bool isLockedOut = await _userManager.IsLockedOutAsync(user);
 
-            if (result.IsLockedOut)
+            if (isLockedOut)
             {
                 _logger.LogError("User account locked out");
                 throw new InvalidArgumentException(Messages.UserIsLockedOut);
             }
-            if (!result.Succeeded)
+
+            bool result = await _userManager.CheckPasswordAsync(user, request.Password);
+
+            if (!result)
             {
+                await _userManager.AccessFailedAsync(user);
                 _logger.LogError("Wrong password provided for user");
                 throw new InvalidArgumentException(Messages.WrongCredentials);
             }
+
+            await _userManager.ResetAccessFailedCountAsync(user);
 
             AuthenticationResponse response = await GenerateJwtTokenAsync(user);
             response.Message = Messages.LogInSussesfuly;
@@ -149,8 +151,8 @@ namespace Business.Implementations
                 Message = message
             };
         }
-        
-        public async Task<PasswordResetEmailResponse> SendPasswordResetEmailAsync(string controllerRouteTemplate, string passwordResetRouteTemplate) 
+
+        public async Task<PasswordResetEmailResponse> SendPasswordResetEmailAsync(string controllerRouteTemplate, string passwordResetRouteTemplate)
         {
             User user = await GetUserByUserClaimIdAsync();
 
@@ -173,7 +175,7 @@ namespace Business.Implementations
 
             //Decode the code
             string code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(request.Code));
-            
+
             IdentityResult resetPasswordResult = await _userManager.ResetPasswordAsync(user, code, request.NewPassword);
 
             if (!resetPasswordResult.Succeeded)
@@ -190,10 +192,10 @@ namespace Business.Implementations
                 Message = Messages.PasswordResetSussesfuly
             };
         }
-        
+
         public async Task<AuthenticationResponse> LogOutAsync()
         {
-            await _signInManager.SignOutAsync();
+            //ToDo revoke access token too
 
             await RevokeUserRefreshTokenAsync();
 
@@ -271,7 +273,7 @@ namespace Business.Implementations
                 User user = userRefreshToken.User;
 
                 AuthenticationResponse response = await GenerateJwtTokenAsync(user);
-                
+
                 return response;
             }
             catch (Exception)
@@ -306,7 +308,7 @@ namespace Business.Implementations
         private async Task<User> GetUserByUserClaimIdAsync()
         {
             string? userId = _httpContext.User
-                .FindFirstValue(AuthenticationConstants.UserIdClaim);
+                .FindFirstValue(ClaimTypes.NameIdentifier);
 
             if (string.IsNullOrEmpty(userId))
             {
@@ -335,7 +337,7 @@ namespace Business.Implementations
             {
                 Subject = new ClaimsIdentity(new[]
                 {
-                    new Claim(AuthenticationConstants.UserIdClaim, user.Id),
+                    new Claim(ClaimTypes.NameIdentifier, user.Id),
                     new Claim(JwtRegisteredClaimNames.Sub, user.Email!),
                     new Claim(JwtRegisteredClaimNames.Email, user.Email!),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
@@ -375,7 +377,7 @@ namespace Business.Implementations
                 userRefreshToken.IsUsed = false;
                 userRefreshToken.IsRevoked = false;
 
-                if(userRefreshToken.ExpiryDate <= DateTime.UtcNow)
+                if (userRefreshToken.ExpiryDate <= DateTime.UtcNow)
                 {
                     userRefreshToken.CreatedDate = DateTime.UtcNow;
                     userRefreshToken.ExpiryDate = DateTime.UtcNow.AddMinutes(_jwtConfig.RefreshTokenMinutesLifetime);
@@ -386,13 +388,25 @@ namespace Business.Implementations
 
             await _userRepository.SaveChangesAsync();
 
-            _httpContext.Response.Cookies
-                .Append(AuthenticationConstants.RefreshTokenCookieKey, userRefreshToken.Token, _cookieOptions);
+            SetRefreshTokenCookie(userRefreshToken.Token);
 
             return new AuthenticationResponse()
             {
                 AccessToken = accessToken
             };
+        }
+
+        private void SetRefreshTokenCookie(string refreshToken)
+        {
+            CookieOptions cookieOptions = new()
+            {
+                HttpOnly = true,
+                SameSite = SameSiteMode.Strict,
+                Secure = true
+            };
+
+            _httpContext.Response.Cookies
+                    .Append(AuthenticationConstants.RefreshTokenCookieKey, refreshToken, cookieOptions);
         }
 
         private string GenerateRefreshToken()

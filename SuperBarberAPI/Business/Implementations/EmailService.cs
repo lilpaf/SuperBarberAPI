@@ -17,22 +17,21 @@ namespace Business.Implementations
     {
         private readonly ILogger<EmailService> _logger;
         private readonly SmtpConfig _smtpConfig;
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        private static HttpContext _httpContext => new HttpContextAccessor().HttpContext ??
+           throw new NotConfiguredException(Messages.NoActiveHttpContext);
 
         public EmailService(
             ILogger<EmailService> logger,
-            IHttpContextAccessor httpContextAccessor,
             IOptions<SmtpConfig> smtpConfig)
         {
             _logger = logger;
-            _httpContextAccessor = httpContextAccessor;
             _smtpConfig = smtpConfig.Value;
         }
 
         public async Task SendConformationEmail(string controllerRouteTemplate, string emailConformationRouteTemplate, User user, string code)
         {
-            string scheme = _httpContextAccessor.HttpContext!.Request.Scheme;
-            string host = _httpContextAccessor.HttpContext.Request.Host.Value;
+            string scheme = _httpContext.Request.Scheme;
+            string host = _httpContext.Request.Host.Value;
 
             string callbackUrl = $"{scheme}://{host}/{controllerRouteTemplate}/{emailConformationRouteTemplate}?code={code}";
 
@@ -48,8 +47,8 @@ namespace Business.Implementations
         
         public async Task SendPasswordResetEmail(string controllerRouteTemplate, string passwordResetRouteTemplate, User user, string code)
         {
-            string scheme = _httpContextAccessor.HttpContext!.Request.Scheme;
-            string host = _httpContextAccessor.HttpContext.Request.Host.Value;
+            string scheme = _httpContext.Request.Scheme; // ToDo will be changed
+            string host = _httpContext.Request.Host.Value; // ToDo will be changed
 
             string callbackUrl = $"{scheme}://{host}/{controllerRouteTemplate}/{passwordResetRouteTemplate}?code={code}";
 

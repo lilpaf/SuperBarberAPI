@@ -1,20 +1,14 @@
 using Business.Configurations;
 using Business.Implementations;
 using Business.Interfaces;
-using Business.Models.Exceptions;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using Persistence.Contexts;
-using Persistence.Entities;
 using Persistence.Implementations;
 using Persistence.Interfaces;
 using SuperBarber.Extensions;
 using SuperBarber.Filters;
 using SuperBarber.Middlewares;
-using System.Text;
 using BarberShopService = Business.Implementations.BarberShopService;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -32,8 +26,6 @@ builder.Services.Configure<SmtpConfig>(builder.Configuration.GetSection(nameof(S
 builder.Services.Configure<IdentityConfig>(builder.Configuration.GetSection(nameof(IdentityConfig)));
 
 builder.AddCustomAuthentication();
-
-builder.Services.AddHttpContextAccessor();
 
 //This is needed in order to use the ValidateModelStateFilter
 builder.Services.Configure<ApiBehaviorOptions>(options => options.SuppressModelStateInvalidFilter = true);
@@ -54,6 +46,7 @@ builder.Services.AddScoped<IBarberShopRepository, BarberShopRepository>();
 //Filters
 builder.Services.AddMvc(options =>
 {
+    options.Filters.Add<AutoValidateAntiforgeryTokenAttribute>();
     options.Filters.Add<ValidateModelStateFilter>(0);
 });
 
