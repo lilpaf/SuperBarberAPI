@@ -3,6 +3,7 @@
     public class EmailConstants
     {
         public const string ConformationEmailSubject = "Email Verification";
+        public const string ResetPasswordEmailSubject = "Reset Password";
         public const string RecipientsDelimiter = ", ";
     }
 }

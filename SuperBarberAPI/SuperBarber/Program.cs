@@ -1,11 +1,16 @@
 using Business.Configurations;
+using Business.Constants.Messages;
 using Business.Implementations;
 using Business.Interfaces;
+using Business.Models.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Persistence.Contexts;
+using Persistence.Entities;
 using Persistence.Implementations;
 using Persistence.Interfaces;
+using StackExchange.Redis;
 using SuperBarber.Extensions;
 using SuperBarber.Filters;
 using SuperBarber.Middlewares;
@@ -15,11 +20,14 @@ var builder = WebApplication.CreateBuilder(args);
 
 /*
  * ToDo check if email is confirmed before making orders or registering as barber
+ * ToDo schedule sending email
  */
 // Add services to the container.
 
 builder.Services.AddDbContext<SuperBarberDbContext>(
             optionsBuilder => optionsBuilder.UseSqlServer(builder.Configuration.GetConnectionString("SuperBarber")));
+
+builder.AddRedisCache();
 
 builder.Services.Configure<JwtConfig>(builder.Configuration.GetSection(nameof(JwtConfig)));
 builder.Services.Configure<SmtpConfig>(builder.Configuration.GetSection(nameof(SmtpConfig)));
@@ -48,7 +56,7 @@ builder.Services.AddScoped<ICityRepository, CityRepository>();
 //Filters
 builder.Services.AddMvc(options =>
 {
-    options.Filters.Add<AutoValidateAntiforgeryTokenAttribute>();
+    //options.Filters.Add<AutoValidateAntiforgeryTokenAttribute>();
     options.Filters.Add<ValidateModelStateFilter>(0);
 });
 

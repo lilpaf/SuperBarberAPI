@@ -59,7 +59,7 @@ namespace Business.Implementations
                 user.Email! // User email will not be null
             };
 
-            await SendEmail(recipients, EmailConstants.ConformationEmailSubject, message);
+            await SendEmail(recipients, EmailConstants.ResetPasswordEmailSubject, message);
         }
 
         private async Task SendEmail(IList<string> recipientsEmails, string subject, string message)

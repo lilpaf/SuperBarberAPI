@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using Persistence.Contexts;
 using Persistence.Entities;
+using StackExchange.Redis;
 using System.Text;
 
 namespace SuperBarber.Extensions
@@ -21,7 +22,7 @@ namespace SuperBarber.Extensions
 
             byte[] key = Encoding.UTF8.GetBytes(jwtConfig.Secret);
 
-            TokenValidationParameters tokenValidationParams = new ()
+            TokenValidationParameters tokenValidationParams = new()
             {
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = new SymmetricSecurityKey(key),
@@ -66,6 +67,26 @@ namespace SuperBarber.Extensions
 
             builder.Services.Configure<DataProtectionTokenProviderOptions>(
                 options => options.TokenLifespan = TimeSpan.FromHours(identityConfig.DataProtectionTokenHoursLifetime));
+
+            return builder;
+        }
+
+        public static IHostApplicationBuilder AddRedisCache(this IHostApplicationBuilder builder)
+        {
+            builder.Services.AddSingleton(_ =>
+            {
+                string connectionString = builder.Configuration.GetConnectionString("RedisCache") ??
+                                           throw new NotConfiguredException("Redis connection string missing");
+
+                return ConnectionMultiplexer.Connect(connectionString);
+            });
+
+            builder.Services.AddScoped(provider =>
+            {
+                ConnectionMultiplexer multiplexer = provider.GetService<ConnectionMultiplexer>() ??
+                     throw new NotConfiguredException("Redis multiplexer does not exists");
+                return multiplexer.GetDatabase();
+            });
 
             return builder;
         }

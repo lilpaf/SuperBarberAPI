@@ -41,9 +41,15 @@ namespace Business.Implementations
 
             //ToDo may be needed if not delete the method
             //int totalActiveBarberShops = await _barberShopRepository.GetTotalNumberActiveBarberShopsAsync();
+            IReadOnlyList<string> citiesName = await _cityRepository.GetAllCitiesNameFromRedisAsync();
 
-            IReadOnlyList<City> cities = await _cityRepository.GetAllCitiesAsync();
-            
+            if (!citiesName.Any())
+            {
+                IReadOnlyList<City> cities = await _cityRepository.GetAllCitiesAsync();
+
+                citiesName = cities.Select(c => c.Name).ToList();
+            }
+
             City? city = await _cityRepository.GetCityByNameAsync(request.City);
 
             if (city is null) 
@@ -52,16 +58,23 @@ namespace Business.Implementations
                 throw new InvalidArgumentException(Messages.InvalidCity);
             }
 
-            IReadOnlyList<Neighborhood> neighborhoods = await _neighborhoodRepository.GetAllNeighborhoodsByCityIdAsync(city.Id);
+            IReadOnlyList<string> neighborhoodsName = await _neighborhoodRepository.GetAllNeighborhoodsNameByCityNameFromRedisAsync(city.Name);
+
+            if (!neighborhoodsName.Any())
+            {
+                IReadOnlyList<Neighborhood> neighborhoods = await _neighborhoodRepository.GetAllNeighborhoodsByCityIdAsync(city.Id);
+                
+                neighborhoodsName = neighborhoods.Select(n => n.Name).ToList();
+            }
 
             IReadOnlyList<BarberShopDto> activeBarberShops = await _barberShopRepository.GetAllActiveBarberShopsAsync(queryParams);
 
             return new AllBarberShopsResponse()
             {
                 City = request.City,
-                Cities = cities.Select(c => c.Name).ToList(),
+                Cities = citiesName,
                 Neighborhood = request.Neighborhood,
-                Neighborhoods = neighborhoods.Select(n => n.Name).ToList(),
+                Neighborhoods = neighborhoodsName,
                 BarberShopSearchName = request.BarberShopSearchName,
                 //TotalPages = totalActiveBarberShops / QueryParameterContainer.BarberShopsPerPage, //ToDo may be needed
                 BarberShops = activeBarberShops

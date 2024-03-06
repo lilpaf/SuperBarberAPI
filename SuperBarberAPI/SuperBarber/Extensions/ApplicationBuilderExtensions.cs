@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Persistence.Contexts;
 using Persistence.Entities;
+using Persistence.Implementations;
+using StackExchange.Redis;
 using SuperBarber.Extensions.DataLoaders;
 
 namespace SuperBarber.Extensions
@@ -14,13 +16,14 @@ namespace SuperBarber.Extensions
             IServiceProvider services = serviceScope.ServiceProvider;
 
             SuperBarberDbContext data = services.GetRequiredService<SuperBarberDbContext>();
+            IDatabase cache = services.GetRequiredService<IDatabase>();
 
             data.Database.Migrate();
 
             //ToDo later on implement them
             SeedCategories(data);
-            SeedCities(data);
-            SeedNeighborhoods(data);
+            SeedCities(data, cache);
+            SeedNeighborhoods(data, cache);
             //SeedAdministrotor(services);
             //SeedBarberRole(services);
             //SeedBarberShopOwnerRole(services);
@@ -44,7 +47,7 @@ namespace SuperBarber.Extensions
             data.SaveChanges();
         }
 
-        private static void SeedCities(SuperBarberDbContext data)
+        private static void SeedCities(SuperBarberDbContext data, IDatabase cache)
         {
             if (data.Cities.Any())
             {
@@ -59,12 +62,14 @@ namespace SuperBarber.Extensions
                 {
                     Name = city
                 });
+
+                cache.ListRightPush(CityRepository.CitiesKeyRedis, city);
             }
 
             data.SaveChanges();
         }
 
-        private static void SeedNeighborhoods(SuperBarberDbContext data)
+        private static void SeedNeighborhoods(SuperBarberDbContext data, IDatabase cache)
         {
             if (data.Neighborhoods.Any())
             {
@@ -84,6 +89,8 @@ namespace SuperBarber.Extensions
                         Name = neighborhood,
                         CityId = city.Id
                     });
+
+                    cache.ListRightPush(cityNeighborhoods.Key, neighborhood);
                 }
             }
 

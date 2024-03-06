@@ -7,5 +7,7 @@ namespace Persistence.Interfaces
         Task<IReadOnlyList<Neighborhood>> GetAllNeighborhoodsByCityIdAsync(int cityId);
 
         Task<Neighborhood?> GetNeighborhoodByNameAsync(string name);
+
+        Task<IReadOnlyList<string>> GetAllNeighborhoodsNameByCityNameFromRedisAsync(string cityName);
     }
 }

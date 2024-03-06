@@ -1,4 +1,5 @@
 ﻿using Business.Constants;
+using Business.Constants.Messages;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
@@ -22,16 +23,15 @@ namespace Business.Models.Requests.BarberShop
         public required string? Neighborhood { get; init; }
 
         [Required]
-        [Display(Name = "Street name and number")]
         [StringLength(DataConstraints.AddressMaxLength, MinimumLength = DataConstraints.DefaultMinLength)]
         public required string Address { get; init; }
 
         [Required]
-        [RegularExpression(@"\b(?:0[0-9]|1[0-9]|2[0-3]):(?:00|30)\b")]
+        [RegularExpression(@"\b(?:0[0-9]|1[0-9]|2[0-3]):(?:00|30)\b", ErrorMessageResourceType = typeof(Messages), ErrorMessageResourceName = nameof(Messages.InvalidHourFormat))]
         public required string StartHour { get; init; }
 
         [Required]
-        [RegularExpression(@"\b(?:0[0-9]|1[0-9]|2[0-3]):(?:00|30)\b")]
+        [RegularExpression(@"\b(?:0[0-9]|1[0-9]|2[0-3]):(?:00|30)\b", ErrorMessageResourceType = typeof(Messages), ErrorMessageResourceName = nameof(Messages.InvalidHourFormat))]
         public required string FinishHour { get; init; }
 
         //ToDo fix it

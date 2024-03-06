@@ -70,6 +70,15 @@ namespace Business.Constants.Messages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The new password and confirmation password do not match..
+        /// </summary>
+        public static string ConfirmationPasswordDoNotMatch {
+            get {
+                return ResourceManager.GetString("ConfirmationPasswordDoNotMatch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Thank you for confirming your email..
         /// </summary>
         public static string EmailConfirmationSucceeded {
@@ -147,6 +156,15 @@ namespace Business.Constants.Messages {
         public static string InvalidDistrict {
             get {
                 return ResourceManager.GetString("InvalidDistrict", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid hour format..
+        /// </summary>
+        public static string InvalidHourFormat {
+            get {
+                return ResourceManager.GetString("InvalidHourFormat", resourceCulture);
             }
         }
         
