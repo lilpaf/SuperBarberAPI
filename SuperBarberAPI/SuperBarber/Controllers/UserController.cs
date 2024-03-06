@@ -2,8 +2,8 @@
 using Business.Constants.Messages;
 using Business.Interfaces;
 using Business.Models.Exceptions;
-using Business.Models.Requests;
-using Business.Models.Responses;
+using Business.Models.Requests.User;
+using Business.Models.Responses.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

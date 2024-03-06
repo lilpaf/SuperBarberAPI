@@ -7,9 +7,9 @@ namespace Persistence.Entities
         public int Id { get; set; }
 
         [Required]
-        public string Name { get; set; } = null!;
+        public required string Name { get; set; }
 
-        public bool IsDeleted { get; set; }
+        public required bool IsDeleted { get; set; }
 
         public DateTime? DeleteDate { get; set; }
 

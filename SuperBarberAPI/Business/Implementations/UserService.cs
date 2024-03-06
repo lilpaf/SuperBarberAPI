@@ -4,8 +4,8 @@ using Business.Constants;
 using Business.Constants.Messages;
 using Business.Interfaces;
 using Business.Models.Exceptions;
-using Business.Models.Requests;
-using Business.Models.Responses;
+using Business.Models.Requests.User;
+using Business.Models.Responses.User;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.WebUtilities;
@@ -65,7 +65,8 @@ namespace Business.Implementations
                 UserName = request.Email,
                 Email = request.Email,
                 PhoneNumber = request.PhoneNumber,
-                EmailConfirmed = false
+                EmailConfirmed = false,
+                IsDeleted = false
             };
 
             IdentityResult isUserCreated = await _userManager.CreateAsync(user, request.Password);

@@ -8,23 +8,23 @@ namespace Persistence.Entities
         public int Id { get; set; }
 
         [Required]
-        public string UserId { get; set; } = null!;
+        public required string UserId { get; set; }
 
         [ForeignKey(nameof(UserId))]
         public User User { get; set; } = null!;
 
         [Required]
-        public string Token { get; set; } = null!;
+        public required string Token { get; set; }
 
         [Required]
-        public string JwtId { get; set; } = null!;
+        public required string JwtId { get; set; }
 
-        public bool IsUsed { get; set; }
+        public required bool IsUsed { get; set; }
 
-        public bool IsRevoked { get; set; }
+        public required bool IsRevoked { get; set; }
 
-        public DateTime CreatedDate { get; set; }
+        public required DateTime CreatedDate { get; set; }
 
-        public DateTime ExpiryDate { get; set; }
+        public required DateTime ExpiryDate { get; set; }
     }
 }

@@ -61,6 +61,15 @@ namespace Business.Constants.Messages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Successfully registered barber shop, we are working on approveing you barbershop. When your barbershop is approved you will receive an email..
+        /// </summary>
+        public static string BarberShopRegistrationSussesfuly {
+            get {
+                return ResourceManager.GetString("BarberShopRegistrationSussesfuly", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Thank you for confirming your email..
         /// </summary>
         public static string EmailConfirmationSucceeded {
@@ -124,6 +133,24 @@ namespace Business.Constants.Messages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to City dose not exists..
+        /// </summary>
+        public static string InvalidCity {
+            get {
+                return ResourceManager.GetString("InvalidCity", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to District dose not exists..
+        /// </summary>
+        public static string InvalidDistrict {
+            get {
+                return ResourceManager.GetString("InvalidDistrict", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Invalid authentication, please log in again..
         /// </summary>
         public static string InvalidJwtToken {
@@ -156,6 +183,24 @@ namespace Business.Constants.Messages {
         public static string LogOutSussesfuly {
             get {
                 return ResourceManager.GetString("LogOutSussesfuly", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Missing city import json file..
+        /// </summary>
+        public static string MissingCityJsonFile {
+            get {
+                return ResourceManager.GetString("MissingCityJsonFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Missing neighborhoods import json file..
+        /// </summary>
+        public static string MissingNeighborhoodJsonFile {
+            get {
+                return ResourceManager.GetString("MissingNeighborhoodJsonFile", resourceCulture);
             }
         }
         

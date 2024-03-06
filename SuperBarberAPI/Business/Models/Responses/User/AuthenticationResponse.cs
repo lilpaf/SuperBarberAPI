@@ -1,4 +1,4 @@
-﻿namespace Business.Models.Responses
+﻿namespace Business.Models.Responses.User
 {
     public class AuthenticationResponse
     {

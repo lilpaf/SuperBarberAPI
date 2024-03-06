@@ -4,11 +4,11 @@ namespace Persistence.Entities
 {
     public class User : IdentityUser
     {
-        public string? FirstName { get; set; }
+        public required string? FirstName { get; set; }
 
-        public string? LastName { get; set; }
+        public required string? LastName { get; set; }
 
-        public bool IsDeleted { get; set; }
+        public required bool IsDeleted { get; set; }
 
         public DateTime? DeleteDate { get; set; }
 

@@ -8,32 +8,35 @@ namespace Persistence.Entities
         public int Id { get; set; }
 
         [Required]
-        public string Name { get; set; } = null!;
+        public required string Name { get; set; }
 
-        public int CityId { get; set; }
+        public required int CityId { get; set; }
 
         [ForeignKey(nameof(CityId))]
         public City City { get; set; } = null!;
 
-        public int DistrictId { get; set; }
+        public int? NeighborhoodId { get; set; }
 
-        [ForeignKey(nameof(DistrictId))]
-        public District District { get; set; } = null!;
+        [ForeignKey(nameof(NeighborhoodId))]
+        public required Neighborhood? Neighborhood { get; set; }
 
         [Required]
-        public string Street { get; set; } = null!;
+        public required string Address { get; set; }
 
-        public TimeSpan StartHour { get; set; }
+        public required TimeSpan StartHour { get; set; }
 
-        public TimeSpan FinishHour { get; set; }
+        public required TimeSpan FinishHour { get; set; }
 
-        public string? ImageName { get; set; }
+        //ToDo fix it
+        //public required string ImageName { get; set; } = null!;
 
-        public bool IsPublic { get; set; }
+        public required bool IsPublic { get; set; }
 
-        public bool IsDeleted { get; set; }
+        public required bool IsDeleted { get; set; }
 
         public DateTime? DeleteDate { get; set; }
+
+        public required double AverageRating { get; set; }
 
         public ICollection<BarberShopService> Services { get; set; } = new HashSet<BarberShopService>();
 

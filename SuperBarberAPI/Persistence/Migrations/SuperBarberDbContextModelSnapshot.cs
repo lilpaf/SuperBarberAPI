@@ -208,20 +208,21 @@ namespace Persistence.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<double>("AverageRating")
+                        .HasColumnType("float");
+
                     b.Property<int>("CityId")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("DeleteDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("DistrictId")
-                        .HasColumnType("int");
-
                     b.Property<TimeSpan>("FinishHour")
                         .HasColumnType("time");
-
-                    b.Property<string>("ImageName")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -233,20 +234,20 @@ namespace Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("NeighborhoodId")
+                        .HasColumnType("int");
+
                     b.Property<TimeSpan>("StartHour")
                         .HasColumnType("time");
-
-                    b.Property<string>("Street")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("CityId")
                         .IsUnique();
 
-                    b.HasIndex("DistrictId")
-                        .IsUnique();
+                    b.HasIndex("NeighborhoodId")
+                        .IsUnique()
+                        .HasFilter("[NeighborhoodId] IS NOT NULL");
 
                     b.ToTable("BarberShops");
                 });
@@ -332,7 +333,7 @@ namespace Persistence.Migrations
                     b.ToTable("Cities");
                 });
 
-            modelBuilder.Entity("Persistence.Entities.District", b =>
+            modelBuilder.Entity("Persistence.Entities.Neighborhood", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -349,10 +350,9 @@ namespace Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CityId")
-                        .IsUnique();
+                    b.HasIndex("CityId");
 
-                    b.ToTable("Districts");
+                    b.ToTable("Neighborhoods");
                 });
 
             modelBuilder.Entity("Persistence.Entities.Order", b =>
@@ -633,15 +633,14 @@ namespace Persistence.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Persistence.Entities.District", "District")
+                    b.HasOne("Persistence.Entities.Neighborhood", "Neighborhood")
                         .WithOne()
-                        .HasForeignKey("Persistence.Entities.BarberShop", "DistrictId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .HasForeignKey("Persistence.Entities.BarberShop", "NeighborhoodId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("City");
 
-                    b.Navigation("District");
+                    b.Navigation("Neighborhood");
                 });
 
             modelBuilder.Entity("Persistence.Entities.BarberShopBarber", b =>
@@ -687,11 +686,11 @@ namespace Persistence.Migrations
                     b.Navigation("Service");
                 });
 
-            modelBuilder.Entity("Persistence.Entities.District", b =>
+            modelBuilder.Entity("Persistence.Entities.Neighborhood", b =>
                 {
                     b.HasOne("Persistence.Entities.City", "City")
-                        .WithOne()
-                        .HasForeignKey("Persistence.Entities.District", "CityId")
+                        .WithMany()
+                        .HasForeignKey("CityId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 

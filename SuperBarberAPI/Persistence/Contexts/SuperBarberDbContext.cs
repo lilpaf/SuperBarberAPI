@@ -18,7 +18,7 @@ namespace Persistence.Contexts
         public DbSet<Category> Categories { get; set; }
         public DbSet<ServiceCategory> ServiceCategories { get; set; }
         public DbSet<City> Cities { get; set; }
-        public DbSet<District> Districts { get; set; }
+        public DbSet<Neighborhood> Neighborhoods { get; set; }
         public DbSet<UserRefreshToken> UserRefreshTokens { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -67,7 +67,7 @@ namespace Persistence.Contexts
                 .OnDelete(DeleteBehavior.Restrict);
             
             modelBuilder.Entity<BarberShop>()
-                .HasOne(bs => bs.District)
+                .HasOne(bs => bs.Neighborhood)
                 .WithOne()
                 .OnDelete(DeleteBehavior.Restrict);
 
@@ -102,9 +102,9 @@ namespace Persistence.Contexts
                 .WithOne(sc => sc.Category)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<District>()
+            modelBuilder.Entity<Neighborhood>()
                 .HasOne(d => d.City)
-                .WithOne()
+                .WithMany()
                 .OnDelete(DeleteBehavior.Restrict);
             
             modelBuilder.Entity<Order>()

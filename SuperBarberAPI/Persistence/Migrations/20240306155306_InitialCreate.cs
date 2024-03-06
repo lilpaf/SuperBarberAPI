@@ -248,7 +248,7 @@ namespace Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Districts",
+                name: "Neighborhoods",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -258,9 +258,9 @@ namespace Persistence.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Districts", x => x.Id);
+                    table.PrimaryKey("PK_Neighborhoods", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Districts_Cities_CityId",
+                        name: "FK_Neighborhoods_Cities_CityId",
                         column: x => x.CityId,
                         principalTable: "Cities",
                         principalColumn: "Id",
@@ -299,14 +299,14 @@ namespace Persistence.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CityId = table.Column<int>(type: "int", nullable: false),
-                    DistrictId = table.Column<int>(type: "int", nullable: false),
-                    Street = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    NeighborhoodId = table.Column<int>(type: "int", nullable: true),
+                    Address = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     StartHour = table.Column<TimeSpan>(type: "time", nullable: false),
                     FinishHour = table.Column<TimeSpan>(type: "time", nullable: false),
-                    ImageName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsPublic = table.Column<bool>(type: "bit", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    DeleteDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                    DeleteDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    AverageRating = table.Column<double>(type: "float", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -318,9 +318,9 @@ namespace Persistence.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_BarberShops_Districts_DistrictId",
-                        column: x => x.DistrictId,
-                        principalTable: "Districts",
+                        name: "FK_BarberShops_Neighborhoods_NeighborhoodId",
+                        column: x => x.NeighborhoodId,
+                        principalTable: "Neighborhoods",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -498,10 +498,11 @@ namespace Persistence.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_BarberShops_DistrictId",
+                name: "IX_BarberShops_NeighborhoodId",
                 table: "BarberShops",
-                column: "DistrictId",
-                unique: true);
+                column: "NeighborhoodId",
+                unique: true,
+                filter: "[NeighborhoodId] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_BarberShopService_BarberShopId",
@@ -520,10 +521,9 @@ namespace Persistence.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Districts_CityId",
-                table: "Districts",
-                column: "CityId",
-                unique: true);
+                name: "IX_Neighborhoods_CityId",
+                table: "Neighborhoods",
+                column: "CityId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Orders_BarberShopId",
@@ -602,7 +602,7 @@ namespace Persistence.Migrations
                 name: "BarberShops");
 
             migrationBuilder.DropTable(
-                name: "Districts");
+                name: "Neighborhoods");
 
             migrationBuilder.DropTable(
                 name: "Cities");

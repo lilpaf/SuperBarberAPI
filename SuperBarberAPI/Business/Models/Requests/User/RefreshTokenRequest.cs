@@ -5,11 +5,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Business.Models.Requests
+namespace Business.Models.Requests.User
 {
     public class RefreshTokenRequest
     {
         [Required]
-        public string AccessToken { get; init; } = null!;
+        public required string AccessToken { get; init; }
     }
 }

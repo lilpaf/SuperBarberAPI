@@ -158,4 +158,19 @@
 	<data name="UserRegistrationSussesfuly" xml:space="preserve">
 		<value>You have been registered.</value>
 	</data>
+	<data name="MissingCityJsonFile" xml:space="preserve">
+		<value>Missing city import json file.</value>
+	</data>
+	<data name="MissingNeighborhoodJsonFile" xml:space="preserve">
+		<value>Missing neighborhoods import json file.</value>
+	</data>
+	<data name="InvalidCity" xml:space="preserve">
+		<value>City dose not exists.</value>
+	</data>
+	<data name="InvalidDistrict" xml:space="preserve">
+		<value>District dose not exists.</value>
+	</data>
+	<data name="BarberShopRegistrationSussesfuly" xml:space="preserve">
+		<value>Successfully registered barber shop, we are working on approveing you barbershop. When your barbershop is approved you will receive an email.</value>
+	</data>
 </root>

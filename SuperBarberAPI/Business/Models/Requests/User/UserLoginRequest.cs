@@ -1,15 +1,15 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Business.Models.Requests
+namespace Business.Models.Requests.User
 {
     public class UserLoginRequest
     {
         [Required]
         [EmailAddress]
-        public string Email { get; init; } = null!;
+        public required string Email { get; init; }
 
         [Required]
         [DataType(DataType.Password)]
-        public string Password { get; init; } = null!;
+        public required string Password { get; init; }
     }
 }

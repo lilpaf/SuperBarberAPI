@@ -4,11 +4,14 @@ using Persistence.Contexts;
 using Persistence.Dtos;
 using Persistence.Entities;
 using Persistence.Interfaces;
+using Persistence.Models;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Persistence.Implementations
 {
     public class BarberShopRepository : IBarberShopRepository
     {
+        private const string StringHourFormat = @"hh\:mm";
         private readonly SuperBarberDbContext _context;
         private readonly ILogger<BarberShopRepository> _logger;
 
@@ -20,25 +23,31 @@ namespace Persistence.Implementations
             _logger = logger;
         }
 
-        //ToDo add query later on
-        public async Task<IReadOnlyList<BarberShopDto>> GetAllActiveBarberShopsAsync()
+        public async Task<IReadOnlyList<BarberShopDto>> GetAllActiveBarberShopsAsync(QueryParameterContainer queryParams)
         {
-            _logger.LogInformation("Getting all barbershops");
+            _logger.LogInformation("Getting all active barbershops");
 
-            return await _context.BarberShops
-                .Where(b => b.IsPublic && !b.IsDeleted)
+            IQueryable<BarberShop> barberShopQuery = QueryBarberShops(queryParams);
+
+            return await barberShopQuery
                 .Select(b => new BarberShopDto
                 {
                     Id = b.Id,
                     Name = b.Name,
-                    City = b.City.Name,
-                    District = b.District.Name,
-                    Street = b.Street,
-                    StartHour = b.StartHour.ToString(@"hh\:mm"),
-                    FinishHour = b.FinishHour.ToString(@"hh\:mm"),
-                    ImageName = b.ImageName
+                    Address = b.Address,
+                    StartHour = b.StartHour.ToString(StringHourFormat),
+                    FinishHour = b.FinishHour.ToString(StringHourFormat),
+                    //ToDo fix it
+                    //ImageName = b.ImageName
                 })
                 .ToListAsync();
+        }
+        
+        public async Task<int> GetTotalNumberActiveBarberShopsAsync()
+        {
+            _logger.LogInformation("Getting total number of all active barbershops");
+
+            return await _context.BarberShops.CountAsync();
         }
 
         public async Task AddBarberShopAsync(BarberShop barberShop)
@@ -51,6 +60,30 @@ namespace Persistence.Implementations
         {
             _logger.LogInformation("Saving barbershop");
             await _context.SaveChangesAsync();
+        }
+
+        private IQueryable<BarberShop> QueryBarberShops(QueryParameterContainer queryParams) 
+        {
+            _logger.LogInformation("Querying barbershops");
+
+            IQueryable<BarberShop> barberShopQuery = _context.BarberShops
+                .Where(b => b.IsPublic && !b.IsDeleted && b.City.Name == queryParams.City)
+                .AsQueryable();
+
+            if (!string.IsNullOrEmpty(queryParams.Neighborhood))
+            {
+                barberShopQuery.Where(b => b.Neighborhood != null && b.Neighborhood.Name == queryParams.Neighborhood);
+            }
+            
+            if (!string.IsNullOrEmpty(queryParams.BarberShopSearchName))
+            {
+                barberShopQuery.Where(b => b.Name.ToLower().Replace(" ", string.Empty)
+                .Contains(queryParams.BarberShopSearchName.ToLower().Replace(" ", string.Empty)));
+            }
+
+            barberShopQuery.Skip(queryParams.SkipCount);
+
+            return barberShopQuery;
         }
     }
 }

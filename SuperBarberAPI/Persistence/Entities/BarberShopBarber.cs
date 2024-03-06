@@ -4,18 +4,18 @@ namespace Persistence.Entities
 {
     public class BarberShopBarber
     {
-        public int BarberShopId { get; set; }
+        public required int BarberShopId { get; set; }
 
         [ForeignKey(nameof(BarberShopId))]
         public BarberShop BarberShop { get; set; } = null!;
 
-        public int BarberId { get; set; }
+        public required int BarberId { get; set; }
 
         [ForeignKey(nameof(BarberId))]
         public Barber Barber { get; set; } = null!;
 
-        public bool IsOwner { get; set; }
+        public required bool IsOwner { get; set; }
 
-        public bool IsAvailable { get; set; }
+        public required bool IsAvailable { get; set; }
     }
 }

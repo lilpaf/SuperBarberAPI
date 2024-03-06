@@ -8,12 +8,12 @@ namespace Persistence.Entities
         public int Id { get; set; }
 
         [Required]
-        public string UserId { get; set; } = null!;
+        public required string UserId { get; set; }
 
         [ForeignKey(nameof(UserId))]
         public User User { get; set; } = null!;
 
-        public bool IsDeleted { get; set; }
+        public required bool IsDeleted { get; set; }
 
         public DateTime? DeleteDate { get; set; }
 

@@ -1,10 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Business.Models.Requests
+namespace Business.Models.Requests.User
 {
     public class EmailConfirmationRequest
     {
         [Required]
-        public string Code { get; init; } = null!;
+        public required string Code { get; init; }
     }
 }

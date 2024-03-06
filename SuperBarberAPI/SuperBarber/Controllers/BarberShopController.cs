@@ -1,5 +1,6 @@
 ﻿using Business.Interfaces;
-using Business.Models.Responses;
+using Business.Models.Requests.BarberShop;
+using Business.Models.Responses.BarberShop;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SuperBarber.Models;
@@ -20,17 +21,31 @@ namespace SuperBarber.Controllers
             _barberShopService = barberShopService;
         }
 
-        [Authorize] //ToDo remove it 
         [HttpGet]
         [Route("all")]
         [Produces(MediaTypeNames.Application.Json)]
         [ProducesResponseType(typeof(ResponseContent<AllBarberShopsResponse>), 200)]
         [ProducesDefaultResponseType(typeof(ResponseContent))]
-        public async Task<ResponseContent<AllBarberShopsResponse>> Register()
+        public async Task<ResponseContent<AllBarberShopsResponse>> GetAll([FromQuery] AllBarberShopRequest request)
         {
-            AllBarberShopsResponse response = await _barberShopService.GetAllBarberShopsAsync();
+            AllBarberShopsResponse response = await _barberShopService.GetAllBarberShopsAsync(request);
 
             return new ResponseContent<AllBarberShopsResponse>()
+            {
+                Result = response
+            };
+        }
+        
+        [HttpPost]
+        [Route("register")]
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(typeof(ResponseContent<RegisterBarberShopResponse>), 200)]
+        [ProducesDefaultResponseType(typeof(ResponseContent))]
+        public async Task<ResponseContent<RegisterBarberShopResponse>> Register(RegisterBarberShopRequest request)
+        {
+            RegisterBarberShopResponse response = await _barberShopService.RegisterBarberShopAsync(request);
+
+            return new ResponseContent<RegisterBarberShopResponse>()
             {
                 Result = response
             };

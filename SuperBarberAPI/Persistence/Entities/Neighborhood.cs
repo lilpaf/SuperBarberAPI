@@ -3,14 +3,14 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Persistence.Entities
 {
-    public class District
+    public class Neighborhood
     {
         public int Id { get; set; }
 
         [Required]
-        public string Name { get; set; } = null!;
+        public required string Name { get; set; }
 
-        public int CityId { get; set; }
+        public required int CityId { get; set; }
         
         [ForeignKey(nameof(CityId))]
         public City City { get; set; } = null!;

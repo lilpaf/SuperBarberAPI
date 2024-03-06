@@ -1,5 +1,5 @@
-﻿using Business.Models.Requests;
-using Business.Models.Responses;
+﻿using Business.Models.Requests.User;
+using Business.Models.Responses.User;
 namespace Business.Interfaces
 {
     public interface IUserService
