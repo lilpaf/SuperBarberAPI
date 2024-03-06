@@ -277,6 +277,15 @@ namespace Business.Constants.Messages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to User with this email already exists..
+        /// </summary>
+        public static string UserWithEmailDoesNotExist {
+            get {
+                return ResourceManager.GetString("UserWithEmailDoesNotExist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Wrong email or password..
         /// </summary>
         public static string WrongCredentials {

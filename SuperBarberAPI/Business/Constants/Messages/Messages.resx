@@ -173,4 +173,7 @@
 	<data name="BarberShopRegistrationSussesfuly" xml:space="preserve">
 		<value>Successfully registered barber shop, we are working on approveing you barbershop. When your barbershop is approved you will receive an email.</value>
 	</data>
+	<data name="UserWithEmailDoesNotExist" xml:space="preserve">
+		<value>User with this email already exists.</value>
+	</data>
 </root>

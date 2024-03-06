@@ -42,6 +42,8 @@ builder.Services.AddSingleton<IEmailService, EmailService>();
 // Repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IBarberShopRepository, BarberShopRepository>();
+builder.Services.AddScoped<INeighborhoodRepository, NeighborhoodRepository>();
+builder.Services.AddScoped<ICityRepository, CityRepository>();
 
 //Filters
 builder.Services.AddMvc(options =>

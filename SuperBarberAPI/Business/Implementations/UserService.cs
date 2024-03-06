@@ -153,9 +153,15 @@ namespace Business.Implementations
             };
         }
 
-        public async Task<PasswordResetEmailResponse> SendPasswordResetEmailAsync(string controllerRouteTemplate, string passwordResetRouteTemplate)
+        public async Task<PasswordResetEmailResponse> SendPasswordResetEmailAsync(ResetPasswordEmailRequest request, string controllerRouteTemplate, string passwordResetRouteTemplate)
         {
-            User user = await GetUserByUserClaimIdAsync();
+            User? user = await _userManager.FindByEmailAsync(request.Email);
+
+            if (user is null || user.IsDeleted)
+            {
+                _logger.LogError("User with this email {Email} dose not exists or is deleted", request.Email);
+                throw new InvalidArgumentException(Messages.UserWithEmailDoesNotExist);
+            }
 
             string code = await _userManager.GeneratePasswordResetTokenAsync(user);
 
@@ -172,7 +178,15 @@ namespace Business.Implementations
 
         public async Task<AuthenticationResponse> ResetPasswordAsync(ResetPasswordRequest request)
         {
-            User user = await GetUserByUserClaimIdAsync();
+            User? user = await _userManager.FindByEmailAsync(request.Email);
+
+            if (user is null || user.IsDeleted)
+            {
+                _logger.LogError("User with this email {Email} dose not exists or is deleted", request.Email);
+                throw new InvalidArgumentException(Messages.UserWithEmailDoesNotExist);
+            }
+
+            await RevokeUserRefreshTokenAsync(user);
 
             //Decode the code
             string code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(request.Code));
@@ -196,7 +210,9 @@ namespace Business.Implementations
 
         public async Task<AuthenticationResponse> LogOutAsync()
         {
-            await RevokeUserRefreshTokenAsync();
+            User user = await GetUserByUserClaimIdAsync();
+
+            await RevokeUserRefreshTokenAsync(user);
 
             return new AuthenticationResponse()
             {
@@ -277,33 +293,29 @@ namespace Business.Implementations
             }
             catch (Exception)
             {
-                await RevokeUserRefreshTokenAsync();
+                User user = await GetUserByUserClaimIdAsync();
+                await RevokeUserRefreshTokenAsync(user);
                 throw;
             }
         }
 
-        private async Task RevokeUserRefreshTokenAsync()
+        private async Task RevokeUserRefreshTokenAsync(User user)
         {
             _httpContext.Response.Cookies.Delete(AuthenticationConstants.RefreshTokenCookieKey);
 
-            User user = await GetUserByUserClaimIdAsync();
-
             UserRefreshToken? userRefreshToken = await _userRepository.GetUserRefreshTokenByUserIdAsync(user.Id);
 
-            if (userRefreshToken is null)
+            if (userRefreshToken is not null)
             {
-                _logger.LogError("No refresh token exists that matches this user id {UserId}", user.Id);
-                throw new InvalidArgumentException(Messages.InvalidJwtToken);
+                userRefreshToken.IsRevoked = true;
+                userRefreshToken.IsUsed = true;
+                userRefreshToken.ExpiryDate = DateTime.UtcNow;
+
+                _userRepository.UpdateUserRefreshToken(userRefreshToken);
+                await _userRepository.SaveChangesAsync();
             }
-
-            userRefreshToken.IsRevoked = true;
-            userRefreshToken.IsUsed = true;
-            userRefreshToken.ExpiryDate = DateTime.UtcNow;
-
-            _userRepository.UpdateUserRefreshToken(userRefreshToken);
-            await _userRepository.SaveChangesAsync();
         }
-
+        
         private async Task<User> GetUserByUserClaimIdAsync()
         {
             string? userId = _httpContext.User

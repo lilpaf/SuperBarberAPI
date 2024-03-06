@@ -105,16 +105,15 @@ namespace SuperBarber.Controllers
             };
         }
 
-        [Authorize]
         [HttpPost]
         [Route("send-reset-password-email")]
         [Produces(MediaTypeNames.Application.Json)]
         [ProducesResponseType(typeof(ResponseContent<PasswordResetEmailResponse>), 200)]
         [ProducesDefaultResponseType(typeof(ResponseContent))]
-        public async Task<ResponseContent<PasswordResetEmailResponse>> SendResetPasswordEmail()
+        public async Task<ResponseContent<PasswordResetEmailResponse>> SendResetPasswordEmail([FromBody] ResetPasswordEmailRequest request)
         {
             //ToDo we need to fix the routes
-            PasswordResetEmailResponse response = await _userService.SendPasswordResetEmailAsync(_controllerRouteTemplate, _resetPasswordRouteTemplate);
+            PasswordResetEmailResponse response = await _userService.SendPasswordResetEmailAsync(request, _controllerRouteTemplate, _resetPasswordRouteTemplate);
 
             return new ResponseContent<PasswordResetEmailResponse>()
             {
@@ -122,7 +121,6 @@ namespace SuperBarber.Controllers
             };
         }
         
-        [Authorize]
         [HttpPost]
         [Route("reset-password")]
         [Produces(MediaTypeNames.Application.Json)]

@@ -12,7 +12,7 @@ namespace Business.Interfaces
 
         Task<AuthenticationResponse> RefreshTokenAsync(RefreshTokenRequest request);
 
-        Task<PasswordResetEmailResponse> SendPasswordResetEmailAsync(string controllerRouteTemplate, string passwordResetRouteTemplate);
+        Task<PasswordResetEmailResponse> SendPasswordResetEmailAsync(ResetPasswordEmailRequest request, string controllerRouteTemplate, string passwordResetRouteTemplate);
 
         Task<AuthenticationResponse> ResetPasswordAsync(ResetPasswordRequest request);
 

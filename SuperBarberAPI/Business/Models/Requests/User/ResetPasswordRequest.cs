@@ -6,6 +6,10 @@ namespace Business.Models.Requests.User
     public class ResetPasswordRequest
     {
         [Required]
+        [EmailAddress]
+        public required string Email { get; init; }
+
+        [Required]
         [Display(Name = AuthenticationConstants.NewPasswordDisplayName)]
         [DataType(DataType.Password)]
         [StringLength(DataConstraints.PasswordMaxLength, MinimumLength = DataConstraints.PasswordMinLength)]
