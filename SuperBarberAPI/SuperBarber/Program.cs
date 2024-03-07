@@ -1,16 +1,11 @@
 using Business.Configurations;
-using Business.Constants.Messages;
 using Business.Implementations;
 using Business.Interfaces;
-using Business.Models.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Persistence.Contexts;
-using Persistence.Entities;
 using Persistence.Implementations;
 using Persistence.Interfaces;
-using StackExchange.Redis;
 using SuperBarber.Extensions;
 using SuperBarber.Filters;
 using SuperBarber.Middlewares;

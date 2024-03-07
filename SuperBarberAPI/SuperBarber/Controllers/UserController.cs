@@ -1,14 +1,11 @@
-﻿using Business.Constants;
-using Business.Constants.Messages;
+﻿using Business.Constants.Messages;
 using Business.Interfaces;
 using Business.Models.Exceptions;
 using Business.Models.Requests.User;
 using Business.Models.Responses.User;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SuperBarber.Models;
-using System.Net.Http;
 using System.Net.Mime;
 using System.Reflection;
 

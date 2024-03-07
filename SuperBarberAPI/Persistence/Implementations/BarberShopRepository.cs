@@ -5,7 +5,6 @@ using Persistence.Dtos;
 using Persistence.Entities;
 using Persistence.Interfaces;
 using Persistence.Models;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Persistence.Implementations
 {

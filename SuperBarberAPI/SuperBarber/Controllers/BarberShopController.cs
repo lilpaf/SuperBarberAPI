@@ -1,7 +1,6 @@
 ﻿using Business.Interfaces;
 using Business.Models.Requests.BarberShop;
 using Business.Models.Responses.BarberShop;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SuperBarber.Models;
 using System.Net.Mime;

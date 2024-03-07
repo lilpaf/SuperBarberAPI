@@ -1,5 +1,4 @@
-﻿using Azure;
-using Business.Configurations;
+﻿using Business.Configurations;
 using Business.Constants;
 using Business.Constants.Messages;
 using Business.Interfaces;

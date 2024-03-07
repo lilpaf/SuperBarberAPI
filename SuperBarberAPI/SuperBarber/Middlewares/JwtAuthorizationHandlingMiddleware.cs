@@ -1,9 +1,4 @@
-﻿using Business.Constants.Messages;
-using Business.Constants;
-using Business.Models.Exceptions.General;
-using SuperBarber.Models;
-
-namespace SuperBarber.Middlewares
+﻿namespace SuperBarber.Middlewares
 {
     public class JwtAuthorizationHandlingMiddleware
     {
