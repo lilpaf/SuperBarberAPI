@@ -63,12 +63,12 @@ namespace Persistence.Contexts
             
             modelBuilder.Entity<BarberShop>()
                 .HasOne(bs => bs.City)
-                .WithOne()
+                .WithMany()
                 .OnDelete(DeleteBehavior.Restrict);
             
             modelBuilder.Entity<BarberShop>()
                 .HasOne(bs => bs.Neighborhood)
-                .WithOne()
+                .WithMany()
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<BarberShopBarber>()

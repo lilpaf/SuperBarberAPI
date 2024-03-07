@@ -494,15 +494,12 @@ namespace Persistence.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_BarberShops_CityId",
                 table: "BarberShops",
-                column: "CityId",
-                unique: true);
+                column: "CityId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_BarberShops_NeighborhoodId",
                 table: "BarberShops",
-                column: "NeighborhoodId",
-                unique: true,
-                filter: "[NeighborhoodId] IS NOT NULL");
+                column: "NeighborhoodId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_BarberShopService_BarberShopId",

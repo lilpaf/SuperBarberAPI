@@ -242,12 +242,9 @@ namespace Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CityId")
-                        .IsUnique();
+                    b.HasIndex("CityId");
 
-                    b.HasIndex("NeighborhoodId")
-                        .IsUnique()
-                        .HasFilter("[NeighborhoodId] IS NOT NULL");
+                    b.HasIndex("NeighborhoodId");
 
                     b.ToTable("BarberShops");
                 });
@@ -628,14 +625,14 @@ namespace Persistence.Migrations
             modelBuilder.Entity("Persistence.Entities.BarberShop", b =>
                 {
                     b.HasOne("Persistence.Entities.City", "City")
-                        .WithOne()
-                        .HasForeignKey("Persistence.Entities.BarberShop", "CityId")
+                        .WithMany()
+                        .HasForeignKey("CityId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Persistence.Entities.Neighborhood", "Neighborhood")
-                        .WithOne()
-                        .HasForeignKey("Persistence.Entities.BarberShop", "NeighborhoodId")
+                        .WithMany()
+                        .HasForeignKey("NeighborhoodId")
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("City");

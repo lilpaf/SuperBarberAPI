@@ -13,7 +13,6 @@ namespace Business.Models.Requests.BarberShop
         [Required]
         public required string City { get; init; }
 
-        [Required]
         public required string? Neighborhood { get; init; }
 
         [Required]
