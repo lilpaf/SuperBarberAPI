@@ -24,7 +24,7 @@ namespace Persistence.Implementations
 
         public async Task<IReadOnlyList<BarberShopDto>> GetAllActiveBarberShopsAsync(QueryParameterContainer queryParams)
         {
-            _logger.LogInformation("Getting all active barbershops");
+            _logger.LogInformation("Getting all active barbershops from SQL Db");
 
             IQueryable<BarberShop> barberShopQuery = QueryBarberShops(queryParams);
 
@@ -44,20 +44,20 @@ namespace Persistence.Implementations
         
         public async Task<int> GetTotalNumberActiveBarberShopsAsync()
         {
-            _logger.LogInformation("Getting total number of all active barbershops");
+            _logger.LogInformation("Getting total number of all active barbershops from SQL Db");
 
             return await _context.BarberShops.CountAsync();
         }
 
         public async Task AddBarberShopAsync(BarberShop barberShop)
         {
-            _logger.LogInformation("Adding barbershop");
+            _logger.LogInformation("Adding barbershop to SQL Db");
             await _context.BarberShops.AddAsync(barberShop);
         }
 
         public async Task SaveChangesAsync()
         {
-            _logger.LogInformation("Saving barbershop");
+            _logger.LogInformation("Saving barbershop to SQL Db");
             await _context.SaveChangesAsync();
         }
 

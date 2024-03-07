@@ -10,7 +10,6 @@ using Serilog;
 using SuperBarber.Extensions;
 using SuperBarber.Filters;
 using SuperBarber.Middlewares;
-using System.Text;
 using BarberShopService = Business.Implementations.BarberShopService;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,7 +17,8 @@ var builder = WebApplication.CreateBuilder(args);
 /*
  * ToDo check if email is confirmed before making orders or registering as barber
  * ToDo schedule sending email
- * ToDo save all cities in a state or something like this in react
+ * ToDo save all cities in a state or something like this in react we will need separate endpoint
+ * ToDo separate endpoint for getting neighborhoods by city
  */
 // Add services to the container.
 
