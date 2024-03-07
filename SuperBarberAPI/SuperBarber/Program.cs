@@ -6,9 +6,11 @@ using Microsoft.EntityFrameworkCore;
 using Persistence.Contexts;
 using Persistence.Implementations;
 using Persistence.Interfaces;
+using Serilog;
 using SuperBarber.Extensions;
 using SuperBarber.Filters;
 using SuperBarber.Middlewares;
+using System.Text;
 using BarberShopService = Business.Implementations.BarberShopService;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -28,6 +30,8 @@ builder.AddRedisCache();
 builder.Services.Configure<JwtConfig>(builder.Configuration.GetSection(nameof(JwtConfig)));
 builder.Services.Configure<SmtpConfig>(builder.Configuration.GetSection(nameof(SmtpConfig)));
 builder.Services.Configure<IdentityConfig>(builder.Configuration.GetSection(nameof(IdentityConfig)));
+
+builder.UseSerilog();
 
 builder.AddCustomAuthentication();
 
@@ -76,7 +80,6 @@ app.UseAuthorization();
 app.MapControllers();
 
 // Middlewares
-app.UseMiddleware<LogMetaDataMiddleware>();
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.Run();

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using Persistence.Contexts;
 using Persistence.Entities;
+using Serilog;
 using StackExchange.Redis;
 using System.Text;
 
@@ -86,6 +87,18 @@ namespace SuperBarber.Extensions
                 ConnectionMultiplexer multiplexer = provider.GetService<ConnectionMultiplexer>() ??
                      throw new NotConfiguredException("Redis multiplexer does not exists");
                 return multiplexer.GetDatabase();
+            });
+
+            return builder;
+        }
+        
+        public static WebApplicationBuilder UseSerilog(this WebApplicationBuilder builder)
+        {
+            Console.OutputEncoding = Encoding.UTF8;
+
+            builder.Host.UseSerilog((hostContext, service, configuration) =>
+            {
+                configuration.ReadFrom.Configuration(builder.Configuration);
             });
 
             return builder;
