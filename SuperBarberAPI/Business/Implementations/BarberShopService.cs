@@ -102,8 +102,8 @@ namespace Business.Implementations
 
                 if (neighborhood is null)
                 {
-                    _logger.LogError("{neighborhood} neighborhood dose not exists", request.City);
-                    throw new InvalidArgumentException(Messages.InvalidCity);
+                    _logger.LogError("{Neighborhood} neighborhood dose not exists", request.Neighborhood);
+                    throw new InvalidArgumentException(Messages.InvalidNeighborhood);
                 }
             }
 

@@ -167,8 +167,8 @@
 	<data name="InvalidCity" xml:space="preserve">
 		<value>City dose not exists.</value>
 	</data>
-	<data name="InvalidDistrict" xml:space="preserve">
-		<value>District dose not exists.</value>
+	<data name="InvalidNeighborhood" xml:space="preserve">
+		<value>Neighborhood dose not exists.</value>
 	</data>
 	<data name="BarberShopRegistrationSussesfuly" xml:space="preserve">
 		<value>Successfully registered barber shop, we are working on approveing you barbershop. When your barbershop is approved you will receive an email.</value>

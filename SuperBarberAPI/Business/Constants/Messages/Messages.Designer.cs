@@ -151,15 +151,6 @@ namespace Business.Constants.Messages {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to District dose not exists..
-        /// </summary>
-        public static string InvalidDistrict {
-            get {
-                return ResourceManager.GetString("InvalidDistrict", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Invalid hour format..
         /// </summary>
         public static string InvalidHourFormat {
@@ -174,6 +165,15 @@ namespace Business.Constants.Messages {
         public static string InvalidJwtToken {
             get {
                 return ResourceManager.GetString("InvalidJwtToken", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Neighborhood dose not exists..
+        /// </summary>
+        public static string InvalidNeighborhood {
+            get {
+                return ResourceManager.GetString("InvalidNeighborhood", resourceCulture);
             }
         }
         

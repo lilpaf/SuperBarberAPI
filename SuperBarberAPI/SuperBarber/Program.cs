@@ -16,6 +16,7 @@ var builder = WebApplication.CreateBuilder(args);
 /*
  * ToDo check if email is confirmed before making orders or registering as barber
  * ToDo schedule sending email
+ * ToDo save all cities in a state or something like this in react
  */
 // Add services to the container.
 
