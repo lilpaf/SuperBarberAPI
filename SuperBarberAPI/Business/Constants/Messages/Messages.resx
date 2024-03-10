@@ -182,4 +182,13 @@
 	<data name="InvalidHourFormat" xml:space="preserve">
 		<value>Invalid hour format.</value>
 	</data>
+	<data name="BarberShopDoseNotExist" xml:space="preserve">
+		<value>Barber shop dose not exists.</value>
+	</data>
+	<data name="BarberShopUpdatedSussesfuly" xml:space="preserve">
+		<value>Successfully updated barber shop information, we are working on approveing you barbershop. When your barbershop is approved you will receive an email.</value>
+	</data>
+	<data name="StartHourIsLargerOrEqualToFinishHour" xml:space="preserve">
+		<value>Barbershop openning hour must me grater than the finish hour and not equal to it.</value>
+	</data>
 </root>

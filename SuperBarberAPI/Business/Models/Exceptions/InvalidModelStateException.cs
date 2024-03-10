@@ -1,4 +1,5 @@
-﻿using Business.Models.Exceptions.General;
+﻿using Business.Constants.Messages;
+using Business.Models.Exceptions.General;
 
 namespace Business.Models.Exceptions
 {
@@ -6,7 +7,7 @@ namespace Business.Models.Exceptions
     {
         public string[] Errors { get; }
 
-        public InvalidModelStateException(string message, params string[] errors) : base(message)
+        public InvalidModelStateException(string[] errors) : base(Messages.ModelStateValidationErrorMessage)
         {
             Errors = errors;
         }

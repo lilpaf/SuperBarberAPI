@@ -1,4 +1,4 @@
-﻿using Persistence.Dtos;
+﻿using Business.Models.Dtos;
 
 namespace Business.Models.Responses.BarberShop
 {

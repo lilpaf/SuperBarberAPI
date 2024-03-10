@@ -1,10 +1,11 @@
-﻿using Business.Constants;
-using Business.Constants.Messages;
+﻿using Business.Constants.Messages;
+using Business.Constants;
 using System.ComponentModel.DataAnnotations;
+using Newtonsoft.Json.Linq;
 
 namespace Business.Models.Requests.BarberShop
 {
-    public class RegisterBarberShopRequest
+    public class UpdateBarberShopRequest
     {
         [Required]
         [StringLength(DataConstraints.ShopNameMaxLength, MinimumLength = DataConstraints.DefaultMinLength)]
@@ -30,6 +31,6 @@ namespace Business.Models.Requests.BarberShop
         //ToDo fix it
         //[Required]
         //[Display(Name = "Image")]
-        //public required IFormFile ImageFile { get; init; }
+        //public requiredIFormFile ImageFile { get; init; }
     }
 }

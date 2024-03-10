@@ -1,6 +1,8 @@
 ﻿using Business.Constants;
 using Business.Constants.Messages;
+using Business.Models.Exceptions;
 using Business.Models.Exceptions.General;
+using Microsoft.AspNetCore.Http;
 using SuperBarber.Models;
 
 namespace SuperBarber.Middlewares
@@ -23,6 +25,18 @@ namespace SuperBarber.Middlewares
             try
             {
                 await _next(context);
+            }
+            catch (InvalidModelStateException exception)
+            {
+                _logger.LogError("Invalid model state error with errors: {Errors}", string.Join(ErrorConstants.ErrorDelimiter, exception.Errors));
+
+                ResponseContent response = new()
+                {
+                    Error = new(exception.Message, exception.StatusCode, exception.ErrorCode, exception.Errors)
+                };
+
+                context.Response.StatusCode = response.Error.StatusCode;
+                await context.Response.WriteAsJsonAsync(response);
             }
             catch (Exception exception)
             {

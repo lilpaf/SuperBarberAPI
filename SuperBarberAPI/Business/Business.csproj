@@ -22,6 +22,7 @@
 
 	<ItemGroup>
 	  <PackageReference Include="MailKit" Version="4.4.0" />
+	  <PackageReference Include="Microsoft.AspNetCore.JsonPatch" Version="8.0.2" />
 	  <PackageReference Include="StackExchange.Redis" Version="2.7.27" />
 	</ItemGroup>
 

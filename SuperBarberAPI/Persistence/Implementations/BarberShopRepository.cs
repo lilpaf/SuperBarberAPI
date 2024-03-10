@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Persistence.Contexts;
-using Persistence.Dtos;
 using Persistence.Entities;
 using Persistence.Interfaces;
 using Persistence.Models;
@@ -10,7 +9,6 @@ namespace Persistence.Implementations
 {
     public class BarberShopRepository : IBarberShopRepository
     {
-        private const string StringHourFormat = @"hh\:mm";
         private readonly SuperBarberDbContext _context;
         private readonly ILogger<BarberShopRepository> _logger;
 
@@ -22,23 +20,15 @@ namespace Persistence.Implementations
             _logger = logger;
         }
 
-        public async Task<IReadOnlyList<BarberShopDto>> GetAllActiveBarberShopsAsync(QueryParameterContainer queryParams)
+        public async Task<IReadOnlyList<BarberShop>> GetAllActiveBarberShopsWithCitiesAndNeighborhoodsAsync(QueryParameterContainer queryParams)
         {
             _logger.LogInformation("Getting all active barbershops from SQL Db");
 
             IQueryable<BarberShop> barberShopQuery = QueryBarberShops(queryParams);
 
             return await barberShopQuery
-                .Select(b => new BarberShopDto
-                {
-                    Id = b.Id,
-                    Name = b.Name,
-                    Address = b.Address,
-                    StartHour = b.StartHour.ToString(StringHourFormat),
-                    FinishHour = b.FinishHour.ToString(StringHourFormat),
-                    //ToDo fix it
-                    //ImageName = b.ImageName
-                })
+                .Include(b =>  b.City)
+                .Include(b =>  b.Neighborhood)
                 .ToListAsync();
         }
         
@@ -48,11 +38,27 @@ namespace Persistence.Implementations
 
             return await _context.BarberShops.CountAsync();
         }
+        
+        public async Task<BarberShop?> GetBarberShopWithCityAndNeighborhoodByIdAsync(int id)
+        {
+            _logger.LogInformation("Getting barber shop by id from SQL Db");
+
+            return await _context.BarberShops
+                .Include(b => b.City)
+                .Include(b => b.Neighborhood)
+                .FirstOrDefaultAsync(b => b.Id == id);
+        }
 
         public async Task AddBarberShopAsync(BarberShop barberShop)
         {
             _logger.LogInformation("Adding barbershop to SQL Db");
             await _context.BarberShops.AddAsync(barberShop);
+        }
+        
+        public void UpdateBarberShopAsync(BarberShop barberShop)
+        {
+            _logger.LogInformation("Updating barbershop from SQL Db");
+            _context.BarberShops.Update(barberShop);
         }
 
         public async Task SaveChangesAsync()

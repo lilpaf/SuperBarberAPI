@@ -1,4 +1,4 @@
-﻿namespace Persistence.Dtos
+﻿namespace Business.Models.Dtos
 {
     public class BarberShopDto
     {
@@ -11,6 +11,8 @@
         public required string StartHour { get; init; }
 
         public required string FinishHour { get; init; }
+
+        public required double AverageRating { get; init; }
 
         //ToDo fix it
         //public required string ImageName { get; init; }

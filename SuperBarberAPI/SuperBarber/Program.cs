@@ -38,7 +38,15 @@ builder.AddCustomAuthentication();
 //This is needed in order to use the ValidateModelStateFilter
 builder.Services.Configure<ApiBehaviorOptions>(options => options.SuppressModelStateInvalidFilter = true);
 
-builder.Services.AddControllers();
+builder.Services.AddControllers(options =>
+{
+    options.InputFormatters.Insert(0, MyJPIF.GetJsonPatchInputFormatter());
+})
+.AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.AllowTrailingCommas = true;
+});
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 

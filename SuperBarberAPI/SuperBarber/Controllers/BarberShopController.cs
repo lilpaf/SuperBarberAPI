@@ -1,6 +1,7 @@
 ﻿using Business.Interfaces;
 using Business.Models.Requests.BarberShop;
 using Business.Models.Responses.BarberShop;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using SuperBarber.Models;
 using System.Net.Mime;
@@ -45,6 +46,24 @@ namespace SuperBarber.Controllers
             RegisterBarberShopResponse response = await _barberShopService.RegisterBarberShopAsync(request);
 
             return new ResponseContent<RegisterBarberShopResponse>()
+            {
+                Result = response
+            };
+        }
+        
+        [HttpPatch]
+        [Route("update/{id}")]
+        [Consumes(MediaTypeNames.Application.JsonPatch)]
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(typeof(ResponseContent<UpdateBarberShopResponse>), 200)]
+        [ProducesDefaultResponseType(typeof(ResponseContent))]
+        public async Task<ResponseContent<UpdateBarberShopResponse>> Update(
+            [FromRoute] int id, 
+            [FromBody] JsonPatchDocument<UpdateBarberShopRequest> patchDoc)
+        {
+            UpdateBarberShopResponse response = await _barberShopService.UpdateBarberShopAsync(id, patchDoc);
+
+            return new ResponseContent<UpdateBarberShopResponse>()
             {
                 Result = response
             };

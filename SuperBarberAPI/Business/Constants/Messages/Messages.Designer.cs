@@ -61,11 +61,29 @@ namespace Business.Constants.Messages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Barber shop dose not exists..
+        /// </summary>
+        public static string BarberShopDoseNotExist {
+            get {
+                return ResourceManager.GetString("BarberShopDoseNotExist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Successfully registered barber shop, we are working on approveing you barbershop. When your barbershop is approved you will receive an email..
         /// </summary>
         public static string BarberShopRegistrationSussesfuly {
             get {
                 return ResourceManager.GetString("BarberShopRegistrationSussesfuly", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Successfully updated barber shop information, we are working on approveing you barbershop. When your barbershop is approved you will receive an email..
+        /// </summary>
+        public static string BarberShopUpdatedSussesfuly {
+            get {
+                return ResourceManager.GetString("BarberShopUpdatedSussesfuly", resourceCulture);
             }
         }
         
@@ -255,6 +273,15 @@ namespace Business.Constants.Messages {
         public static string RouteTemplateNotConfigured {
             get {
                 return ResourceManager.GetString("RouteTemplateNotConfigured", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Barbershop openning hour must me grater than the finish hour and not equal to it..
+        /// </summary>
+        public static string StartHourIsLargerOrEqualToFinishHour {
+            get {
+                return ResourceManager.GetString("StartHourIsLargerOrEqualToFinishHour", resourceCulture);
             }
         }
         

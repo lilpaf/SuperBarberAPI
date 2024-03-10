@@ -2,6 +2,13 @@
 using SuperBarber.Models;
 using Business.Constants;
 using Business.Constants.Messages;
+using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.JsonPatch;
+using Newtonsoft.Json.Linq;
+using Business.Models.Requests.BarberShop;
+using Business.Models.Exceptions;
+using Org.BouncyCastle.Asn1.X509.Qualified;
 
 namespace SuperBarber.Filters
 {
@@ -22,20 +29,8 @@ namespace SuperBarber.Filters
                     .Select(x => x.ErrorMessage)
                     .ToArray();
 
-                string message = Messages.ModelStateValidationErrorMessage;
-                int statusCode = StatusCodes.Status400BadRequest;
-                int errorCode = ErrorConstants.ClientSideErrorCode;
 
-                ResponseContent response = new()
-                {
-                    Error = new ErrorResponse(message, statusCode, errorCode, errorsMessages)
-                };
-
-                context.HttpContext.Response.StatusCode = statusCode;
-                await context.HttpContext.Response.WriteAsJsonAsync(response);
-
-                _logger.LogError("Invalid model state error with errors: {Errors}", string.Join(ErrorConstants.ErrorDelimiter, errorsMessages));
-                return;
+                throw new InvalidModelStateException(errorsMessages);
             }
 
             await next();
