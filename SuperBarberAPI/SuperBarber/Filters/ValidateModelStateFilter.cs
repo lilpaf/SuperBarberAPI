@@ -5,12 +5,6 @@ namespace SuperBarber.Filters
 {
     public class ValidateModelStateFilter : IAsyncActionFilter
     {
-        private readonly ILogger<ValidateModelStateFilter> _logger;
-        public ValidateModelStateFilter(ILogger<ValidateModelStateFilter> logger)
-        {
-            _logger = logger;
-        }
-
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
             if (!context.ModelState.IsValid)
@@ -19,7 +13,6 @@ namespace SuperBarber.Filters
                     .SelectMany(x => x.Errors)
                     .Select(x => x.ErrorMessage)
                     .ToArray();
-
 
                 throw new InvalidModelStateException(errorsMessages);
             }
