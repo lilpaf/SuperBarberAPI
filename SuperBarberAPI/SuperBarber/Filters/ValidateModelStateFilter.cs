@@ -1,14 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc.Filters;
-using SuperBarber.Models;
-using Business.Constants;
-using Business.Constants.Messages;
-using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.JsonPatch;
-using Newtonsoft.Json.Linq;
-using Business.Models.Requests.BarberShop;
 using Business.Models.Exceptions;
-using Org.BouncyCastle.Asn1.X509.Qualified;
 
 namespace SuperBarber.Filters
 {

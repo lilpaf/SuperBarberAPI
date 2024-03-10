@@ -1,5 +1,5 @@
-﻿using Business.Constants.Messages;
-using Business.Models.Exceptions.General;
+﻿using Business.Models.Exceptions.General;
+using Common.Constants.Messages;
 
 namespace Business.Models.Exceptions
 {

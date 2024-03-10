@@ -1,5 +1,5 @@
-﻿using Business.Constants;
-using Business.Constants.Messages;
+﻿using Common.Constants;
+using Common.Constants.Messages;
 using System.ComponentModel.DataAnnotations;
 
 namespace Business.Models.Requests.BarberShop
@@ -18,14 +18,15 @@ namespace Business.Models.Requests.BarberShop
         [Required]
         [StringLength(DataConstraints.AddressMaxLength, MinimumLength = DataConstraints.DefaultMinLength)]
         public required string Address { get; init; }
+        
+        [StringLength(DataConstraints.AboutMaxLength)]
+        public required string? About { get; init; }
 
         [Required]
-        [RegularExpression(@"\b(?:0[0-9]|1[0-9]|2[0-3]):(?:00|30)\b", ErrorMessageResourceType = typeof(Messages), ErrorMessageResourceName = nameof(Messages.InvalidHourFormat))]
-        public required string StartHour { get; init; }
-
-        [Required]
-        [RegularExpression(@"\b(?:0[0-9]|1[0-9]|2[0-3]):(?:00|30)\b", ErrorMessageResourceType = typeof(Messages), ErrorMessageResourceName = nameof(Messages.InvalidHourFormat))]
-        public required string FinishHour { get; init; }
+        [ValidWorkingWeekHours(
+            ErrorMessageResourceType = typeof(Messages), 
+            ErrorMessageResourceName = nameof(Messages.InvalidAndDateHourFormat))]
+        public required Dictionary<string, Tuple<string?, string?>> WorkingDaysHours { get; init; }
 
         //ToDo fix it
         //[Required]

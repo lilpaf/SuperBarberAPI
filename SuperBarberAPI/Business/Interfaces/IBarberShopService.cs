@@ -6,7 +6,9 @@ namespace Business.Interfaces
 {
     public interface IBarberShopService
     {
-        Task<AllBarberShopsResponse> GetAllBarberShopsAsync(AllBarberShopRequest request);
+        Task<AllBarberShopsResponse> GetAllPublicBarberShopsAsync(AllBarberShopRequest request);
+
+        Task<BarberShopResponse> GetPublicBarberShopAsync(int barberShopId);
 
         Task<RegisterBarberShopResponse> RegisterBarberShopAsync(RegisterBarberShopRequest request);
 

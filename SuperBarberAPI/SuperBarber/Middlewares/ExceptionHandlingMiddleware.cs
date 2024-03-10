@@ -1,8 +1,7 @@
-﻿using Business.Constants;
-using Business.Constants.Messages;
-using Business.Models.Exceptions;
+﻿using Business.Models.Exceptions;
 using Business.Models.Exceptions.General;
-using Microsoft.AspNetCore.Http;
+using Common.Constants;
+using Common.Constants.Messages;
 using SuperBarber.Models;
 
 namespace SuperBarber.Middlewares
@@ -28,7 +27,8 @@ namespace SuperBarber.Middlewares
             }
             catch (InvalidModelStateException exception)
             {
-                _logger.LogError("Invalid model state error with errors: {Errors}", string.Join(ErrorConstants.ErrorDelimiter, exception.Errors));
+                _logger.LogError("Invalid model state error with errors: {Errors}", 
+                    string.Join(ErrorConstants.ErrorDelimiter, exception.Errors));
 
                 ResponseContent response = new()
                 {

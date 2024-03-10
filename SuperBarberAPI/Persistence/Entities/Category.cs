@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Persistence.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace Persistence.Entities
 {
@@ -7,7 +8,11 @@ namespace Persistence.Entities
         public int Id { get; set; }
 
         [Required]
-        public required string Name { get; set; }
+        public required string CategoryName { get; set; }
+        
+        [Required]
+        [EnumDataType(typeof(CategoryEnum))]
+        public required CategoryEnum CategoryEnum { get; set; }
 
         public ICollection<ServiceCategory> Services { get; set; } = new HashSet<ServiceCategory>();
     }

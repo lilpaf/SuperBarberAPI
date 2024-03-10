@@ -22,10 +22,8 @@ namespace Persistence.Entities
 
         [Required]
         public required string Address { get; set; }
-
-        public required TimeSpan StartHour { get; set; }
-
-        public required TimeSpan FinishHour { get; set; }
+        
+        public required string? About { get; set; }
 
         //ToDo fix it
         //public required string ImageName { get; set; } = null!;
@@ -38,10 +36,13 @@ namespace Persistence.Entities
 
         public required double AverageRating { get; set; }
 
+        public required ICollection<BarberShopWorkingDay> BarberShopWorkingDays { get; set; } = new HashSet<BarberShopWorkingDay>();
+        
         public ICollection<BarberShopService> Services { get; set; } = new HashSet<BarberShopService>();
 
         public ICollection<Order> Orders { get; set; } = new HashSet<Order>();
 
+        //ToDo make it required
         public ICollection<BarberShopBarber> Barbers { get; set; } = new HashSet<BarberShopBarber>();
     }
 }

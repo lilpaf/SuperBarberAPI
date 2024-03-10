@@ -9,6 +9,10 @@ namespace Persistence.Entities
         [Required]
         public required string Name { get; set; }
 
+        public required string? About { get; set; }
+        
+        public required TimeSpan TimeToExecute { get; set; }
+
         public required bool IsDeleted { get; set; }
 
         public DateTime? DeleteDate { get; set; }

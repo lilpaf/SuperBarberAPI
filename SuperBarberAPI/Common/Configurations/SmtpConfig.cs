@@ -1,4 +1,4 @@
-﻿namespace Business.Configurations
+﻿namespace Common.Configurations
 {
     public class SmtpConfig
     {

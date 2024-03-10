@@ -15,6 +15,6 @@ namespace Business.Models.Responses.BarberShop
 
         public string? BarberShopSearchName { get; init; }
 
-        public required IReadOnlyList<BarberShopDto> BarberShops { get; init; }
+        public required IReadOnlyList<AllBarberShopDto> BarberShops { get; init; }
     }
 }

@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Business.Constants.Messages {
+namespace Common.Constants.Messages {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace Business.Constants.Messages {
         public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Business.Constants.Messages.Messages", typeof(Messages).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Common.Constants.Messages.Messages", typeof(Messages).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -160,20 +160,20 @@ namespace Business.Constants.Messages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Invalid date or/and hour date format..
+        /// </summary>
+        public static string InvalidAndDateHourFormat {
+            get {
+                return ResourceManager.GetString("InvalidAndDateHourFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to City dose not exists..
         /// </summary>
         public static string InvalidCity {
             get {
                 return ResourceManager.GetString("InvalidCity", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Invalid hour format..
-        /// </summary>
-        public static string InvalidHourFormat {
-            get {
-                return ResourceManager.GetString("InvalidHourFormat", resourceCulture);
             }
         }
         
@@ -228,6 +228,15 @@ namespace Business.Constants.Messages {
         public static string MissingCityJsonFile {
             get {
                 return ResourceManager.GetString("MissingCityJsonFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Missing days import json file..
+        /// </summary>
+        public static string MissingDaysJsonFile {
+            get {
+                return ResourceManager.GetString("MissingDaysJsonFile", resourceCulture);
             }
         }
         

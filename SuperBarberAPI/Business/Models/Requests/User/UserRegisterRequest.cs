@@ -1,4 +1,4 @@
-﻿using Business.Constants;
+﻿using Common.Constants;
 using System.ComponentModel.DataAnnotations;
 
 namespace Business.Models.Requests.User

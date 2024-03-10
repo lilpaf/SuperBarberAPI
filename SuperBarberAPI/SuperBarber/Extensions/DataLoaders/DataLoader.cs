@@ -1,5 +1,5 @@
-﻿using Business.Constants.Messages;
-using Business.Models.Exceptions;
+﻿using Business.Models.Exceptions;
+using Common.Constants.Messages;
 using System.Text.Json;
 
 namespace SuperBarber.Extensions.DataLoaders

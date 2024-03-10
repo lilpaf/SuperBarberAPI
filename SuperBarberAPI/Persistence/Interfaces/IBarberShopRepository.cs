@@ -5,11 +5,13 @@ namespace Persistence.Interfaces
 {
     public interface IBarberShopRepository
     {
-        Task<IReadOnlyList<BarberShop>> GetAllActiveBarberShopsWithCitiesAndNeighborhoodsAsync(QueryParameterContainer queryParams);
+        Task<IReadOnlyList<BarberShop>> GetAllPublicBarberShopsWithCitiesNeighborhoodsAndWorkingDaysAsync(QueryParameterContainer queryParams);
 
         Task<int> GetTotalNumberActiveBarberShopsAsync();
 
-        Task<BarberShop?> GetBarberShopWithCityAndNeighborhoodByIdAsync(int id);
+        Task<BarberShop?> GetPublicAndPrivateBarberShopWithCitiesNeighborhoodsAndWorkingDaysByIdAsync(int id);
+
+        Task<BarberShop?> GetOnlyPublicBarberShopWithCitiesNeighborhoodsAndWorkingDaysByIdAsync(int id);
 
         Task AddBarberShopAsync(BarberShop barberShop);
 

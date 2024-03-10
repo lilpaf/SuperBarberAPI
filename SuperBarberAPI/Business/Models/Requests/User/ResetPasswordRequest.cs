@@ -1,5 +1,5 @@
-﻿using Business.Constants;
-using Business.Constants.Messages;
+﻿using Common.Constants;
+using Common.Constants.Messages;
 using System.ComponentModel.DataAnnotations;
 
 namespace Business.Models.Requests.User

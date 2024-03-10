@@ -12,7 +12,7 @@ using Persistence.Contexts;
 namespace Persistence.Migrations
 {
     [DbContext(typeof(SuperBarberDbContext))]
-    [Migration("20240307075743_InitialCreate")]
+    [Migration("20240310184323_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -170,6 +170,9 @@ namespace Persistence.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("About")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime?>("DeleteDate")
                         .HasColumnType("datetime2");
 
@@ -211,6 +214,9 @@ namespace Persistence.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("About")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Address")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -224,9 +230,6 @@ namespace Persistence.Migrations
                     b.Property<DateTime?>("DeleteDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<TimeSpan>("FinishHour")
-                        .HasColumnType("time");
-
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
@@ -239,9 +242,6 @@ namespace Persistence.Migrations
 
                     b.Property<int?>("NeighborhoodId")
                         .HasColumnType("int");
-
-                    b.Property<TimeSpan>("StartHour")
-                        .HasColumnType("time");
 
                     b.HasKey("Id");
 
@@ -270,7 +270,28 @@ namespace Persistence.Migrations
 
                     b.HasIndex("BarberShopId");
 
-                    b.ToTable("BarberShopBarber");
+                    b.ToTable("BarberShopBarbers");
+                });
+
+            modelBuilder.Entity("Persistence.Entities.BarberShopRating", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BarberShopId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Star")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BarberShopId");
+
+                    b.ToTable("BarberShopRatings");
                 });
 
             modelBuilder.Entity("Persistence.Entities.BarberShopService", b =>
@@ -296,7 +317,28 @@ namespace Persistence.Migrations
                     b.HasIndex("ServiceId")
                         .IsUnique();
 
-                    b.ToTable("BarberShopService");
+                    b.ToTable("BarberShopServices");
+                });
+
+            modelBuilder.Entity("Persistence.Entities.BarberShopWorkingDay", b =>
+                {
+                    b.Property<int>("BarberShopId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("WeekDayId")
+                        .HasColumnType("int");
+
+                    b.Property<TimeSpan?>("ClosingHour")
+                        .HasColumnType("time");
+
+                    b.Property<TimeSpan?>("OpeningHour")
+                        .HasColumnType("time");
+
+                    b.HasKey("BarberShopId", "WeekDayId");
+
+                    b.HasIndex("WeekDayId");
+
+                    b.ToTable("BarberShopWorkingDays");
                 });
 
             modelBuilder.Entity("Persistence.Entities.Category", b =>
@@ -307,7 +349,10 @@ namespace Persistence.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Name")
+                    b.Property<int>("CategoryEnum")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CategoryName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -397,6 +442,9 @@ namespace Persistence.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("About")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime?>("DeleteDate")
                         .HasColumnType("datetime2");
 
@@ -406,6 +454,9 @@ namespace Persistence.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<TimeSpan>("TimeToExecute")
+                        .HasColumnType("time");
 
                     b.HasKey("Id");
 
@@ -544,6 +595,26 @@ namespace Persistence.Migrations
                     b.ToTable("UserRefreshTokens");
                 });
 
+            modelBuilder.Entity("Persistence.Entities.WeekDay", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("DayOfWeekEnum")
+                        .HasColumnType("int");
+
+                    b.Property<string>("DayOfWeekName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("WeekDays");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -662,6 +733,17 @@ namespace Persistence.Migrations
                     b.Navigation("BarberShop");
                 });
 
+            modelBuilder.Entity("Persistence.Entities.BarberShopRating", b =>
+                {
+                    b.HasOne("Persistence.Entities.BarberShop", "BarberShop")
+                        .WithMany()
+                        .HasForeignKey("BarberShopId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("BarberShop");
+                });
+
             modelBuilder.Entity("Persistence.Entities.BarberShopService", b =>
                 {
                     b.HasOne("Persistence.Entities.BarberShop", "BarberShop")
@@ -684,6 +766,25 @@ namespace Persistence.Migrations
                     b.Navigation("BarberShop");
 
                     b.Navigation("Service");
+                });
+
+            modelBuilder.Entity("Persistence.Entities.BarberShopWorkingDay", b =>
+                {
+                    b.HasOne("Persistence.Entities.BarberShop", "BarberShop")
+                        .WithMany("BarberShopWorkingDays")
+                        .HasForeignKey("BarberShopId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Persistence.Entities.WeekDay", "WeekDay")
+                        .WithMany()
+                        .HasForeignKey("WeekDayId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("BarberShop");
+
+                    b.Navigation("WeekDay");
                 });
 
             modelBuilder.Entity("Persistence.Entities.Neighborhood", b =>
@@ -755,6 +856,8 @@ namespace Persistence.Migrations
 
             modelBuilder.Entity("Persistence.Entities.BarberShop", b =>
                 {
+                    b.Navigation("BarberShopWorkingDays");
+
                     b.Navigation("Barbers");
 
                     b.Navigation("Orders");

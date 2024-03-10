@@ -1,5 +1,5 @@
-﻿using Business.Configurations;
-using Business.Models.Exceptions;
+﻿using Business.Models.Exceptions;
+using Common.Configurations;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;

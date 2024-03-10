@@ -1,4 +1,4 @@
-﻿using Business.Constants;
+﻿using Common.Constants;
 using Microsoft.AspNetCore.Http;
 
 namespace Business.Models.Exceptions.General

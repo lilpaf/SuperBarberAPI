@@ -1,6 +1,4 @@
-﻿using Business.Configurations;
-using Business.Constants.Messages;
-using Business.Interfaces;
+﻿using Business.Interfaces;
 using Business.Models.Exceptions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -8,8 +6,10 @@ using Microsoft.Extensions.Options;
 using Persistence.Entities;
 using MimeKit;
 using MimeKit.Text;
+using Common.Configurations;
+using Common.Constants.Messages;
+using Common.Constants;
 using SmtpClient = MailKit.Net.Smtp.SmtpClient;
-using Business.Constants;
 
 namespace Business.Implementations
 {

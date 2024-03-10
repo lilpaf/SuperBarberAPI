@@ -13,6 +13,10 @@ namespace Persistence.Contexts
         public DbSet<Barber> Barbers { get; set; }
         public DbSet<BarberOrder> BarberOrders { get; set; }
         public DbSet<BarberShop> BarberShops { get; set; }
+        public DbSet<BarberShopBarber> BarberShopBarbers { get; set; }
+        public DbSet<BarberShopRating> BarberShopRatings { get; set; }
+        public DbSet<BarberShopService> BarberShopServices { get; set; }
+        public DbSet<BarberShopWorkingDay> BarberShopWorkingDays { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<Service> Services { get; set; }
         public DbSet<Category> Categories { get; set; }
@@ -20,6 +24,7 @@ namespace Persistence.Contexts
         public DbSet<City> Cities { get; set; }
         public DbSet<Neighborhood> Neighborhoods { get; set; }
         public DbSet<UserRefreshToken> UserRefreshTokens { get; set; }
+        public DbSet<WeekDay> WeekDays { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -95,6 +100,19 @@ namespace Persistence.Contexts
             modelBuilder.Entity<BarberShopService>()
                 .HasOne(bss => bss.BarberShop)
                 .WithMany(bs => bs.Services)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<BarberShopWorkingDay>()
+                .HasKey(bswd => new { bswd.BarberShopId, bswd.WeekDayId });
+
+            modelBuilder.Entity<BarberShopWorkingDay>()
+                .HasOne(bswd => bswd.BarberShop)
+                .WithMany(bs => bs.BarberShopWorkingDays)
+                .OnDelete(DeleteBehavior.Restrict);
+            
+            modelBuilder.Entity<BarberShopWorkingDay>()
+                .HasOne(bswd => bswd.WeekDay)
+                .WithMany()
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Category>()

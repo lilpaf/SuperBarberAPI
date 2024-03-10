@@ -20,33 +20,49 @@ namespace Persistence.Implementations
             _logger = logger;
         }
 
-        public async Task<IReadOnlyList<BarberShop>> GetAllActiveBarberShopsWithCitiesAndNeighborhoodsAsync(QueryParameterContainer queryParams)
+        public async Task<IReadOnlyList<BarberShop>> GetAllPublicBarberShopsWithCitiesNeighborhoodsAndWorkingDaysAsync(QueryParameterContainer queryParams)
         {
             _logger.LogInformation("Getting all active barbershops from SQL Db");
 
             IQueryable<BarberShop> barberShopQuery = QueryBarberShops(queryParams);
 
             return await barberShopQuery
-                .Include(b =>  b.City)
-                .Include(b =>  b.Neighborhood)
+                .Include(b => b.City)
+                .Include(b => b.Neighborhood)
+                .Include(b => b.BarberShopWorkingDays)
+                .ThenInclude(d => d.WeekDay)
                 .ToListAsync();
         }
-        
+
         public async Task<int> GetTotalNumberActiveBarberShopsAsync()
         {
             _logger.LogInformation("Getting total number of all active barbershops from SQL Db");
 
             return await _context.BarberShops.CountAsync();
         }
-        
-        public async Task<BarberShop?> GetBarberShopWithCityAndNeighborhoodByIdAsync(int id)
+
+        public async Task<BarberShop?> GetPublicAndPrivateBarberShopWithCitiesNeighborhoodsAndWorkingDaysByIdAsync(int id)
         {
-            _logger.LogInformation("Getting barber shop by id from SQL Db");
+            _logger.LogInformation("Getting public and private barber shop by id from SQL Db");
 
             return await _context.BarberShops
                 .Include(b => b.City)
                 .Include(b => b.Neighborhood)
-                .FirstOrDefaultAsync(b => b.Id == id);
+                .Include(b => b.BarberShopWorkingDays)
+                .ThenInclude(d => d.WeekDay)
+                .FirstOrDefaultAsync(b => b.Id == id && !b.IsDeleted);
+        }
+
+        public async Task<BarberShop?> GetOnlyPublicBarberShopWithCitiesNeighborhoodsAndWorkingDaysByIdAsync(int id)
+        {
+            _logger.LogInformation("Getting only public barber shop by id from SQL Db");
+
+            return await _context.BarberShops
+                .Include(b => b.City)
+                .Include(b => b.Neighborhood)
+                .Include(b => b.BarberShopWorkingDays)
+                .ThenInclude(d => d.WeekDay)
+                .FirstOrDefaultAsync(b => b.Id == id && !b.IsDeleted && b.IsPublic);
         }
 
         public async Task AddBarberShopAsync(BarberShop barberShop)
@@ -54,7 +70,7 @@ namespace Persistence.Implementations
             _logger.LogInformation("Adding barbershop to SQL Db");
             await _context.BarberShops.AddAsync(barberShop);
         }
-        
+
         public void UpdateBarberShopAsync(BarberShop barberShop)
         {
             _logger.LogInformation("Updating barbershop from SQL Db");
@@ -67,7 +83,7 @@ namespace Persistence.Implementations
             await _context.SaveChangesAsync();
         }
 
-        private IQueryable<BarberShop> QueryBarberShops(QueryParameterContainer queryParams) 
+        private IQueryable<BarberShop> QueryBarberShops(QueryParameterContainer queryParams)
         {
             _logger.LogInformation("Querying barbershops");
 
@@ -79,7 +95,7 @@ namespace Persistence.Implementations
             {
                 barberShopQuery.Where(b => b.Neighborhood != null && b.Neighborhood.Name == queryParams.Neighborhood);
             }
-            
+
             if (!string.IsNullOrEmpty(queryParams.BarberShopSearchName))
             {
                 barberShopQuery.Where(b => b.Name.ToLower().Replace(" ", string.Empty)

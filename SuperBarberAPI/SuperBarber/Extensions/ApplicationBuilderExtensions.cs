@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Persistence.Contexts;
 using Persistence.Entities;
+using Persistence.Enums;
 using Persistence.Implementations;
 using StackExchange.Redis;
 using SuperBarber.Extensions.DataLoaders;
@@ -24,6 +25,7 @@ namespace SuperBarber.Extensions
             SeedCategories(data);
             SeedCities(data, cache);
             SeedNeighborhoods(data, cache);
+            SeedWeekDays(data);
             //SeedAdministrotor(services);
             //SeedBarberRole(services);
             //SeedBarberShopOwnerRole(services);
@@ -38,10 +40,45 @@ namespace SuperBarber.Extensions
                 return;
             }
 
-            data.Categories.AddRange(new[]
+            string[] categoryName = Enum.GetNames<CategoryEnum>();
+            CategoryEnum[] categoryEnum = Enum.GetValues<CategoryEnum>();
+
+            for (int i = 0; i < categoryName.Length; i++)
             {
-                new Category{ Name = "Hair" },
-                new Category{ Name = "Face" }
+                data.Categories.Add(new Category
+                {
+                    CategoryName = categoryName[i],
+                    CategoryEnum = categoryEnum[i]
+                });
+            }
+
+            data.SaveChanges();
+        }
+
+        private static void SeedWeekDays(SuperBarberDbContext data)
+        {
+            if (data.WeekDays.Any())
+            {
+                return;
+            }
+
+            string[] weekDayName = Enum.GetNames<DayOfWeek>();
+            DayOfWeek[] weekDayEnum = Enum.GetValues<DayOfWeek>();
+
+            for (int i = 1; i < weekDayName.Length; i++)
+            {
+                data.WeekDays.Add(new WeekDay
+                {
+                    DayOfWeekName = weekDayName[i],
+                    DayOfWeekEnum = weekDayEnum[i]
+                });
+            }
+
+            // Sunday needs to be at the end
+            data.WeekDays.Add(new WeekDay
+            {
+                DayOfWeekName = weekDayName[0],
+                DayOfWeekEnum = weekDayEnum[0]
             });
 
             data.SaveChanges();

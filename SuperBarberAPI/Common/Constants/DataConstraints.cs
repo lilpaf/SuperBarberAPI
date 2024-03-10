@@ -1,4 +1,4 @@
-﻿namespace Business.Constants
+﻿namespace Common.Constants
 {
     public class DataConstraints
     {
@@ -17,6 +17,7 @@
         public const int PasswordMaxLength = 100;
         public const int ServiceNameMaxLength = 50;
         public const int ImageNameMaxLength = 100;
+        public const int AboutMaxLength = 200;
 
         public const int DefaultMinLength = 2;
         public const int PriceMinRange = 0;

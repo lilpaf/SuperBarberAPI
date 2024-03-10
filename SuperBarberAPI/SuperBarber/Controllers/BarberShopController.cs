@@ -22,13 +22,28 @@ namespace SuperBarber.Controllers
         }
 
         [HttpGet]
+        [Route("{id}")]
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(typeof(ResponseContent<BarberShopResponse>), 200)]
+        [ProducesDefaultResponseType(typeof(ResponseContent))]
+        public async Task<ResponseContent<BarberShopResponse>> Get([FromRoute] int id)
+        {
+            BarberShopResponse response = await _barberShopService.GetPublicBarberShopAsync(id);
+
+            return new ResponseContent<BarberShopResponse>()
+            {
+                Result = response
+            };
+        }
+        
+        [HttpGet]
         [Route("all")]
         [Produces(MediaTypeNames.Application.Json)]
         [ProducesResponseType(typeof(ResponseContent<AllBarberShopsResponse>), 200)]
         [ProducesDefaultResponseType(typeof(ResponseContent))]
         public async Task<ResponseContent<AllBarberShopsResponse>> GetAll([FromQuery] AllBarberShopRequest request)
         {
-            AllBarberShopsResponse response = await _barberShopService.GetAllBarberShopsAsync(request);
+            AllBarberShopsResponse response = await _barberShopService.GetAllPublicBarberShopsAsync(request);
 
             return new ResponseContent<AllBarberShopsResponse>()
             {
@@ -53,7 +68,6 @@ namespace SuperBarber.Controllers
         
         [HttpPatch]
         [Route("update/{id}")]
-        [Consumes(MediaTypeNames.Application.JsonPatch)]
         [Produces(MediaTypeNames.Application.Json)]
         [ProducesResponseType(typeof(ResponseContent<UpdateBarberShopResponse>), 200)]
         [ProducesDefaultResponseType(typeof(ResponseContent))]

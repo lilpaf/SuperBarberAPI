@@ -161,6 +161,9 @@
 	<data name="MissingCityJsonFile" xml:space="preserve">
 		<value>Missing city import json file.</value>
 	</data>
+	<data name="MissingDaysJsonFile" xml:space="preserve">
+		<value>Missing days import json file.</value>
+	</data>
 	<data name="MissingNeighborhoodJsonFile" xml:space="preserve">
 		<value>Missing neighborhoods import json file.</value>
 	</data>
@@ -179,8 +182,8 @@
 	<data name="ConfirmationPasswordDoNotMatch" xml:space="preserve">
 		<value>The new password and confirmation password do not match.</value>
 	</data>
-	<data name="InvalidHourFormat" xml:space="preserve">
-		<value>Invalid hour format.</value>
+	<data name="InvalidAndDateHourFormat" xml:space="preserve">
+		<value>Invalid date or/and hour date format.</value>
 	</data>
 	<data name="BarberShopDoseNotExist" xml:space="preserve">
 		<value>Barber shop dose not exists.</value>

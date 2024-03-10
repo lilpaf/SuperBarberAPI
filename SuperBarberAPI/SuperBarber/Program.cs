@@ -1,6 +1,6 @@
-using Business.Configurations;
 using Business.Implementations;
 using Business.Interfaces;
+using Common.Configurations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Contexts;
@@ -19,6 +19,8 @@ var builder = WebApplication.CreateBuilder(args);
  * ToDo schedule sending email
  * ToDo save all cities in a state or something like this in react we will need separate endpoint
  * ToDo separate endpoint for getting neighborhoods by city
+ * ToDo translate app when we have FE 
+ * ToDo FE validations
  */
 // Add services to the container.
 
@@ -60,6 +62,7 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IBarberShopRepository, BarberShopRepository>();
 builder.Services.AddScoped<INeighborhoodRepository, NeighborhoodRepository>();
 builder.Services.AddScoped<ICityRepository, CityRepository>();
+builder.Services.AddScoped<IWeekDayRepository, WeekDayRepository>();
 
 //Filters
 builder.Services.AddMvc(options =>

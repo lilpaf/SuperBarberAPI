@@ -7,6 +7,8 @@ namespace Persistence.Entities
     {
         public int Id { get; set; }
 
+        public required string? About { get; set; }
+
         [Required]
         public required string UserId { get; set; }
 

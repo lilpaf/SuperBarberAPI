@@ -1,10 +1,10 @@
-﻿using Business.Configurations;
-using Business.Constants;
-using Business.Constants.Messages;
-using Business.Interfaces;
+﻿using Business.Interfaces;
 using Business.Models.Exceptions;
 using Business.Models.Requests.User;
 using Business.Models.Responses.User;
+using Common.Configurations;
+using Common.Constants;
+using Common.Constants.Messages;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.WebUtilities;
@@ -74,7 +74,8 @@ namespace Business.Implementations
             {
                 string[] errorsMessages = isUserCreated.Errors.Select(e => e.Description).ToArray();
 
-                _logger.LogError("There was an error when creating the user. Error messages: {ErrorMessages}", String.Join(ErrorConstants.ErrorDelimiter, errorsMessages));
+                _logger.LogError("There was an error when creating the user. Error messages: {ErrorMessages}", 
+                    String.Join(ErrorConstants.ErrorDelimiter, errorsMessages));
                 throw new ErrorCreatingUserException(Messages.ErrorCreatingUser);
             }
 
