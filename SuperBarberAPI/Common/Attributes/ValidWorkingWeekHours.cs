@@ -1,48 +1,51 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
 
-[AttributeUsage(AttributeTargets.Property)]
-public class ValidWorkingWeekHours : ValidationAttribute
+namespace Common.Attributes
 {
-    private readonly Regex _regex;
-
-    public ValidWorkingWeekHours()
+    [AttributeUsage(AttributeTargets.Property)]
+    public class ValidWorkingWeekHours : ValidationAttribute
     {
-        _regex = new(@"\b(?:0[0-9]|1[0-9]|2[0-3]):(?:00|30)\b");
-    }
+        private readonly Regex _regex;
 
-    public override bool IsValid(object? value)
-    {
-        if (value is not Dictionary<string, Tuple<string?, string?>> workingWeekHours)
+        public ValidWorkingWeekHours()
         {
-            return false;
+            _regex = new(@"\b(?:0[0-9]|1[0-9]|2[0-3]):(?:00|30)\b");
         }
 
-        if (workingWeekHours.Keys.Any(day => !Enum.GetNames<DayOfWeek>().Contains(day)))
+        public override bool IsValid(object? value)
         {
-            return false;
-        }
-
-        foreach (var hours in workingWeekHours.Values)
-        {
-            string? startHour = hours.Item1;
-            string? finishHour = hours.Item2;
-
-            if (startHour is null && finishHour is null)
-            {
-                continue;
-            }
-            else if (startHour is null || finishHour is null)
+            if (value is not Dictionary<string, Tuple<string?, string?>> workingWeekHours)
             {
                 return false;
             }
 
-            if (!_regex.IsMatch(startHour) || !_regex.IsMatch(finishHour))
+            if (workingWeekHours.Keys.Any(day => !Enum.GetNames<DayOfWeek>().Contains(day)))
             {
                 return false;
             }
-        }
 
-        return true;
+            foreach (var hours in workingWeekHours.Values)
+            {
+                string? startHour = hours.Item1;
+                string? finishHour = hours.Item2;
+
+                if (startHour is null && finishHour is null)
+                {
+                    continue;
+                }
+                else if (startHour is null || finishHour is null)
+                {
+                    return false;
+                }
+
+                if (!_regex.IsMatch(startHour) || !_regex.IsMatch(finishHour))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
     }
 }
