@@ -194,4 +194,10 @@
 	<data name="StartHourIsLargerOrEqualToFinishHour" xml:space="preserve">
 		<value>Barbershop openning hour must me grater than the finish hour and not equal to it.</value>
 	</data>
+	<data name="UserIsAlreadyBarber" xml:space="preserve">
+		<value>You are already a barber.</value>
+	</data>
+	<data name="BarberRegistrationSussesfuly" xml:space="preserve">
+		<value>You have been registered as barber.</value>
+	</data>
 </root>

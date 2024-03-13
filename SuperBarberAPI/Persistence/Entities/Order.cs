@@ -22,7 +22,7 @@ namespace Persistence.Entities
 
         public required bool IsDeleted { get; set; }
 
-        public DateTime? DeleteDate { get; set; }
+        public required DateTime? DeleteDate { get; set; }
 
         [Column(TypeName = "decimal(18,2)")]
         public required decimal TotalPrice { get; set; }

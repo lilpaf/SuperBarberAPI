@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Common.Constants;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Persistence.Contexts;
 using Persistence.Entities;
 using Persistence.Enums;
@@ -21,14 +23,13 @@ namespace SuperBarber.Extensions
 
             data.Database.Migrate();
 
-            //ToDo later on implement them
             SeedCategories(data);
             SeedCities(data, cache);
             SeedNeighborhoods(data, cache);
             SeedWeekDays(data);
-            //SeedAdministrotor(services);
-            //SeedBarberRole(services);
-            //SeedBarberShopOwnerRole(services);
+            SeedAdministrator(services);
+            SeedBarberRole(services);
+            SeedBarberShopOwnerRole(services);
 
             return app;
         }
@@ -132,6 +133,89 @@ namespace SuperBarber.Extensions
             }
 
             data.SaveChanges();
+        }
+
+        private static void SeedAdministrator(IServiceProvider services)
+        {
+            var userManager = services.GetRequiredService<UserManager<User>>();
+            var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+
+            Task.Run(async () =>
+            {
+                if (await roleManager.RoleExistsAsync(RolesConstants.AdministratorRoleName))
+                {
+                    return;
+                }
+
+                IdentityRole role = new () 
+                { 
+                    Name = RolesConstants.AdministratorRoleName 
+                };
+
+                await roleManager.CreateAsync(role);
+
+                string adminPassword = "admin!23";
+
+                User user = new()
+                {
+                    Email = "admin@barbers.com",
+                    UserName = "admin@barbers.com",
+                    FirstName = "AdminFirstName",
+                    LastName = "AdminLastName",
+                    IsDeleted = false,
+                    DeleteDate = null
+                };
+
+                await userManager.CreateAsync(user, adminPassword);
+
+                await userManager.AddToRoleAsync(user, role.Name);
+            })
+            .GetAwaiter()
+            .GetResult();
+        }
+
+        private static void SeedBarberRole(IServiceProvider services)
+        {
+            var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+
+            Task.Run(async () =>
+            {
+                if (await roleManager.RoleExistsAsync(RolesConstants.BarberRoleName))
+                {
+                    return;
+                }
+
+                IdentityRole role = new () 
+                { 
+                    Name = RolesConstants.BarberRoleName 
+                };
+
+                await roleManager.CreateAsync(role);
+            })
+            .GetAwaiter()
+            .GetResult();
+        }
+
+        private static void SeedBarberShopOwnerRole(IServiceProvider services)
+        {
+            var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+
+            Task.Run(async () =>
+            {
+                if (await roleManager.RoleExistsAsync(RolesConstants.BarberShopOwnerRoleName))
+                {
+                    return;
+                }
+
+                IdentityRole role = new () 
+                { 
+                    Name = RolesConstants.BarberShopOwnerRoleName 
+                };
+
+                await roleManager.CreateAsync(role);
+            })
+            .GetAwaiter()
+            .GetResult();
         }
     }
 }

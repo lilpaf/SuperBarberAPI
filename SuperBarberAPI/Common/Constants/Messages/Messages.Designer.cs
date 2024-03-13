@@ -61,6 +61,15 @@ namespace Common.Constants.Messages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to You have been registered as barber..
+        /// </summary>
+        public static string BarberRegistrationSussesfuly {
+            get {
+                return ResourceManager.GetString("BarberRegistrationSussesfuly", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Barber shop dose not exists..
         /// </summary>
         public static string BarberShopDoseNotExist {
@@ -309,6 +318,15 @@ namespace Common.Constants.Messages {
         public static string UserExists {
             get {
                 return ResourceManager.GetString("UserExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You are already a barber..
+        /// </summary>
+        public static string UserIsAlreadyBarber {
+            get {
+                return ResourceManager.GetString("UserIsAlreadyBarber", resourceCulture);
             }
         }
         

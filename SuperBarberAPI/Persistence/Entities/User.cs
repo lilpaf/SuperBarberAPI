@@ -10,7 +10,7 @@ namespace Persistence.Entities
 
         public required bool IsDeleted { get; set; }
 
-        public DateTime? DeleteDate { get; set; }
+        public required DateTime? DeleteDate { get; set; }
 
         public ICollection<Order> Reservations { get; set; } = new HashSet<Order>();
     }

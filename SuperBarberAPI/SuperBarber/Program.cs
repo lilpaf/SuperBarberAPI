@@ -57,6 +57,7 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserHandler, UserHandler>();
 builder.Services.AddScoped<IBarberShopService, BarberShopService>();
 builder.Services.AddSingleton<IEmailService, EmailService>();
+builder.Services.AddScoped<IBarberService, BarberService>();
 
 // Repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -64,6 +65,7 @@ builder.Services.AddScoped<IBarberShopRepository, BarberShopRepository>();
 builder.Services.AddScoped<INeighborhoodRepository, NeighborhoodRepository>();
 builder.Services.AddScoped<ICityRepository, CityRepository>();
 builder.Services.AddScoped<IWeekDayRepository, WeekDayRepository>();
+builder.Services.AddScoped<IBarberRepository, BarberRepository>();
 
 //Filters
 builder.Services.AddMvc(options =>
