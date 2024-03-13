@@ -266,29 +266,6 @@ namespace Business.Implementations
             return (startHourParsed, finishHourParsed);
         }
 
-        private Dictionary<string, string?> GetBarberShopWorkingWeekHours(BarberShop barberShop)
-        {
-            Dictionary<string, string?> result = new();
-
-            foreach (var workingDay in barberShop.BarberShopWorkingDays)
-            {
-                string dayOfWeek = workingDay.WeekDay.DayOfWeekName;
-                string? startHour = workingDay.OpeningHour.ToString();
-                string? finishHour = workingDay.ClosingHour.ToString();
-
-                if (startHour is null || finishHour is null)
-                {
-                    result.Add(dayOfWeek, null);
-
-                    continue;
-                }
-
-                result.Add(dayOfWeek, $"{startHour}:{finishHour}");
-            }
-
-            return result;
-        }
-
         private Dictionary<string, Tuple<string?, string?>> GetBarberShopWorkingHoursTodayUtc(ICollection<BarberShopWorkingDay> barberShopWorkingDays)
         {
             BarberShopWorkingDay today = barberShopWorkingDays
