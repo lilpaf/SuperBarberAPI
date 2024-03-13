@@ -15,7 +15,7 @@ namespace Business.Implementations
 {
     public class BarberShopService : IBarberShopService
     {
-        private const string StringHourFormat = @"hh\:mm";
+        private const string StringDateTimeFormat = @"hh\:mm";
         private readonly IBarberShopRepository _barberShopRepository;
         private readonly ICityRepository _cityRepository;
         private readonly INeighborhoodRepository _neighborhoodRepository;
@@ -289,8 +289,8 @@ namespace Business.Implementations
             {
                 string weekDayName = barberShopWorkingDay.WeekDay.DayOfWeekName;
 
-                string? openingHour = barberShopWorkingDay.OpeningHour?.ToString(StringHourFormat);
-                string? closingHour = barberShopWorkingDay.ClosingHour?.ToString(StringHourFormat);
+                string? openingHour = barberShopWorkingDay.OpeningHour?.ToString(StringDateTimeFormat);
+                string? closingHour = barberShopWorkingDay.ClosingHour?.ToString(StringDateTimeFormat);
 
                 result.Add(weekDayName, Tuple.Create(openingHour, closingHour));
             }
