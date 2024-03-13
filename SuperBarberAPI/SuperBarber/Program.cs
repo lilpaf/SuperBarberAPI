@@ -54,6 +54,7 @@ builder.Services.AddSwaggerGen();
 
 // Services
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IUserHandler, UserHandler>();
 builder.Services.AddScoped<IBarberShopService, BarberShopService>();
 builder.Services.AddSingleton<IEmailService, EmailService>();
 

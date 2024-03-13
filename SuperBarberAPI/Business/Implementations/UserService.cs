@@ -28,6 +28,7 @@ namespace Business.Implementations
         private readonly ILogger<UserService> _logger;
         private readonly IEmailService _emailService;
         private readonly TokenValidationParameters _tokenValidationParameters;
+        private readonly IUserHandler _userHandler;
         private static HttpContext _httpContext => new HttpContextAccessor().HttpContext ??
             throw new NotConfiguredException(Messages.NoActiveHttpContext);
 
@@ -37,7 +38,8 @@ namespace Business.Implementations
             IOptions<JwtConfig> jwtConfig,
             IUserRepository userRepository,
             IEmailService emailService,
-            TokenValidationParameters tokenValidationParameters)
+            TokenValidationParameters tokenValidationParameters,
+            IUserHandler userHandler)
         {
             _userManager = userManager;
             _logger = logger;
@@ -45,6 +47,7 @@ namespace Business.Implementations
             _userRepository = userRepository;
             _emailService = emailService;
             _tokenValidationParameters = tokenValidationParameters;
+            _userHandler = userHandler;
         }
 
         public async Task<AuthenticationResponse> RegisterUserAsync(UserRegisterRequest request, string controllerRouteTemplate, string emailConformationRouteTemplate)
@@ -129,7 +132,7 @@ namespace Business.Implementations
 
         public async Task<EmailConfirmationResponse> ConfirmEmailAsync(EmailConfirmationRequest request)
         {
-            User user = await GetUserByUserClaimIdAsync();
+            User user = await _userHandler.GetUserByUserClaimIdAsync();
 
             //Decode the code
             string code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(request.Code));
@@ -210,7 +213,7 @@ namespace Business.Implementations
 
         public async Task<AuthenticationResponse> LogOutAsync()
         {
-            User user = await GetUserByUserClaimIdAsync();
+            User user = await _userHandler.GetUserByUserClaimIdAsync();
 
             await RevokeUserRefreshTokenAsync(user);
 
@@ -293,7 +296,7 @@ namespace Business.Implementations
             }
             catch (Exception)
             {
-                User user = await GetUserByUserClaimIdAsync();
+                User user = await _userHandler.GetUserByUserClaimIdAsync();
                 await RevokeUserRefreshTokenAsync(user);
                 throw;
             }
@@ -316,28 +319,6 @@ namespace Business.Implementations
             }
         }
         
-        private async Task<User> GetUserByUserClaimIdAsync()
-        {
-            string? userId = _httpContext.User
-                .FindFirstValue(ClaimTypes.NameIdentifier);
-
-            if (string.IsNullOrEmpty(userId))
-            {
-                _logger.LogError("User Id claim was not found");
-                throw new InvalidArgumentException(Messages.InvalidJwtToken);
-            }
-
-            User? user = await _userManager.FindByIdAsync(userId);
-
-            if (user is null || user.IsDeleted)
-            {
-                _logger.LogError("User with this id {Id} dose not exists or is deleted", userId);
-                throw new InvalidArgumentException(Messages.UserDoesNotExist);
-            }
-
-            return user;
-        }
-
         private async Task<AuthenticationResponse> GenerateJwtTokenAsync(User user)
         {
             JwtSecurityTokenHandler jwtTokenHandler = new();
@@ -348,7 +329,7 @@ namespace Business.Implementations
             {
                 Subject = new ClaimsIdentity(new[]
                 {
-                    new Claim(ClaimTypes.NameIdentifier, user.Id),
+                    new Claim(AuthenticationConstants.UserIdClaimType, user.Id),
                     new Claim(JwtRegisteredClaimNames.Sub, user.Email!),
                     new Claim(JwtRegisteredClaimNames.Email, user.Email!),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
