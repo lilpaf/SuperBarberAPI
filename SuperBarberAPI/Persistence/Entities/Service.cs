@@ -11,12 +11,11 @@ namespace Persistence.Entities
 
         public required string? About { get; set; }
         
-        public required TimeSpan TimeToExecute { get; set; }
-
         public required bool IsDeleted { get; set; }
 
         public DateTime? DeleteDate { get; set; }
 
         public ICollection<ServiceCategory> Categories { get; set; } = new HashSet<ServiceCategory>();
+        public ICollection<BarberShopService> BarberShopServices { get; set; } = new HashSet<BarberShopService>();
     }
 }

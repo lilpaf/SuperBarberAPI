@@ -4,6 +4,8 @@ namespace Persistence.Entities
 {
     public class BarberShopService
     {
+        public int Id { get; set; }
+
         public required int BarberShopId { get; set; }
 
         [ForeignKey(nameof(BarberShopId))]
@@ -16,5 +18,7 @@ namespace Persistence.Entities
 
         [Column(TypeName = "decimal(18,2)")]
         public required decimal Price { get; set; }
+
+        public required TimeSpan TimeToExecute { get; set; }
     }
 }

@@ -90,7 +90,6 @@ namespace Persistence.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     About = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    TimeToExecute = table.Column<TimeSpan>(type: "time", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     DeleteDate = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
@@ -311,12 +310,14 @@ namespace Persistence.Migrations
                 name: "ServiceCategories",
                 columns: table => new
                 {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     CategoryId = table.Column<int>(type: "int", nullable: false),
                     ServiceId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ServiceCategories", x => new { x.ServiceId, x.CategoryId });
+                    table.PrimaryKey("PK_ServiceCategories", x => x.Id);
                     table.ForeignKey(
                         name: "FK_ServiceCategories_Categories_CategoryId",
                         column: x => x.CategoryId,
@@ -388,14 +389,16 @@ namespace Persistence.Migrations
                 name: "BarberShopBarbers",
                 columns: table => new
                 {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     BarberShopId = table.Column<int>(type: "int", nullable: false),
                     BarberId = table.Column<int>(type: "int", nullable: false),
                     IsOwner = table.Column<bool>(type: "bit", nullable: false),
-                    IsAvailable = table.Column<bool>(type: "bit", nullable: false)
+                    CanTakeOrders = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_BarberShopBarbers", x => new { x.BarberId, x.BarberShopId });
+                    table.PrimaryKey("PK_BarberShopBarbers", x => x.Id);
                     table.ForeignKey(
                         name: "FK_BarberShopBarbers_BarberShops_BarberShopId",
                         column: x => x.BarberShopId,
@@ -434,6 +437,8 @@ namespace Persistence.Migrations
                 name: "BarberShopWorkingDays",
                 columns: table => new
                 {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     WeekDayId = table.Column<int>(type: "int", nullable: false),
                     BarberShopId = table.Column<int>(type: "int", nullable: false),
                     OpeningHour = table.Column<TimeSpan>(type: "time", nullable: true),
@@ -441,7 +446,7 @@ namespace Persistence.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_BarberShopWorkingDays", x => new { x.BarberShopId, x.WeekDayId });
+                    table.PrimaryKey("PK_BarberShopWorkingDays", x => x.Id);
                     table.ForeignKey(
                         name: "FK_BarberShopWorkingDays_BarberShops_BarberShopId",
                         column: x => x.BarberShopId,
@@ -463,7 +468,9 @@ namespace Persistence.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     BarberShopId = table.Column<int>(type: "int", nullable: false),
-                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    BarberId = table.Column<int>(type: "int", nullable: false),
+                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EndDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     DeleteDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     TotalPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
@@ -483,28 +490,31 @@ namespace Persistence.Migrations
                         principalTable: "BarberShops",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "BarberOrders",
-                columns: table => new
-                {
-                    OrderId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    BarberId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_BarberOrders", x => new { x.BarberId, x.OrderId });
                     table.ForeignKey(
-                        name: "FK_BarberOrders_Barbers_BarberId",
+                        name: "FK_Orders_Barbers_BarberId",
                         column: x => x.BarberId,
                         principalTable: "Barbers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "BarberShopBarberWeekends",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    BarberShopBarberId = table.Column<int>(type: "int", nullable: false),
+                    Start = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    End = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BarberShopBarberWeekends", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_BarberOrders_Orders_OrderId",
-                        column: x => x.OrderId,
-                        principalTable: "Orders",
+                        name: "FK_BarberShopBarberWeekends_BarberShopBarbers_BarberShopBarberId",
+                        column: x => x.BarberShopBarberId,
+                        principalTable: "BarberShopBarbers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -513,14 +523,17 @@ namespace Persistence.Migrations
                 name: "BarberShopServices",
                 columns: table => new
                 {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     BarberShopId = table.Column<int>(type: "int", nullable: false),
                     ServiceId = table.Column<int>(type: "int", nullable: false),
                     Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    TimeToExecute = table.Column<TimeSpan>(type: "time", nullable: false),
                     OrderId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_BarberShopServices", x => new { x.ServiceId, x.BarberShopId });
+                    table.PrimaryKey("PK_BarberShopServices", x => x.Id);
                     table.ForeignKey(
                         name: "FK_BarberShopServices_BarberShops_BarberShopId",
                         column: x => x.BarberShopId,
@@ -581,11 +594,6 @@ namespace Persistence.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_BarberOrders_OrderId",
-                table: "BarberOrders",
-                column: "OrderId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_BarberRatings_BarberId",
                 table: "BarberRatings",
                 column: "BarberId");
@@ -597,9 +605,19 @@ namespace Persistence.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_BarberShopBarbers_BarberId",
+                table: "BarberShopBarbers",
+                column: "BarberId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_BarberShopBarbers_BarberShopId",
                 table: "BarberShopBarbers",
                 column: "BarberShopId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_BarberShopBarberWeekends_BarberShopBarberId",
+                table: "BarberShopBarberWeekends",
+                column: "BarberShopBarberId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_BarberShopRatings_BarberShopId",
@@ -629,8 +647,12 @@ namespace Persistence.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_BarberShopServices_ServiceId",
                 table: "BarberShopServices",
-                column: "ServiceId",
-                unique: true);
+                column: "ServiceId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_BarberShopWorkingDays_BarberShopId",
+                table: "BarberShopWorkingDays",
+                column: "BarberShopId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_BarberShopWorkingDays_WeekDayId",
@@ -641,6 +663,11 @@ namespace Persistence.Migrations
                 name: "IX_Neighborhoods_CityId",
                 table: "Neighborhoods",
                 column: "CityId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Orders_BarberId",
+                table: "Orders",
+                column: "BarberId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Orders_BarberShopId",
@@ -656,6 +683,11 @@ namespace Persistence.Migrations
                 name: "IX_ServiceCategories_CategoryId",
                 table: "ServiceCategories",
                 column: "CategoryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ServiceCategories_ServiceId",
+                table: "ServiceCategories",
+                column: "ServiceId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserRatings_UserId",
@@ -688,13 +720,10 @@ namespace Persistence.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "BarberOrders");
-
-            migrationBuilder.DropTable(
                 name: "BarberRatings");
 
             migrationBuilder.DropTable(
-                name: "BarberShopBarbers");
+                name: "BarberShopBarberWeekends");
 
             migrationBuilder.DropTable(
                 name: "BarberShopRatings");
@@ -718,7 +747,7 @@ namespace Persistence.Migrations
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "Barbers");
+                name: "BarberShopBarbers");
 
             migrationBuilder.DropTable(
                 name: "Orders");
@@ -733,13 +762,16 @@ namespace Persistence.Migrations
                 name: "Services");
 
             migrationBuilder.DropTable(
-                name: "AspNetUsers");
-
-            migrationBuilder.DropTable(
                 name: "BarberShops");
 
             migrationBuilder.DropTable(
+                name: "Barbers");
+
+            migrationBuilder.DropTable(
                 name: "Neighborhoods");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUsers");
 
             migrationBuilder.DropTable(
                 name: "Cities");

@@ -18,7 +18,14 @@ namespace Persistence.Entities
         [ForeignKey(nameof(BarberShopId))]
         public BarberShop BarberShop { get; set; } = null!;
 
-        public required DateTime Date { get; set; }
+        public required int BarberId { get; set; }
+
+        [ForeignKey(nameof(BarberId))]
+        public Barber Barber { get; set; }
+
+        public required DateTime StartDate { get; set; }
+        
+        public required DateTime EndDate { get; set; }
 
         public required bool IsDeleted { get; set; }
 
@@ -28,6 +35,5 @@ namespace Persistence.Entities
         public required decimal TotalPrice { get; set; }
 
         public ICollection<BarberShopService> Services { get; set; } = new HashSet<BarberShopService>();
-        public ICollection<BarberOrder> Barbers { get; set; } = new HashSet<BarberOrder>();
     }
 }

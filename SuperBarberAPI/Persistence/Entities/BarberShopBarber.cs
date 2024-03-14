@@ -4,6 +4,8 @@ namespace Persistence.Entities
 {
     public class BarberShopBarber
     {
+        public int Id { get; set; }
+
         public required int BarberShopId { get; set; }
 
         [ForeignKey(nameof(BarberShopId))]
@@ -16,6 +18,8 @@ namespace Persistence.Entities
 
         public required bool IsOwner { get; set; }
 
-        public required bool IsAvailable { get; set; }
+        public required bool CanTakeOrders { get; set; }
+
+        public ICollection<BarberShopBarberWeekend> Weekends { get; set; } = new HashSet<BarberShopBarberWeekend>();
     }
 }

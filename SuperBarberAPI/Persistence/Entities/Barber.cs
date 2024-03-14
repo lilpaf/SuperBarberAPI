@@ -21,7 +21,7 @@ namespace Persistence.Entities
 
         public required double AverageRating { get; set; }
 
-        public ICollection<BarberOrder> Orders { get; set; } = new HashSet<BarberOrder>();
+        public ICollection<Order> Orders { get; set; } = new HashSet<Order>();
 
         public ICollection<BarberShopBarber> BarberShops { get; set; } = new HashSet<BarberShopBarber>();
     }

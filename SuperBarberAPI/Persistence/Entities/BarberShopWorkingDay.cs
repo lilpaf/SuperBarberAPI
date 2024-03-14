@@ -4,6 +4,8 @@ namespace Persistence.Entities
 {
     public class BarberShopWorkingDay
     {
+        public int Id { get; set; }
+
         public required int WeekDayId { get; set; }
         
         [ForeignKey(nameof(WeekDayId))]

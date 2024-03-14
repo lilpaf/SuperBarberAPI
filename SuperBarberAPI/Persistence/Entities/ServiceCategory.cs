@@ -4,6 +4,8 @@ namespace Persistence.Entities
 {
     public class ServiceCategory
     {
+        public int Id { get; set; }
+
         public required int CategoryId { get; set; }
 
         [ForeignKey(nameof(CategoryId))]

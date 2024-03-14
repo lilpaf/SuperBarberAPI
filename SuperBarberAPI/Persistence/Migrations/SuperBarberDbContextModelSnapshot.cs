@@ -191,21 +191,6 @@ namespace Persistence.Migrations
                     b.ToTable("Barbers");
                 });
 
-            modelBuilder.Entity("Persistence.Entities.BarberOrder", b =>
-                {
-                    b.Property<int>("BarberId")
-                        .HasColumnType("int");
-
-                    b.Property<Guid>("OrderId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("BarberId", "OrderId");
-
-                    b.HasIndex("OrderId");
-
-                    b.ToTable("BarberOrders");
-                });
-
             modelBuilder.Entity("Persistence.Entities.BarberRating", b =>
                 {
                     b.Property<int>("Id")
@@ -275,23 +260,55 @@ namespace Persistence.Migrations
 
             modelBuilder.Entity("Persistence.Entities.BarberShopBarber", b =>
                 {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
                     b.Property<int>("BarberId")
                         .HasColumnType("int");
 
                     b.Property<int>("BarberShopId")
                         .HasColumnType("int");
 
-                    b.Property<bool>("IsAvailable")
+                    b.Property<bool>("CanTakeOrders")
                         .HasColumnType("bit");
 
                     b.Property<bool>("IsOwner")
                         .HasColumnType("bit");
 
-                    b.HasKey("BarberId", "BarberShopId");
+                    b.HasKey("Id");
+
+                    b.HasIndex("BarberId");
 
                     b.HasIndex("BarberShopId");
 
                     b.ToTable("BarberShopBarbers");
+                });
+
+            modelBuilder.Entity("Persistence.Entities.BarberShopBarberWeekend", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BarberShopBarberId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("End")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("Start")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BarberShopBarberId");
+
+                    b.ToTable("BarberShopBarberWeekends");
                 });
 
             modelBuilder.Entity("Persistence.Entities.BarberShopRating", b =>
@@ -317,8 +334,11 @@ namespace Persistence.Migrations
 
             modelBuilder.Entity("Persistence.Entities.BarberShopService", b =>
                 {
-                    b.Property<int>("ServiceId")
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("BarberShopId")
                         .HasColumnType("int");
@@ -329,24 +349,32 @@ namespace Persistence.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
 
-                    b.HasKey("ServiceId", "BarberShopId");
+                    b.Property<int>("ServiceId")
+                        .HasColumnType("int");
+
+                    b.Property<TimeSpan>("TimeToExecute")
+                        .HasColumnType("time");
+
+                    b.HasKey("Id");
 
                     b.HasIndex("BarberShopId");
 
                     b.HasIndex("OrderId");
 
-                    b.HasIndex("ServiceId")
-                        .IsUnique();
+                    b.HasIndex("ServiceId");
 
                     b.ToTable("BarberShopServices");
                 });
 
             modelBuilder.Entity("Persistence.Entities.BarberShopWorkingDay", b =>
                 {
-                    b.Property<int>("BarberShopId")
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<int>("WeekDayId")
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BarberShopId")
                         .HasColumnType("int");
 
                     b.Property<TimeSpan?>("ClosingHour")
@@ -355,7 +383,12 @@ namespace Persistence.Migrations
                     b.Property<TimeSpan?>("OpeningHour")
                         .HasColumnType("time");
 
-                    b.HasKey("BarberShopId", "WeekDayId");
+                    b.Property<int>("WeekDayId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BarberShopId");
 
                     b.HasIndex("WeekDayId");
 
@@ -427,17 +460,23 @@ namespace Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("BarberShopId")
+                    b.Property<int>("BarberId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("datetime2");
+                    b.Property<int>("BarberShopId")
+                        .HasColumnType("int");
 
                     b.Property<DateTime?>("DeleteDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<decimal>("TotalPrice")
                         .HasColumnType("decimal(18,2)");
@@ -447,6 +486,8 @@ namespace Persistence.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("BarberId");
 
                     b.HasIndex("BarberShopId");
 
@@ -476,9 +517,6 @@ namespace Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<TimeSpan>("TimeToExecute")
-                        .HasColumnType("time");
-
                     b.HasKey("Id");
 
                     b.ToTable("Services");
@@ -486,15 +524,23 @@ namespace Persistence.Migrations
 
             modelBuilder.Entity("Persistence.Entities.ServiceCategory", b =>
                 {
-                    b.Property<int>("ServiceId")
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("CategoryId")
                         .HasColumnType("int");
 
-                    b.HasKey("ServiceId", "CategoryId");
+                    b.Property<int>("ServiceId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
 
                     b.HasIndex("CategoryId");
+
+                    b.HasIndex("ServiceId");
 
                     b.ToTable("ServiceCategories");
                 });
@@ -723,25 +769,6 @@ namespace Persistence.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Persistence.Entities.BarberOrder", b =>
-                {
-                    b.HasOne("Persistence.Entities.Barber", "Barber")
-                        .WithMany("Orders")
-                        .HasForeignKey("BarberId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Persistence.Entities.Order", "Order")
-                        .WithMany("Barbers")
-                        .HasForeignKey("OrderId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Barber");
-
-                    b.Navigation("Order");
-                });
-
             modelBuilder.Entity("Persistence.Entities.BarberRating", b =>
                 {
                     b.HasOne("Persistence.Entities.Barber", "Barber")
@@ -790,6 +817,17 @@ namespace Persistence.Migrations
                     b.Navigation("BarberShop");
                 });
 
+            modelBuilder.Entity("Persistence.Entities.BarberShopBarberWeekend", b =>
+                {
+                    b.HasOne("Persistence.Entities.BarberShopBarber", "BarberShopBarber")
+                        .WithMany("Weekends")
+                        .HasForeignKey("BarberShopBarberId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("BarberShopBarber");
+                });
+
             modelBuilder.Entity("Persistence.Entities.BarberShopRating", b =>
                 {
                     b.HasOne("Persistence.Entities.BarberShop", "BarberShop")
@@ -815,8 +853,8 @@ namespace Persistence.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Persistence.Entities.Service", "Service")
-                        .WithOne()
-                        .HasForeignKey("Persistence.Entities.BarberShopService", "ServiceId")
+                        .WithMany("BarberShopServices")
+                        .HasForeignKey("ServiceId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -857,6 +895,12 @@ namespace Persistence.Migrations
 
             modelBuilder.Entity("Persistence.Entities.Order", b =>
                 {
+                    b.HasOne("Persistence.Entities.Barber", "Barber")
+                        .WithMany("Orders")
+                        .HasForeignKey("BarberId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("Persistence.Entities.BarberShop", "BarberShop")
                         .WithMany("Orders")
                         .HasForeignKey("BarberShopId")
@@ -868,6 +912,8 @@ namespace Persistence.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("Barber");
 
                     b.Navigation("BarberShop");
 
@@ -933,6 +979,11 @@ namespace Persistence.Migrations
                     b.Navigation("Services");
                 });
 
+            modelBuilder.Entity("Persistence.Entities.BarberShopBarber", b =>
+                {
+                    b.Navigation("Weekends");
+                });
+
             modelBuilder.Entity("Persistence.Entities.Category", b =>
                 {
                     b.Navigation("Services");
@@ -940,13 +991,13 @@ namespace Persistence.Migrations
 
             modelBuilder.Entity("Persistence.Entities.Order", b =>
                 {
-                    b.Navigation("Barbers");
-
                     b.Navigation("Services");
                 });
 
             modelBuilder.Entity("Persistence.Entities.Service", b =>
                 {
+                    b.Navigation("BarberShopServices");
+
                     b.Navigation("Categories");
                 });
 
