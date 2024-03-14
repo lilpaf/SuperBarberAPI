@@ -4,12 +4,12 @@ using Microsoft.Extensions.Logging;
 using Persistence.Contexts;
 using Persistence.Entities;
 using Persistence.Interfaces;
+using Common.Constants;
 
 namespace Persistence.Implementations
 {
     public class CityRepository : ICityRepository
     {
-        public const string CitiesKeyRedis = "Cities";
         private readonly IDatabase _redisDb;
         private readonly SuperBarberDbContext _context;
         private readonly ILogger<CityRepository> _logger;
@@ -28,7 +28,7 @@ namespace Persistence.Implementations
         {
             _logger.LogInformation("Getting all cities from Redis Db");
 
-            RedisValue[] citiesName = await _redisDb.ListRangeAsync(CitiesKeyRedis);
+            RedisValue[] citiesName = await _redisDb.ListRangeAsync(RedisConstants.CitiesKeyRedis);
 
             return [.. citiesName];            
         }

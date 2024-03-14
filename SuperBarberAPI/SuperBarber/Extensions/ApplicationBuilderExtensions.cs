@@ -101,7 +101,7 @@ namespace SuperBarber.Extensions
                     Name = city
                 });
 
-                cache.ListRightPush(CityRepository.CitiesKeyRedis, city);
+                cache.ListRightPush(RedisConstants.CitiesKeyRedis, city);
             }
 
             data.SaveChanges();
@@ -128,7 +128,7 @@ namespace SuperBarber.Extensions
                         CityId = city.Id
                     });
 
-                    cache.ListRightPush(cityNeighborhoods.Key, neighborhood);
+                    cache.ListRightPush(string.Format(RedisConstants.NeighborhoodsKeyRedis, cityNeighborhoods.Key), neighborhood);
                 }
             }
 
@@ -163,7 +163,8 @@ namespace SuperBarber.Extensions
                     FirstName = "AdminFirstName",
                     LastName = "AdminLastName",
                     IsDeleted = false,
-                    DeleteDate = null
+                    DeleteDate = null,
+                    AverageRating = 0
                 };
 
                 await userManager.CreateAsync(user, adminPassword);

@@ -34,6 +34,7 @@ namespace Persistence.Migrations
                     LastName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     DeleteDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    AverageRating = table.Column<double>(type: "float", nullable: false),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -227,13 +228,34 @@ namespace Persistence.Migrations
                     About = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    DeleteDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                    DeleteDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    AverageRating = table.Column<double>(type: "float", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Barbers", x => x.Id);
                     table.ForeignKey(
                         name: "FK_Barbers_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserRatings",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Star = table.Column<int>(type: "int", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserRatings", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UserRatings_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
@@ -305,6 +327,26 @@ namespace Persistence.Migrations
                         name: "FK_ServiceCategories_Services_ServiceId",
                         column: x => x.ServiceId,
                         principalTable: "Services",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "BarberRatings",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Star = table.Column<int>(type: "int", nullable: false),
+                    BarberId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BarberRatings", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_BarberRatings_Barbers_BarberId",
+                        column: x => x.BarberId,
+                        principalTable: "Barbers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -385,7 +427,7 @@ namespace Persistence.Migrations
                         column: x => x.BarberShopId,
                         principalTable: "BarberShops",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -544,6 +586,11 @@ namespace Persistence.Migrations
                 column: "OrderId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_BarberRatings_BarberId",
+                table: "BarberRatings",
+                column: "BarberId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Barbers_UserId",
                 table: "Barbers",
                 column: "UserId",
@@ -611,6 +658,11 @@ namespace Persistence.Migrations
                 column: "CategoryId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_UserRatings_UserId",
+                table: "UserRatings",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_UserRefreshTokens_UserId",
                 table: "UserRefreshTokens",
                 column: "UserId",
@@ -639,6 +691,9 @@ namespace Persistence.Migrations
                 name: "BarberOrders");
 
             migrationBuilder.DropTable(
+                name: "BarberRatings");
+
+            migrationBuilder.DropTable(
                 name: "BarberShopBarbers");
 
             migrationBuilder.DropTable(
@@ -652,6 +707,9 @@ namespace Persistence.Migrations
 
             migrationBuilder.DropTable(
                 name: "ServiceCategories");
+
+            migrationBuilder.DropTable(
+                name: "UserRatings");
 
             migrationBuilder.DropTable(
                 name: "UserRefreshTokens");

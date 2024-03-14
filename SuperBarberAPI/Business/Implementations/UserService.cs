@@ -69,7 +69,8 @@ namespace Business.Implementations
                 PhoneNumber = request.PhoneNumber,
                 EmailConfirmed = false,
                 IsDeleted = false,
-                DeleteDate = null
+                DeleteDate = null,
+                AverageRating = 0
             };
 
             IdentityResult isUserCreated = await _userManager.CreateAsync(user, request.Password);

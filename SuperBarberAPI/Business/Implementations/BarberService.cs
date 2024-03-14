@@ -47,7 +47,8 @@ namespace Business.Implementations
                 UserId = user.Id,
                 About = request.About,
                 IsDeleted = false,
-                DeleteDate = null
+                DeleteDate = null,
+                AverageRating = 0
             };
 
             await _userManager.AddToRoleAsync(user, RolesConstants.BarberRoleName);
@@ -66,8 +67,6 @@ namespace Business.Implementations
             }
 
             await _barberRepository.SaveChangesAsync();
-
-            //await signInManager.RefreshSignInAsync(user);
 
             return new RegisterBarberResponse
             {

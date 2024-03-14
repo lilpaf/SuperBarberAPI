@@ -170,6 +170,9 @@ namespace Persistence.Migrations
                     b.Property<string>("About")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<double>("AverageRating")
+                        .HasColumnType("float");
+
                     b.Property<DateTime?>("DeleteDate")
                         .HasColumnType("datetime2");
 
@@ -201,6 +204,27 @@ namespace Persistence.Migrations
                     b.HasIndex("OrderId");
 
                     b.ToTable("BarberOrders");
+                });
+
+            modelBuilder.Entity("Persistence.Entities.BarberRating", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BarberId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Star")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BarberId");
+
+                    b.ToTable("BarberRatings");
                 });
 
             modelBuilder.Entity("Persistence.Entities.BarberShop", b =>
@@ -483,6 +507,9 @@ namespace Persistence.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
+                    b.Property<double>("AverageRating")
+                        .HasColumnType("float");
+
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
@@ -550,6 +577,28 @@ namespace Persistence.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
+                });
+
+            modelBuilder.Entity("Persistence.Entities.UserRating", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Star")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserRatings");
                 });
 
             modelBuilder.Entity("Persistence.Entities.UserRefreshToken", b =>
@@ -693,6 +742,17 @@ namespace Persistence.Migrations
                     b.Navigation("Order");
                 });
 
+            modelBuilder.Entity("Persistence.Entities.BarberRating", b =>
+                {
+                    b.HasOne("Persistence.Entities.Barber", "Barber")
+                        .WithMany()
+                        .HasForeignKey("BarberId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Barber");
+                });
+
             modelBuilder.Entity("Persistence.Entities.BarberShop", b =>
                 {
                     b.HasOne("Persistence.Entities.City", "City")
@@ -735,7 +795,7 @@ namespace Persistence.Migrations
                     b.HasOne("Persistence.Entities.BarberShop", "BarberShop")
                         .WithMany()
                         .HasForeignKey("BarberShopId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("BarberShop");
@@ -831,6 +891,17 @@ namespace Persistence.Migrations
                     b.Navigation("Category");
 
                     b.Navigation("Service");
+                });
+
+            modelBuilder.Entity("Persistence.Entities.UserRating", b =>
+                {
+                    b.HasOne("Persistence.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Persistence.Entities.UserRefreshToken", b =>

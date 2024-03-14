@@ -12,6 +12,8 @@ namespace Persistence.Entities
 
         public required DateTime? DeleteDate { get; set; }
 
+        public required double AverageRating { get; set; }
+
         public ICollection<Order> Reservations { get; set; } = new HashSet<Order>();
     }
 }

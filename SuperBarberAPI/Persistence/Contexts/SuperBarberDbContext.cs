@@ -12,6 +12,7 @@ namespace Persistence.Contexts
 
         public DbSet<Barber> Barbers { get; set; }
         public DbSet<BarberOrder> BarberOrders { get; set; }
+        public DbSet<BarberRating> BarberRatings { get; set; }
         public DbSet<BarberShop> BarberShops { get; set; }
         public DbSet<BarberShopBarber> BarberShopBarbers { get; set; }
         public DbSet<BarberShopRating> BarberShopRatings { get; set; }
@@ -23,6 +24,7 @@ namespace Persistence.Contexts
         public DbSet<ServiceCategory> ServiceCategories { get; set; }
         public DbSet<City> Cities { get; set; }
         public DbSet<Neighborhood> Neighborhoods { get; set; }
+        public DbSet<UserRating> UserRatings { get; set; }
         public DbSet<UserRefreshToken> UserRefreshTokens { get; set; }
         public DbSet<WeekDay> WeekDays { get; set; }
 
@@ -49,6 +51,11 @@ namespace Persistence.Contexts
             modelBuilder.Entity<BarberOrder>()
                 .HasOne(bo => bo.Order)
                 .WithMany(o => o.Barbers)
+                .OnDelete(DeleteBehavior.Restrict);
+            
+            modelBuilder.Entity<BarberRating>()
+                .HasOne(br => br.Barber)
+                .WithMany()
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<BarberShop>()
@@ -88,6 +95,11 @@ namespace Persistence.Contexts
                 .HasOne(bsb => bsb.BarberShop)
                 .WithMany(bs => bs.Barbers)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<BarberShopRating>()
+               .HasOne(bsr => bsr.BarberShop)
+               .WithMany()
+               .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<BarberShopService>()
                 .HasKey(bss => new { bss.ServiceId, bss.BarberShopId });
@@ -167,7 +179,12 @@ namespace Persistence.Contexts
                 .HasMany(u => u.Reservations)
                 .WithOne(r => r.User)
                 .OnDelete(DeleteBehavior.Restrict);
-            
+
+            modelBuilder.Entity<UserRating>()
+               .HasOne(ur => ur.User)
+               .WithMany()
+               .OnDelete(DeleteBehavior.Restrict);
+
             modelBuilder.Entity<UserRefreshToken>()
                 .HasOne(u => u.User)
                 .WithOne()
