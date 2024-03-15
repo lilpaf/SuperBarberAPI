@@ -44,5 +44,7 @@ namespace Persistence.Entities
 
         //ToDo make it required
         public ICollection<BarberShopBarber> Barbers { get; set; } = new HashSet<BarberShopBarber>();
+        
+        public ICollection<BarberShopRating> Ratings { get; set; } = new HashSet<BarberShopRating>();
     }
 }

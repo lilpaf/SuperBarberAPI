@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 
 namespace Persistence.Entities
 {
@@ -15,5 +17,9 @@ namespace Persistence.Entities
         public required double AverageRating { get; set; }
 
         public ICollection<Order> Reservations { get; set; } = new HashSet<Order>();
+
+        public ICollection<UserRating> Ratings { get; set; } = new HashSet<UserRating>();
+
+        public ICollection<UserRefreshToken> RefreshTokens { get; set; } = new HashSet<UserRefreshToken>();
     }
 }

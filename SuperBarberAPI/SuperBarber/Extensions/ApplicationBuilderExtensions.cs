@@ -1,6 +1,7 @@
 ﻿using Common.Constants;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Extensions;
 using Persistence.Contexts;
 using Persistence.Entities;
 using Persistence.Enums;
@@ -24,6 +25,7 @@ namespace SuperBarber.Extensions
             data.Database.Migrate();
 
             SeedCategories(data);
+            SeedOrderCancellationReasons(data);
             SeedCities(data, cache);
             SeedNeighborhoods(data, cache);
             SeedWeekDays(data);
@@ -50,6 +52,27 @@ namespace SuperBarber.Extensions
                 {
                     CategoryName = categoryName[i],
                     CategoryEnum = categoryEnum[i]
+                });
+            }
+
+            data.SaveChanges();
+        }
+        
+        private static void SeedOrderCancellationReasons(SuperBarberDbContext data)
+        {
+            if (data.OrderCancellationReasons.Any())
+            {
+                return;
+            }
+
+            CancellationReasonEnum[] cancellationReasonEnum = Enum.GetValues<CancellationReasonEnum>();
+
+            for (int i = 0; i < cancellationReasonEnum.Length; i++)
+            {
+                data.OrderCancellationReasons.Add(new OrderCancellationReason
+                {
+                    Reason = cancellationReasonEnum[i].GetDisplayName(),
+                    CancellationReasonEnum = cancellationReasonEnum[i]
                 });
             }
 

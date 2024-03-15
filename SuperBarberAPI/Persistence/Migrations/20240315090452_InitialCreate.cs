@@ -83,6 +83,20 @@ namespace Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "OrderCancellationReasons",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Reason = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CancellationReasonEnum = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OrderCancellationReasons", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Services",
                 columns: table => new
                 {
@@ -434,6 +448,34 @@ namespace Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "BarberShopServices",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    BarberShopId = table.Column<int>(type: "int", nullable: false),
+                    ServiceId = table.Column<int>(type: "int", nullable: false),
+                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    TimeToExecute = table.Column<TimeSpan>(type: "time", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BarberShopServices", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_BarberShopServices_BarberShops_BarberShopId",
+                        column: x => x.BarberShopId,
+                        principalTable: "BarberShops",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_BarberShopServices_Services_ServiceId",
+                        column: x => x.ServiceId,
+                        principalTable: "Services",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "BarberShopWorkingDays",
                 columns: table => new
                 {
@@ -473,6 +515,7 @@ namespace Persistence.Migrations
                     EndDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     DeleteDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    OrderCancellationReasonId = table.Column<int>(type: "int", nullable: true),
                     TotalPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
                 },
                 constraints: table =>
@@ -496,6 +539,12 @@ namespace Persistence.Migrations
                         principalTable: "Barbers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Orders_OrderCancellationReasons_OrderCancellationReasonId",
+                        column: x => x.OrderCancellationReasonId,
+                        principalTable: "OrderCancellationReasons",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -505,8 +554,8 @@ namespace Persistence.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     BarberShopBarberId = table.Column<int>(type: "int", nullable: false),
-                    Start = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    End = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EndDate = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -520,36 +569,27 @@ namespace Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "BarberShopServices",
+                name: "BarberShopServicesOrders",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    BarberShopId = table.Column<int>(type: "int", nullable: false),
-                    ServiceId = table.Column<int>(type: "int", nullable: false),
-                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    TimeToExecute = table.Column<TimeSpan>(type: "time", nullable: false),
-                    OrderId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                    BarberShopServiceId = table.Column<int>(type: "int", nullable: false),
+                    OrderId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_BarberShopServices", x => x.Id);
+                    table.PrimaryKey("PK_BarberShopServicesOrders", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_BarberShopServices_BarberShops_BarberShopId",
-                        column: x => x.BarberShopId,
-                        principalTable: "BarberShops",
+                        name: "FK_BarberShopServicesOrders_BarberShopServices_BarberShopServiceId",
+                        column: x => x.BarberShopServiceId,
+                        principalTable: "BarberShopServices",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_BarberShopServices_Orders_OrderId",
+                        name: "FK_BarberShopServicesOrders_Orders_OrderId",
                         column: x => x.OrderId,
                         principalTable: "Orders",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_BarberShopServices_Services_ServiceId",
-                        column: x => x.ServiceId,
-                        principalTable: "Services",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -640,14 +680,19 @@ namespace Persistence.Migrations
                 column: "BarberShopId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_BarberShopServices_OrderId",
-                table: "BarberShopServices",
-                column: "OrderId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_BarberShopServices_ServiceId",
                 table: "BarberShopServices",
                 column: "ServiceId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_BarberShopServicesOrders_BarberShopServiceId",
+                table: "BarberShopServicesOrders",
+                column: "BarberShopServiceId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_BarberShopServicesOrders_OrderId",
+                table: "BarberShopServicesOrders",
+                column: "OrderId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_BarberShopWorkingDays_BarberShopId",
@@ -675,6 +720,11 @@ namespace Persistence.Migrations
                 column: "BarberShopId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Orders_OrderCancellationReasonId",
+                table: "Orders",
+                column: "OrderCancellationReasonId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Orders_UserId",
                 table: "Orders",
                 column: "UserId");
@@ -697,8 +747,7 @@ namespace Persistence.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_UserRefreshTokens_UserId",
                 table: "UserRefreshTokens",
-                column: "UserId",
-                unique: true);
+                column: "UserId");
         }
 
         /// <inheritdoc />
@@ -729,7 +778,7 @@ namespace Persistence.Migrations
                 name: "BarberShopRatings");
 
             migrationBuilder.DropTable(
-                name: "BarberShopServices");
+                name: "BarberShopServicesOrders");
 
             migrationBuilder.DropTable(
                 name: "BarberShopWorkingDays");
@@ -750,6 +799,9 @@ namespace Persistence.Migrations
                 name: "BarberShopBarbers");
 
             migrationBuilder.DropTable(
+                name: "BarberShopServices");
+
+            migrationBuilder.DropTable(
                 name: "Orders");
 
             migrationBuilder.DropTable(
@@ -766,6 +818,9 @@ namespace Persistence.Migrations
 
             migrationBuilder.DropTable(
                 name: "Barbers");
+
+            migrationBuilder.DropTable(
+                name: "OrderCancellationReasons");
 
             migrationBuilder.DropTable(
                 name: "Neighborhoods");

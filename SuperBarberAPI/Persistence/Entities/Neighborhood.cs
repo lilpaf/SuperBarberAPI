@@ -14,5 +14,7 @@ namespace Persistence.Entities
         
         [ForeignKey(nameof(CityId))]
         public City City { get; set; } = null!;
+
+        public ICollection<BarberShop> BarberShops { get; set; } = new HashSet<BarberShop>();
     }
 }

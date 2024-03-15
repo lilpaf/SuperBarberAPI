@@ -12,7 +12,7 @@ using Persistence.Contexts;
 namespace Persistence.Migrations
 {
     [DbContext(typeof(SuperBarberDbContext))]
-    [Migration("20240314210122_InitialCreate")]
+    [Migration("20240315090452_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -301,10 +301,10 @@ namespace Persistence.Migrations
                     b.Property<int>("BarberShopBarberId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("End")
+                    b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("Start")
+                    b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
@@ -346,9 +346,6 @@ namespace Persistence.Migrations
                     b.Property<int>("BarberShopId")
                         .HasColumnType("int");
 
-                    b.Property<Guid?>("OrderId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
 
@@ -362,11 +359,32 @@ namespace Persistence.Migrations
 
                     b.HasIndex("BarberShopId");
 
-                    b.HasIndex("OrderId");
-
                     b.HasIndex("ServiceId");
 
                     b.ToTable("BarberShopServices");
+                });
+
+            modelBuilder.Entity("Persistence.Entities.BarberShopServiceOrder", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BarberShopServiceId")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("OrderId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BarberShopServiceId");
+
+                    b.HasIndex("OrderId");
+
+                    b.ToTable("BarberShopServicesOrders");
                 });
 
             modelBuilder.Entity("Persistence.Entities.BarberShopWorkingDay", b =>
@@ -478,6 +496,9 @@ namespace Persistence.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
+                    b.Property<int?>("OrderCancellationReasonId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
 
@@ -494,9 +515,31 @@ namespace Persistence.Migrations
 
                     b.HasIndex("BarberShopId");
 
+                    b.HasIndex("OrderCancellationReasonId");
+
                     b.HasIndex("UserId");
 
                     b.ToTable("Orders");
+                });
+
+            modelBuilder.Entity("Persistence.Entities.OrderCancellationReason", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CancellationReasonEnum")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("OrderCancellationReasons");
                 });
 
             modelBuilder.Entity("Persistence.Entities.Service", b =>
@@ -684,8 +727,7 @@ namespace Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId")
-                        .IsUnique();
+                    b.HasIndex("UserId");
 
                     b.ToTable("UserRefreshTokens");
                 });
@@ -775,7 +817,7 @@ namespace Persistence.Migrations
             modelBuilder.Entity("Persistence.Entities.BarberRating", b =>
                 {
                     b.HasOne("Persistence.Entities.Barber", "Barber")
-                        .WithMany()
+                        .WithMany("Ratings")
                         .HasForeignKey("BarberId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -786,13 +828,13 @@ namespace Persistence.Migrations
             modelBuilder.Entity("Persistence.Entities.BarberShop", b =>
                 {
                     b.HasOne("Persistence.Entities.City", "City")
-                        .WithMany()
+                        .WithMany("BarberShops")
                         .HasForeignKey("CityId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Persistence.Entities.Neighborhood", "Neighborhood")
-                        .WithMany()
+                        .WithMany("BarberShops")
                         .HasForeignKey("NeighborhoodId")
                         .OnDelete(DeleteBehavior.Restrict);
 
@@ -834,7 +876,7 @@ namespace Persistence.Migrations
             modelBuilder.Entity("Persistence.Entities.BarberShopRating", b =>
                 {
                     b.HasOne("Persistence.Entities.BarberShop", "BarberShop")
-                        .WithMany()
+                        .WithMany("Ratings")
                         .HasForeignKey("BarberShopId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -850,11 +892,6 @@ namespace Persistence.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Persistence.Entities.Order", null)
-                        .WithMany("Services")
-                        .HasForeignKey("OrderId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("Persistence.Entities.Service", "Service")
                         .WithMany("BarberShopServices")
                         .HasForeignKey("ServiceId")
@@ -866,6 +903,25 @@ namespace Persistence.Migrations
                     b.Navigation("Service");
                 });
 
+            modelBuilder.Entity("Persistence.Entities.BarberShopServiceOrder", b =>
+                {
+                    b.HasOne("Persistence.Entities.BarberShopService", "BarberShopService")
+                        .WithMany("Orders")
+                        .HasForeignKey("BarberShopServiceId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Persistence.Entities.Order", "Order")
+                        .WithMany("Services")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("BarberShopService");
+
+                    b.Navigation("Order");
+                });
+
             modelBuilder.Entity("Persistence.Entities.BarberShopWorkingDay", b =>
                 {
                     b.HasOne("Persistence.Entities.BarberShop", "BarberShop")
@@ -875,7 +931,7 @@ namespace Persistence.Migrations
                         .IsRequired();
 
                     b.HasOne("Persistence.Entities.WeekDay", "WeekDay")
-                        .WithMany()
+                        .WithMany("BarberShopWorkingDays")
                         .HasForeignKey("WeekDayId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -888,7 +944,7 @@ namespace Persistence.Migrations
             modelBuilder.Entity("Persistence.Entities.Neighborhood", b =>
                 {
                     b.HasOne("Persistence.Entities.City", "City")
-                        .WithMany()
+                        .WithMany("Neighborhoods")
                         .HasForeignKey("CityId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -910,6 +966,11 @@ namespace Persistence.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("Persistence.Entities.OrderCancellationReason", "OrderCancellationReason")
+                        .WithMany("Orders")
+                        .HasForeignKey("OrderCancellationReasonId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("Persistence.Entities.User", "User")
                         .WithMany("Reservations")
                         .HasForeignKey("UserId")
@@ -919,6 +980,8 @@ namespace Persistence.Migrations
                     b.Navigation("Barber");
 
                     b.Navigation("BarberShop");
+
+                    b.Navigation("OrderCancellationReason");
 
                     b.Navigation("User");
                 });
@@ -945,7 +1008,7 @@ namespace Persistence.Migrations
             modelBuilder.Entity("Persistence.Entities.UserRating", b =>
                 {
                     b.HasOne("Persistence.Entities.User", "User")
-                        .WithMany()
+                        .WithMany("Ratings")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -956,8 +1019,8 @@ namespace Persistence.Migrations
             modelBuilder.Entity("Persistence.Entities.UserRefreshToken", b =>
                 {
                     b.HasOne("Persistence.Entities.User", "User")
-                        .WithOne()
-                        .HasForeignKey("Persistence.Entities.UserRefreshToken", "UserId")
+                        .WithMany("RefreshTokens")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -969,6 +1032,8 @@ namespace Persistence.Migrations
                     b.Navigation("BarberShops");
 
                     b.Navigation("Orders");
+
+                    b.Navigation("Ratings");
                 });
 
             modelBuilder.Entity("Persistence.Entities.BarberShop", b =>
@@ -979,6 +1044,8 @@ namespace Persistence.Migrations
 
                     b.Navigation("Orders");
 
+                    b.Navigation("Ratings");
+
                     b.Navigation("Services");
                 });
 
@@ -987,14 +1054,36 @@ namespace Persistence.Migrations
                     b.Navigation("Weekends");
                 });
 
+            modelBuilder.Entity("Persistence.Entities.BarberShopService", b =>
+                {
+                    b.Navigation("Orders");
+                });
+
             modelBuilder.Entity("Persistence.Entities.Category", b =>
                 {
                     b.Navigation("Services");
                 });
 
+            modelBuilder.Entity("Persistence.Entities.City", b =>
+                {
+                    b.Navigation("BarberShops");
+
+                    b.Navigation("Neighborhoods");
+                });
+
+            modelBuilder.Entity("Persistence.Entities.Neighborhood", b =>
+                {
+                    b.Navigation("BarberShops");
+                });
+
             modelBuilder.Entity("Persistence.Entities.Order", b =>
                 {
                     b.Navigation("Services");
+                });
+
+            modelBuilder.Entity("Persistence.Entities.OrderCancellationReason", b =>
+                {
+                    b.Navigation("Orders");
                 });
 
             modelBuilder.Entity("Persistence.Entities.Service", b =>
@@ -1006,7 +1095,16 @@ namespace Persistence.Migrations
 
             modelBuilder.Entity("Persistence.Entities.User", b =>
                 {
+                    b.Navigation("Ratings");
+
+                    b.Navigation("RefreshTokens");
+
                     b.Navigation("Reservations");
+                });
+
+            modelBuilder.Entity("Persistence.Entities.WeekDay", b =>
+                {
+                    b.Navigation("BarberShopWorkingDays");
                 });
 #pragma warning restore 612, 618
         }

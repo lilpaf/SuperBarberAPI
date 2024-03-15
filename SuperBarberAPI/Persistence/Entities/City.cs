@@ -7,6 +7,10 @@ namespace Persistence.Entities
         public int Id { get; set; }
 
         [Required]
-        public required string Name { get; set; } 
+        public required string Name { get; set; }
+
+        public ICollection<BarberShop> BarberShops { get; set; } = new HashSet<BarberShop>();
+        
+        public ICollection<Neighborhood> Neighborhoods { get; set; } = new HashSet<Neighborhood>();
     }
 }

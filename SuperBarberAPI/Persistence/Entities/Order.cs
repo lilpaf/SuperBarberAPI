@@ -31,9 +31,14 @@ namespace Persistence.Entities
 
         public required DateTime? DeleteDate { get; set; }
 
+        public int? OrderCancellationReasonId { get; set; }
+
+        [ForeignKey(nameof(OrderCancellationReasonId))]
+        public OrderCancellationReason? OrderCancellationReason { get; set; }
+
         [Column(TypeName = "decimal(18,2)")]
         public required decimal TotalPrice { get; set; }
 
-        public ICollection<BarberShopService> Services { get; set; } = new HashSet<BarberShopService>();
+        public ICollection<BarberShopServiceOrder> Services { get; set; } = new HashSet<BarberShopServiceOrder>();
     }
 }

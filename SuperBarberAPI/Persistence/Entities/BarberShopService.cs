@@ -20,5 +20,7 @@ namespace Persistence.Entities
         public required decimal Price { get; set; }
 
         public required TimeSpan TimeToExecute { get; set; }
+
+        public ICollection<BarberShopServiceOrder> Orders { get; set; } = new HashSet<BarberShopServiceOrder>();
     }
 }

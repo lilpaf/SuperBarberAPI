@@ -17,8 +17,10 @@ namespace Persistence.Contexts
         public DbSet<BarberShopBarberWeekend> BarberShopBarberWeekends { get; set; }
         public DbSet<BarberShopRating> BarberShopRatings { get; set; }
         public DbSet<BarberShopService> BarberShopServices { get; set; }
+        public DbSet<BarberShopServiceOrder> BarberShopServicesOrders { get; set; }
         public DbSet<BarberShopWorkingDay> BarberShopWorkingDays { get; set; }
         public DbSet<Order> Orders { get; set; }
+        public DbSet<OrderCancellationReason> OrderCancellationReasons { get; set; }
         public DbSet<Service> Services { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<ServiceCategory> ServiceCategories { get; set; }
@@ -42,7 +44,7 @@ namespace Persistence.Contexts
  
             modelBuilder.Entity<BarberRating>()
                 .HasOne(br => br.Barber)
-                .WithMany()
+                .WithMany(b => b.Ratings)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<BarberShop>()
@@ -62,12 +64,12 @@ namespace Persistence.Contexts
             
             modelBuilder.Entity<BarberShop>()
                 .HasOne(bs => bs.City)
-                .WithMany()
+                .WithMany(c => c.BarberShops)
                 .OnDelete(DeleteBehavior.Restrict);
             
             modelBuilder.Entity<BarberShop>()
                 .HasOne(bs => bs.Neighborhood)
-                .WithMany()
+                .WithMany(n => n.BarberShops)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<BarberShopBarber>()
@@ -92,7 +94,7 @@ namespace Persistence.Contexts
 
             modelBuilder.Entity<BarberShopRating>()
                .HasOne(bsr => bsr.BarberShop)
-               .WithMany()
+               .WithMany(b => b.Ratings)
                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<BarberShopService>()
@@ -105,6 +107,21 @@ namespace Persistence.Contexts
                 .WithMany(bs => bs.Services)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<BarberShopService>()
+                .HasMany(bss => bss.Orders)
+                .WithOne(bsso => bsso.BarberShopService)
+                .OnDelete(DeleteBehavior.Restrict);
+            
+            modelBuilder.Entity<BarberShopServiceOrder>()
+                .HasOne(bsso => bsso.BarberShopService)
+                .WithMany(bss => bss.Orders)
+                .OnDelete(DeleteBehavior.Restrict);
+            
+            modelBuilder.Entity<BarberShopServiceOrder>()
+                .HasOne(bsso => bsso.Order)
+                .WithMany(o => o.Services)
+                .OnDelete(DeleteBehavior.Restrict);
+
             modelBuilder.Entity<BarberShopWorkingDay>()
                 .HasOne(bswd => bswd.BarberShop)
                 .WithMany(bs => bs.BarberShopWorkingDays)
@@ -112,7 +129,7 @@ namespace Persistence.Contexts
             
             modelBuilder.Entity<BarberShopWorkingDay>()
                 .HasOne(bswd => bswd.WeekDay)
-                .WithMany()
+                .WithMany(wd => wd.BarberShopWorkingDays)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Category>()
@@ -121,18 +138,18 @@ namespace Persistence.Contexts
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Neighborhood>()
-                .HasOne(d => d.City)
-                .WithMany()
+                .HasOne(n => n.City)
+                .WithMany(c => c.Neighborhoods)
                 .OnDelete(DeleteBehavior.Restrict);
             
             modelBuilder.Entity<Order>()
                 .HasOne(o => o.Barber)
                 .WithMany(b => b.Orders)
                 .OnDelete(DeleteBehavior.Restrict);
-            
+
             modelBuilder.Entity<Order>()
                 .HasMany(o => o.Services)
-                .WithOne()
+                .WithOne(bsso => bsso.Order)
                 .OnDelete(DeleteBehavior.Restrict);
             
             modelBuilder.Entity<Order>()
@@ -143,6 +160,16 @@ namespace Persistence.Contexts
             modelBuilder.Entity<Order>()
                 .HasOne(o => o.BarberShop)
                 .WithMany(b => b.Orders)
+                .OnDelete(DeleteBehavior.Restrict); 
+            
+            modelBuilder.Entity<Order>()
+                .HasOne(o => o.OrderCancellationReason)
+                .WithMany(b => b.Orders)
+                .OnDelete(DeleteBehavior.Restrict); 
+            
+            modelBuilder.Entity<OrderCancellationReason>()
+                .HasMany(ocr => ocr.Orders)
+                .WithOne(o => o.OrderCancellationReason)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Service>()
@@ -172,12 +199,12 @@ namespace Persistence.Contexts
 
             modelBuilder.Entity<UserRating>()
                .HasOne(ur => ur.User)
-               .WithMany()
+               .WithMany(u => u.Ratings)
                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<UserRefreshToken>()
-                .HasOne(u => u.User)
-                .WithOne()
+                .HasOne(urt => urt.User)
+                .WithMany(u => u.RefreshTokens)
                 .OnDelete(DeleteBehavior.Restrict); //ToDo may need change when we delete a user we will delete its token
             
             base.OnModelCreating(modelBuilder);

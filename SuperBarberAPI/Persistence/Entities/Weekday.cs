@@ -12,5 +12,7 @@ namespace Persistence.Entities
         [Required]
         [EnumDataType(typeof(DayOfWeek))]
         public DayOfWeek DayOfWeekEnum { get; set; }
+
+        public ICollection<BarberShopWorkingDay> BarberShopWorkingDays { get; set; } = new HashSet<BarberShopWorkingDay>();
     }
 }

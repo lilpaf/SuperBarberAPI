@@ -24,5 +24,7 @@ namespace Persistence.Entities
         public ICollection<Order> Orders { get; set; } = new HashSet<Order>();
 
         public ICollection<BarberShopBarber> BarberShops { get; set; } = new HashSet<BarberShopBarber>();
+        
+        public ICollection<BarberRating> Ratings { get; set; } = new HashSet<BarberRating>();
     }
 }
