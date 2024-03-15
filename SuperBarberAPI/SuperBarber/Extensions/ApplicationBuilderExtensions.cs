@@ -8,6 +8,7 @@ using Persistence.Enums;
 using Persistence.Implementations;
 using StackExchange.Redis;
 using SuperBarber.Extensions.DataLoaders;
+using System.ComponentModel.DataAnnotations;
 
 namespace SuperBarber.Extensions
 {
@@ -71,7 +72,7 @@ namespace SuperBarber.Extensions
             {
                 data.OrderCancellationReasons.Add(new OrderCancellationReason
                 {
-                    Reason = cancellationReasonEnum[i].GetDisplayName(),
+                    Reason = cancellationReasonEnum[i].GetAttributeOfType<DisplayAttribute>().Name ?? cancellationReasonEnum[i].ToString(),
                     CancellationReasonEnum = cancellationReasonEnum[i]
                 });
             }
