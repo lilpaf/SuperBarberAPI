@@ -36,5 +36,21 @@ namespace SuperBarber.Controllers
                 Result = response
             };
         }
+        
+        [HttpGet]
+        [Route("all")]
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(typeof(ResponseContent<AllBarbersResponse>), 200)]
+        [ProducesDefaultResponseType(typeof(ResponseContent))]
+        public async Task<ResponseContent<AllBarbersResponse>> Register([FromQuery] AllBarbersRequest request)
+        {
+            AllBarbersResponse response = await _barberService.GetAllAsync(request);
+
+            return new ResponseContent<AllBarbersResponse>()
+            {
+                Result = response
+            };
+        }
+
     }
 }

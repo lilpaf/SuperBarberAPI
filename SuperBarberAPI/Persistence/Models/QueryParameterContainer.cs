@@ -22,10 +22,10 @@
 
         public int SkipCount => PageNumber * BarberShopsPerPage;
 
-        public required string City { get; init; }
+        public string? City { get; init; }
 
         public string? Neighborhood { get; init; }
 
-        public string? BarberShopSearchName { get; init; }
+        public string? SearchName { get; init; }
     }
 }

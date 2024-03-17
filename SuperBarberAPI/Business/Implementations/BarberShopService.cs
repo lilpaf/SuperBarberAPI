@@ -42,7 +42,7 @@ namespace Business.Implementations
             {
                 City = request.City,
                 Neighborhood = request.Neighborhood,
-                BarberShopSearchName = request.BarberShopSearchName
+                SearchName = request.BarberShopName
             };
 
             //ToDo may be needed if not delete the method
@@ -97,7 +97,7 @@ namespace Business.Implementations
                 Cities = citiesName,
                 Neighborhood = request.Neighborhood,
                 Neighborhoods = neighborhoodsName,
-                BarberShopSearchName = request.BarberShopSearchName,
+                BarberShopSearchName = request.BarberShopName,
                 //TotalPages = totalActiveBarberShops / QueryParameterContainer.BarberShopsPerPage, //ToDo may be needed
                 BarberShops = publicBarberShopsDto
             };

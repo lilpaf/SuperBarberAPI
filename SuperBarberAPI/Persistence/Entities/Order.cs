@@ -21,7 +21,7 @@ namespace Persistence.Entities
         public required int BarberId { get; set; }
 
         [ForeignKey(nameof(BarberId))]
-        public Barber Barber { get; set; }
+        public Barber Barber { get; set; } = null!;
 
         public required DateTime StartDate { get; set; }
         

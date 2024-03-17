@@ -1,4 +1,5 @@
 ﻿using Business.Interfaces;
+using Business.Models.Dtos;
 using Business.Models.Exceptions;
 using Business.Models.Requests.Barber;
 using Business.Models.Responses.Barber;
@@ -8,6 +9,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Persistence.Entities;
 using Persistence.Interfaces;
+using Persistence.Models;
 
 namespace Business.Implementations
 {
@@ -60,6 +62,8 @@ namespace Business.Implementations
                 deletedBarber.About = barber.About;
                 deletedBarber.IsDeleted = barber.IsDeleted;
                 deletedBarber.DeleteDate = barber.DeleteDate;
+
+                _barberRepository.UpdateBarber(deletedBarber);
             }
             else
             {
@@ -71,6 +75,37 @@ namespace Business.Implementations
             return new RegisterBarberResponse
             {
                 Message = Messages.BarberRegistrationSussesfuly
+            };
+        }
+
+        public async Task<AllBarbersResponse> GetAllAsync(AllBarbersRequest request)
+        {
+            QueryParameterContainer queryParams = new()
+            {
+                City = request.BarberShopCity,
+                Neighborhood = request.BarberShopNeighborhood,
+                SearchName = request.BarberName
+            };
+
+            IReadOnlyList<Barber> barbers = await _barberRepository.GetAllActiveBarbersWithUsersAndBarberShopsAsync(queryParams);
+
+            IReadOnlyList<AllBarberDto> barberDtos = barbers
+                .Select(b => new AllBarberDto 
+                { 
+                    Id = b.Id,
+                    FirstName = b.User.FirstName!,
+                    LastName = b.User.LastName!,
+                    AverageRating = b.AverageRating,
+                    BarberShopsNamesEmployed = b.BarberShops
+                    .Where(bs => bs.CanTakeOrders)
+                    .Select(bs => bs.BarberShop.Name)
+                    .ToList()
+                })
+                .ToList();
+
+            return new AllBarbersResponse()
+            {
+                Barbers = barberDtos
             };
         }
     }

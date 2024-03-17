@@ -22,7 +22,7 @@ namespace Persistence.Implementations
 
         public async Task<IReadOnlyList<BarberShop>> GetAllPublicBarberShopsWithCitiesNeighborhoodsAndWorkingDaysAsync(QueryParameterContainer queryParams)
         {
-            _logger.LogInformation("Getting all active barbershops from SQL Db");
+            _logger.LogInformation("Getting all active barber shops from SQL Db");
 
             IQueryable<BarberShop> barberShopQuery = QueryBarberShops(queryParams);
 
@@ -36,7 +36,7 @@ namespace Persistence.Implementations
 
         public async Task<int> GetTotalNumberActiveBarberShopsAsync()
         {
-            _logger.LogInformation("Getting total number of all active barbershops from SQL Db");
+            _logger.LogInformation("Getting total number of all active barber shops from SQL Db");
 
             return await _context.BarberShops.CountAsync();
         }
@@ -67,25 +67,25 @@ namespace Persistence.Implementations
 
         public async Task AddBarberShopAsync(BarberShop barberShop)
         {
-            _logger.LogInformation("Adding barbershop to SQL Db");
+            _logger.LogInformation("Adding barber shop to SQL Db");
             await _context.BarberShops.AddAsync(barberShop);
         }
 
         public void UpdateBarberShopAsync(BarberShop barberShop)
         {
-            _logger.LogInformation("Updating barbershop from SQL Db");
+            _logger.LogInformation("Updating barber shop from SQL Db");
             _context.BarberShops.Update(barberShop);
         }
 
         public async Task SaveChangesAsync()
         {
-            _logger.LogInformation("Saving barbershop to SQL Db");
+            _logger.LogInformation("Saving barber shop to SQL Db");
             await _context.SaveChangesAsync();
         }
 
         private IQueryable<BarberShop> QueryBarberShops(QueryParameterContainer queryParams)
         {
-            _logger.LogInformation("Querying barbershops");
+            _logger.LogInformation("Querying barber shops");
 
             IQueryable<BarberShop> barberShopQuery = _context.BarberShops
                 .Where(b => b.IsPublic && !b.IsDeleted && b.City.Name == queryParams.City)
@@ -96,10 +96,12 @@ namespace Persistence.Implementations
                 barberShopQuery.Where(b => b.Neighborhood != null && b.Neighborhood.Name == queryParams.Neighborhood);
             }
 
-            if (!string.IsNullOrEmpty(queryParams.BarberShopSearchName))
+            if (!string.IsNullOrEmpty(queryParams.SearchName))
             {
-                barberShopQuery.Where(b => b.Name.ToLower().Replace(" ", string.Empty)
-                .Contains(queryParams.BarberShopSearchName.ToLower().Replace(" ", string.Empty)));
+                string searchName = queryParams.SearchName.Replace(" ", string.Empty);
+
+                barberShopQuery.Where(b => b.Name.Replace(" ", string.Empty)
+                .Contains(searchName, StringComparison.InvariantCultureIgnoreCase));
             }
 
             barberShopQuery.Skip(queryParams.SkipCount);

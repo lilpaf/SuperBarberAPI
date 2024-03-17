@@ -1,4 +1,5 @@
 ﻿using Persistence.Entities;
+using Persistence.Models;
 
 namespace Persistence.Interfaces
 {
@@ -8,7 +9,11 @@ namespace Persistence.Interfaces
 
         Task<Barber?> GetActiveOrDeletedBarberByUserIdAsync(string userId);
 
+        Task<IReadOnlyList<Barber>> GetAllActiveBarbersWithUsersAndBarberShopsAsync(QueryParameterContainer queryParams);
+
         Task AddBarberAsync(Barber barber);
+
+        void UpdateBarber(Barber barber);
 
         Task SaveChangesAsync();
     }
