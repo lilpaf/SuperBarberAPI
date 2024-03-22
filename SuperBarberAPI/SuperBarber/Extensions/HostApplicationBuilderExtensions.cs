@@ -1,5 +1,6 @@
 ﻿using Business.Models.Exceptions;
 using Common.Configurations;
+using Confluent.Kafka;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
@@ -87,6 +88,25 @@ namespace SuperBarber.Extensions
                 ConnectionMultiplexer multiplexer = provider.GetService<ConnectionMultiplexer>() ??
                      throw new NotConfiguredException("Redis multiplexer does not exists");
                 return multiplexer.GetDatabase();
+            });
+
+            return builder;
+        }
+        
+        public static IHostApplicationBuilder AddKafkaProducerSingleton(this IHostApplicationBuilder builder)
+        {
+            KafkaProducerConfig kafkaConfig = builder.Configuration.GetSection(nameof(KafkaProducerConfig)).Get<KafkaProducerConfig>() ??
+                    throw new NotConfiguredException("The kafka producer config is not configured correctly");
+
+            ProducerConfig producerConfig = new ()
+            {
+                BootstrapServers = kafkaConfig.BootstrapServers,
+                ClientId = kafkaConfig.ClientId
+            };
+
+            builder.Services.AddSingleton(provider => 
+            {
+                return new ProducerBuilder<Null, string>(producerConfig).Build();
             });
 
             return builder;

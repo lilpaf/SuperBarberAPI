@@ -1,4 +1,4 @@
-﻿namespace Common.Configurations
+﻿namespace NotificationService.Models.Configurations
 {
     public class SmtpConfig
     {

@@ -1,6 +1,8 @@
 using Business.Implementations;
 using Business.Interfaces;
 using Common.Configurations;
+using Common.Constants;
+using Confluent.Kafka;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Contexts;
@@ -13,7 +15,6 @@ using SuperBarber.Middlewares;
 using BarberShopService = Business.Implementations.BarberShopService;
 
 var builder = WebApplication.CreateBuilder(args);
-
 /*
  * ToDo check if email is confirmed before making orders or registering as barber
  * ToDo schedule sending email
@@ -30,8 +31,10 @@ builder.Services.AddDbContext<SuperBarberDbContext>(
 builder.AddRedisCache();
 
 builder.Services.Configure<JwtConfig>(builder.Configuration.GetSection(nameof(JwtConfig)));
-builder.Services.Configure<SmtpConfig>(builder.Configuration.GetSection(nameof(SmtpConfig)));
 builder.Services.Configure<IdentityConfig>(builder.Configuration.GetSection(nameof(IdentityConfig)));
+builder.Services.Configure<KafkaEmailProducerConfig>(builder.Configuration.GetSection(nameof(KafkaEmailProducerConfig)));
+
+builder.AddKafkaProducerSingleton();
 
 builder.UseSerilog();
 
@@ -57,6 +60,7 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserHandler, UserHandler>();
 builder.Services.AddScoped<IBarberShopService, BarberShopService>();
 builder.Services.AddSingleton<IEmailService, EmailService>();
+builder.Services.AddSingleton<IKafkaProducer, KafkaProducer>();
 builder.Services.AddScoped<IBarberService, BarberService>();
 
 // Repositories

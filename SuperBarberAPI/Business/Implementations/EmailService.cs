@@ -4,36 +4,33 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Persistence.Entities;
-using MimeKit;
-using MimeKit.Text;
-using Common.Configurations;
 using Common.Constants.Resourses;
 using Common.Constants;
-using SmtpClient = MailKit.Net.Smtp.SmtpClient;
+using Business.Models.Email;
 
 namespace Business.Implementations
 {
     public class EmailService : IEmailService
     {
         private readonly ILogger<EmailService> _logger;
-        private readonly SmtpConfig _smtpConfig;
+        private readonly IKafkaProducer _kafkaProducer;
+        private readonly string _scheme;
+        private readonly string _host;
         private static HttpContext _httpContext => new HttpContextAccessor().HttpContext ??
            throw new NotConfiguredException(Messages.NoActiveHttpContext);
 
-        public EmailService(
-            ILogger<EmailService> logger,
-            IOptions<SmtpConfig> smtpConfig)
+        public EmailService(ILogger<EmailService> logger, IKafkaProducer kafkaProducer)
         {
             _logger = logger;
-            _smtpConfig = smtpConfig.Value;
+            _kafkaProducer = kafkaProducer;
+            _scheme = _httpContext.Request.Scheme;
+            _host = _httpContext.Request.Host.Value;
+            
         }
 
         public async Task SendConformationEmail(string controllerRouteTemplate, string emailConformationRouteTemplate, User user, string code)
         {
-            string scheme = _httpContext.Request.Scheme;
-            string host = _httpContext.Request.Host.Value;
-
-            string callbackUrl = $"{scheme}://{host}/{controllerRouteTemplate}/{emailConformationRouteTemplate}?code={code}";
+            string callbackUrl = $"{_scheme}://{_host}/{controllerRouteTemplate}/{emailConformationRouteTemplate}?code={code}";
 
             string message = $"Please confirm your email address <a href=\"{callbackUrl}\">Click here</a>";
 
@@ -42,15 +39,12 @@ namespace Business.Implementations
                 user.Email! // User email will not be null
             };
 
-            await SendEmail(recipients, EmailConstants.ConformationEmailSubject, message);
+            await ProduceEmailAsync(recipients, EmailConstants.ConformationEmailSubject, message);
         }
-        
-        public async Task SendPasswordResetEmail(string controllerRouteTemplate, string passwordResetRouteTemplate, User user, string code)
-        {
-            string scheme = _httpContext.Request.Scheme; // ToDo will be changed
-            string host = _httpContext.Request.Host.Value; // ToDo will be changed
 
-            string callbackUrl = $"{scheme}://{host}/{controllerRouteTemplate}/{passwordResetRouteTemplate}?code={code}";
+        public async Task SendPasswordResetEmail(string controllerRouteTemplate, string passwordResetRouteTemplate, User user, string code)
+        { 
+            string callbackUrl = $"{_scheme}://{_host}/{controllerRouteTemplate}/{passwordResetRouteTemplate}?code={code}";
 
             string message = $"Reset password link <a href=\"{callbackUrl}\">Click here</a>. If you did not request a reset password link, please ignore this email.";
 
@@ -59,41 +53,19 @@ namespace Business.Implementations
                 user.Email! // User email will not be null
             };
 
-            await SendEmail(recipients, EmailConstants.ResetPasswordEmailSubject, message);
+            await ProduceEmailAsync(recipients, EmailConstants.ResetPasswordEmailSubject, message);
         }
 
-        private async Task SendEmail(IList<string> recipientsEmails, string subject, string message)
+        private async Task ProduceEmailAsync(IEnumerable<string> recipientsEmails, string subject, string message)
         {
-            try
+            EmailData emailData = new()
             {
-                InternetAddressList recipients = new ();
+                RecipientsEmails = recipientsEmails,
+                Subject = subject,
+                Message = message
+            };
 
-                foreach (var email in recipientsEmails)
-                {
-                    recipients.Add(MailboxAddress.Parse(email));
-                }
-
-                MimeMessage mailMessage = new ();
-                mailMessage.From.Add(MailboxAddress.Parse(_smtpConfig.SmtpUsername));
-                mailMessage.To.AddRange(recipients);
-                mailMessage.Subject = subject;
-                mailMessage.Body = new TextPart(TextFormat.Html) { Text = message };
-
-                using SmtpClient client = new();
-
-                await client.ConnectAsync(_smtpConfig.SmtpServer, _smtpConfig.SmtpPort);
-                await client.AuthenticateAsync(_smtpConfig.SmtpUsername, _smtpConfig.SmtpPassword);
-
-                await client.SendAsync(mailMessage);
-                
-                _logger.LogInformation("Successfully sent email to {Recipients}", string.Join(EmailConstants.RecipientsDelimiter, mailMessage.To));
-            }
-            catch (Exception exception)
-            {
-                _logger.LogError(exception, "Exception occurred when sending the email: {Message}", exception.Message);
-
-                throw new ErrorSendingEmailException(Messages.ErrorSendingEmail);
-            }
+            await _kafkaProducer.ProduceEmailAsync(emailData);
         }
     }
 }
