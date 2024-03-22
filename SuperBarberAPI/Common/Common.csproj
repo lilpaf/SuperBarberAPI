@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Update="Constants\Messages\Messages.Designer.cs">
+    <Compile Update="Constants\Resourses\Messages.Designer.cs">
       <DependentUpon>Messages.resx</DependentUpon>
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Update="Constants\Messages\Messages.resx">
+    <EmbeddedResource Update="Constants\Resourses\Messages.resx">
       <SubType>Designer</SubType>
       <LastGenOutput>Messages.Designer.cs</LastGenOutput>
       <Generator>PublicResXFileCodeGenerator</Generator>

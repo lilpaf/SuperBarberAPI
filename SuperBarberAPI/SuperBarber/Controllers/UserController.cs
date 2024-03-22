@@ -2,7 +2,7 @@
 using Business.Models.Exceptions;
 using Business.Models.Requests.User;
 using Business.Models.Responses.User;
-using Common.Constants.Messages;
+using Common.Constants.Resourses;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SuperBarber.Models;

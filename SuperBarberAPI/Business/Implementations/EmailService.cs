@@ -7,7 +7,7 @@ using Persistence.Entities;
 using MimeKit;
 using MimeKit.Text;
 using Common.Configurations;
-using Common.Constants.Messages;
+using Common.Constants.Resourses;
 using Common.Constants;
 using SmtpClient = MailKit.Net.Smtp.SmtpClient;
 

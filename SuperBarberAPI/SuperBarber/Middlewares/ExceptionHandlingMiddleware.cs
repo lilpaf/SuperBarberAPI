@@ -1,7 +1,7 @@
 ﻿using Business.Models.Exceptions;
 using Business.Models.Exceptions.General;
 using Common.Constants;
-using Common.Constants.Messages;
+using Common.Constants.Resourses;
 using SuperBarber.Models;
 
 namespace SuperBarber.Middlewares

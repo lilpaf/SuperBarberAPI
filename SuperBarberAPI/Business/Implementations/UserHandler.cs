@@ -1,7 +1,7 @@
 ﻿using Business.Interfaces;
 using Business.Models.Exceptions;
 using Common.Constants;
-using Common.Constants.Messages;
+using Common.Constants.Resourses;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;

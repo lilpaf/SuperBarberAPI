@@ -4,7 +4,7 @@ using Business.Models.Requests.User;
 using Business.Models.Responses.User;
 using Common.Configurations;
 using Common.Constants;
-using Common.Constants.Messages;
+using Common.Constants.Resourses;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.WebUtilities;

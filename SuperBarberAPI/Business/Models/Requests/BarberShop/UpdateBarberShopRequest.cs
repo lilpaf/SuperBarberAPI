@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Common.Constants.Messages;
+using Common.Constants.Resourses;
 using Common.Constants;
 using Common.Attributes;
 

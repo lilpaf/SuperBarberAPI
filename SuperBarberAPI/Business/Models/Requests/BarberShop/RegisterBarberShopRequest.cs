@@ -1,6 +1,6 @@
 ﻿using Common.Attributes;
 using Common.Constants;
-using Common.Constants.Messages;
+using Common.Constants.Resourses;
 using System.ComponentModel.DataAnnotations;
 
 namespace Business.Models.Requests.BarberShop

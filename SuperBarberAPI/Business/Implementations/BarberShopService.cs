@@ -3,7 +3,7 @@ using Business.Models.Dtos;
 using Business.Models.Exceptions;
 using Business.Models.Requests.BarberShop;
 using Business.Models.Responses.BarberShop;
-using Common.Constants.Messages;
+using Common.Constants.Resourses;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.Extensions.Logging;
 using Persistence.Entities;

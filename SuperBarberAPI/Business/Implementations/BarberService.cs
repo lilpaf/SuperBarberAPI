@@ -4,7 +4,7 @@ using Business.Models.Exceptions;
 using Business.Models.Requests.Barber;
 using Business.Models.Responses.Barber;
 using Common.Constants;
-using Common.Constants.Messages;
+using Common.Constants.Resourses;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Persistence.Entities;
