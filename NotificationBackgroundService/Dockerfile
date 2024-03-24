@@ -1,23 +1,23 @@
-#See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
+# Use the .NET Core 8.0 SDK image as the base image
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build-env
 
-FROM mcr.microsoft.com/dotnet/runtime:8.0 AS base
-USER app
+# Set the working directory in the container
 WORKDIR /app
 
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-ARG BUILD_CONFIGURATION=Release
-WORKDIR /src
-COPY ["NotificationService.csproj", "."]
-RUN dotnet restore "./NotificationService.csproj"
-COPY . .
-WORKDIR "/src/."
-RUN dotnet build "./NotificationService.csproj" -c $BUILD_CONFIGURATION -o /app/build
+# Copy the .csproj files and restore dependencies
+COPY *.csproj ./
+RUN dotnet restore
 
-FROM build AS publish
-ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./NotificationService.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+# Copy the remaining source code
+COPY . ./
 
-FROM base AS final
+# Build the application
+RUN dotnet publish -c Release -o out
+
+# Generate runtime image
+FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
-COPY --from=publish /app/publish .
+COPY --from=build-env /app/out .
+
+# Start the application
 ENTRYPOINT ["dotnet", "NotificationService.dll"]

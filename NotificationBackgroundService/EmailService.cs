@@ -4,7 +4,7 @@ using MimeKit;
 using MimeKit.Text;
 using NotificationService.Constants;
 using NotificationService.Models.Configurations;
-using NotificationService.Models.Email;
+using NotificationService.Models.Dtos;
 using NotificationService.Models.Exceptions;
 using NotificationService.Resourses;
 using System.Text.Json;
@@ -34,15 +34,16 @@ namespace NotificationService
             {
                 BootstrapServers = _kafkaConfig.BootstrapServers,
                 GroupId = _kafkaConfig.GroupId,
-                AutoOffsetReset = AutoOffsetReset.Earliest,
-                EnableAutoCommit = false,
+                AutoOffsetReset = AutoOffsetReset.Latest,
+                EnableAutoCommit = true,
+                AutoCommitIntervalMs = 101
             };
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             using var consumer = new ConsumerBuilder<Ignore, string>(_config).Build();
-
+            
             consumer.Subscribe(_kafkaEmailConfig.Topic);
 
             while (!stoppingToken.IsCancellationRequested)
@@ -51,7 +52,7 @@ namespace NotificationService
 
                 _logger.LogInformation("Received email message to send with email data {EmailData}", message.Message.Value);
 
-                EmailData? emailData = JsonSerializer.Deserialize<EmailData>(message.Message.Value);
+                EmailDataDto? emailData = JsonSerializer.Deserialize<EmailDataDto>(message.Message.Value);
 
                 if (emailData is null)
                 {

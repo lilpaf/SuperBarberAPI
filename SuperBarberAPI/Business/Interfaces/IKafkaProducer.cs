@@ -1,4 +1,4 @@
-﻿using Business.Models.Email;
+﻿using Business.Models.Dtos;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +9,6 @@ namespace Business.Interfaces
 {
     public interface IKafkaProducer
     {
-        Task ProduceEmailAsync(EmailData emailData);
+        Task ProduceEmailAsync(EmailDataDto emailData);
     }
 }

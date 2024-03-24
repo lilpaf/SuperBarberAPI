@@ -7,7 +7,7 @@
       },
       "dotnetRunMessages": true
     },
-    "Container (Dockerfile)": {
+    "Docker": {
       "commandName": "Docker"
     }
   },

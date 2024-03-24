@@ -6,7 +6,7 @@ using Microsoft.Extensions.Options;
 using Persistence.Entities;
 using Common.Constants.Resourses;
 using Common.Constants;
-using Business.Models.Email;
+using Business.Models.Dtos;
 
 namespace Business.Implementations
 {
@@ -58,7 +58,7 @@ namespace Business.Implementations
 
         private async Task ProduceEmailAsync(IEnumerable<string> recipientsEmails, string subject, string message)
         {
-            EmailData emailData = new()
+            EmailDataDto emailData = new()
             {
                 RecipientsEmails = recipientsEmails,
                 Subject = subject,

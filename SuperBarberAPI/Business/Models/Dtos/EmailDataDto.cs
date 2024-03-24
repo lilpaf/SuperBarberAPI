@@ -1,6 +1,6 @@
-﻿namespace Business.Models.Email
+﻿namespace Business.Models.Dtos
 {
-    public class EmailData
+    public class EmailDataDto
     {
         public required IEnumerable<string> RecipientsEmails { get; init; }
         public required string Subject { get; init; }

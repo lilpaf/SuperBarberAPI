@@ -1,6 +1,6 @@
-﻿namespace NotificationService.Models.Email
+﻿namespace NotificationService.Models.Dtos
 {
-    public class EmailData
+    public class EmailDataDto
     {
         public required string[] RecipientsEmails { get; init; }
         public required string Subject { get; init; }

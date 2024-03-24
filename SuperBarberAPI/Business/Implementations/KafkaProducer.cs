@@ -1,5 +1,5 @@
 ﻿using Business.Interfaces;
-using Business.Models.Email;
+using Business.Models.Dtos;
 using Business.Models.Exceptions;
 using Common.Configurations;
 using Common.Constants.Resourses;
@@ -27,7 +27,7 @@ namespace Business.Implementations
             _kafkaEmailProducerConfig = kafkaEmailProducerConfig.Value;
         }
 
-        public async Task ProduceEmailAsync(EmailData emailData)
+        public async Task ProduceEmailAsync(EmailDataDto emailData)
         {
             try
             {
