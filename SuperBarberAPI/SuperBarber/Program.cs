@@ -1,8 +1,6 @@
 using Business.Implementations;
 using Business.Interfaces;
 using Common.Configurations;
-using Common.Constants;
-using Confluent.Kafka;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Contexts;
