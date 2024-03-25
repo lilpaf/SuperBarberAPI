@@ -10,7 +10,7 @@ namespace Business.Interfaces
 
         Task<EmailConfirmationResponse> ConfirmEmailAsync(EmailConfirmationRequest request);
 
-        Task<AuthenticationResponse> RefreshTokenAsync(RefreshTokenRequest request);
+        Task RefreshTokenAsync();
 
         Task<PasswordResetEmailResponse> SendPasswordResetEmailAsync(ResetPasswordEmailRequest request, string controllerRouteTemplate, string passwordResetRouteTemplate);
 

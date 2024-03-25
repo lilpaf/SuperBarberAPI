@@ -1,5 +1,6 @@
 ﻿using Business.Models.Exceptions;
 using Common.Configurations;
+using Common.Constants;
 using Confluent.Kafka;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -43,10 +44,23 @@ namespace SuperBarber.Extensions
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-            }).AddJwtBearer(jwt =>
+            })
+            .AddCookie(x =>
+            {
+                x.Cookie.Name = AuthenticationConstants.AccessTokenCookieKey;
+            })
+            .AddJwtBearer(jwt =>
             {
                 jwt.SaveToken = true;
                 jwt.TokenValidationParameters = tokenValidationParams;
+                jwt.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        context.Token = context.Request.Cookies[AuthenticationConstants.AccessTokenCookieKey];
+                        return Task.CompletedTask;
+                    }
+                };
             });
 
             builder.Services.AddDefaultIdentity<User>(options =>
@@ -92,26 +106,26 @@ namespace SuperBarber.Extensions
 
             return builder;
         }
-        
+
         public static IHostApplicationBuilder AddKafkaProducerSingleton(this IHostApplicationBuilder builder)
         {
             KafkaProducerConfig kafkaConfig = builder.Configuration.GetSection(nameof(KafkaProducerConfig)).Get<KafkaProducerConfig>() ??
                     throw new NotConfiguredException("The kafka producer config is not configured correctly");
 
-            ProducerConfig producerConfig = new ()
+            ProducerConfig producerConfig = new()
             {
                 BootstrapServers = kafkaConfig.BootstrapServers,
                 ClientId = kafkaConfig.ClientId
             };
 
-            builder.Services.AddSingleton(provider => 
+            builder.Services.AddSingleton(provider =>
             {
                 return new ProducerBuilder<Null, string>(producerConfig).Build();
             });
 
             return builder;
         }
-        
+
         public static WebApplicationBuilder UseSerilog(this WebApplicationBuilder builder)
         {
             Console.OutputEncoding = Encoding.UTF8;

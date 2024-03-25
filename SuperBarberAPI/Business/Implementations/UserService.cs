@@ -91,10 +91,12 @@ namespace Business.Implementations
 
             await _emailService.SendConformationEmail(controllerRouteTemplate, emailConformationRouteTemplate, user, code);
 
-            AuthenticationResponse response = await GenerateJwtTokenAsync(user);
-            response.Message = Messages.UserRegistrationSussesfuly;
+            await GenerateJwtTokenAsync(user);
 
-            return response;
+            return new AuthenticationResponse()
+            {
+                Message = Messages.UserRegistrationSussesfuly
+        };
         }
 
         public async Task<AuthenticationResponse> LoginUserAsync(UserLoginRequest request)
@@ -126,10 +128,12 @@ namespace Business.Implementations
 
             await _userManager.ResetAccessFailedCountAsync(user);
 
-            AuthenticationResponse response = await GenerateJwtTokenAsync(user);
-            response.Message = Messages.LogInSussesfuly;
-
-            return response;
+            await GenerateJwtTokenAsync(user);
+            
+            return new AuthenticationResponse()
+            { 
+                Message = Messages.LogInSussesfuly 
+            };
         }
 
         public async Task<EmailConfirmationResponse> ConfirmEmailAsync(EmailConfirmationRequest request)
@@ -191,7 +195,7 @@ namespace Business.Implementations
                 throw new InvalidArgumentException(Messages.UserWithEmailDoesNotExist);
             }
 
-            await RevokeUserRefreshTokenAsync(user);
+            await RevokeRefreshTokenAsync(user);
 
             //Decode the code
             string code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(request.Code));
@@ -217,7 +221,8 @@ namespace Business.Implementations
         {
             User user = await _userHandler.GetUserByUserClaimIdAsync();
 
-            await RevokeUserRefreshTokenAsync(user);
+            RevokeAccessTokenAsync();
+            await RevokeRefreshTokenAsync(user);
 
             return new AuthenticationResponse()
             {
@@ -225,13 +230,14 @@ namespace Business.Implementations
             };
         }
 
-        public async Task<AuthenticationResponse> RefreshTokenAsync(RefreshTokenRequest request)
+        public async Task RefreshTokenAsync()
         {
+            string? accessToken = _httpContext.Request.Cookies[AuthenticationConstants.AccessTokenCookieKey];
             string? refreshToken = _httpContext.Request.Cookies[AuthenticationConstants.RefreshTokenCookieKey];
 
-            if (string.IsNullOrEmpty(refreshToken))
+            if (string.IsNullOrEmpty(refreshToken) || string.IsNullOrEmpty(accessToken))
             {
-                _logger.LogError("Refresh token missing");
+                _logger.LogError("Refresh token or access token is missing");
                 throw new InvalidArgumentException(Messages.InvalidJwtToken);
             }
 
@@ -242,7 +248,7 @@ namespace Business.Implementations
                 // We set the validate lifetime to false so we can validate the expired access token
                 _tokenValidationParameters.ValidateLifetime = false;
 
-                TokenValidationResult tokenVerificationResult = await jwtTokenHandler.ValidateTokenAsync(request.AccessToken, _tokenValidationParameters);
+                TokenValidationResult tokenVerificationResult = await jwtTokenHandler.ValidateTokenAsync(accessToken, _tokenValidationParameters);
 
                 // Set validate lifetime back to true
                 _tokenValidationParameters.ValidateLifetime = true;
@@ -250,7 +256,7 @@ namespace Business.Implementations
                 if (!tokenVerificationResult.IsValid)
                 {
                     _logger.LogError("Token verification was unsuccessful for token: {Token}. Error: {Error}",
-                        request.AccessToken, tokenVerificationResult.Exception.Message);
+                        accessToken, tokenVerificationResult.Exception.Message);
                     throw new InvalidArgumentException(Messages.InvalidJwtToken);
                 }
 
@@ -260,7 +266,7 @@ namespace Business.Implementations
 
                 if (userRefreshToken is null)
                 {
-                    _logger.LogError("No refresh token exists that matches this token {Token}", request.AccessToken);
+                    _logger.LogError("No refresh token exists that matches this token {Token}", accessToken);
                     throw new InvalidArgumentException(Messages.InvalidJwtToken);
                 }
 
@@ -292,36 +298,17 @@ namespace Business.Implementations
 
                 User user = userRefreshToken.User;
 
-                AuthenticationResponse response = await GenerateJwtTokenAsync(user);
-
-                return response;
+                await GenerateJwtTokenAsync(user);
             }
             catch (Exception)
             {
                 User user = await _userHandler.GetUserByUserClaimIdAsync();
-                await RevokeUserRefreshTokenAsync(user);
+                await RevokeRefreshTokenAsync(user);
                 throw;
             }
         }
 
-        private async Task RevokeUserRefreshTokenAsync(User user)
-        {
-            _httpContext.Response.Cookies.Delete(AuthenticationConstants.RefreshTokenCookieKey);
-
-            UserRefreshToken? userRefreshToken = await _userRepository.GetUserRefreshTokenByUserIdAsync(user.Id);
-
-            if (userRefreshToken is not null)
-            {
-                userRefreshToken.IsRevoked = true;
-                userRefreshToken.IsUsed = true;
-                userRefreshToken.ExpiryDate = DateTime.UtcNow;
-
-                _userRepository.UpdateUserRefreshToken(userRefreshToken);
-                await _userRepository.SaveChangesAsync();
-            }
-        }
-        
-        private async Task<AuthenticationResponse> GenerateJwtTokenAsync(User user)
+        private async Task GenerateJwtTokenAsync(User user)
         {
             JwtSecurityTokenHandler jwtTokenHandler = new();
 
@@ -382,12 +369,30 @@ namespace Business.Implementations
 
             await _userRepository.SaveChangesAsync();
 
+            SetAccessTokenCookie(accessToken, tokenDescriptor.Expires);
             SetRefreshTokenCookie(userRefreshToken.Token, userRefreshToken.ExpiryDate);
+        }
 
-            return new AuthenticationResponse()
+        private async Task RevokeRefreshTokenAsync(User user)
+        {
+            _httpContext.Response.Cookies.Delete(AuthenticationConstants.RefreshTokenCookieKey);
+
+            UserRefreshToken? userRefreshToken = await _userRepository.GetUserRefreshTokenByUserIdAsync(user.Id);
+
+            if (userRefreshToken is not null)
             {
-                AccessToken = accessToken
-            };
+                userRefreshToken.IsRevoked = true;
+                userRefreshToken.IsUsed = true;
+                userRefreshToken.ExpiryDate = DateTime.UtcNow;
+
+                _userRepository.UpdateUserRefreshToken(userRefreshToken);
+                await _userRepository.SaveChangesAsync();
+            }
+        }
+        
+        private void RevokeAccessTokenAsync()
+        {
+            _httpContext.Response.Cookies.Delete(AuthenticationConstants.AccessTokenCookieKey);
         }
 
         private void SetRefreshTokenCookie(string refreshToken, DateTime expirationDate)
@@ -397,11 +402,27 @@ namespace Business.Implementations
                 HttpOnly = true,
                 SameSite = SameSiteMode.Strict,
                 Secure = true,
-                Expires = expirationDate
+                Expires = expirationDate,
+                IsEssential = true
             };
 
             _httpContext.Response.Cookies
                     .Append(AuthenticationConstants.RefreshTokenCookieKey, refreshToken, cookieOptions);
+        }
+        
+        private void SetAccessTokenCookie(string accessToken, DateTime? expirationDate)
+        {
+            CookieOptions cookieOptions = new()
+            {
+                HttpOnly = true,
+                SameSite = SameSiteMode.Strict,
+                Secure = true,
+                Expires = expirationDate,
+                IsEssential = true
+            };
+
+            _httpContext.Response.Cookies
+                    .Append(AuthenticationConstants.AccessTokenCookieKey, accessToken, cookieOptions);
         }
 
         private string GenerateRefreshToken()

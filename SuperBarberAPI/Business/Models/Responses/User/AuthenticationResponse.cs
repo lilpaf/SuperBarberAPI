@@ -2,7 +2,6 @@
 {
     public class AuthenticationResponse
     {
-        public string? AccessToken { get; init; }
-        public string? Message { get; set; }
+        public required string Message { get; init; }
     }
 }

@@ -36,7 +36,7 @@ namespace SuperBarber.Controllers
                 Result = response
             };
         }
-        
+
         [HttpGet]
         [Route("all")]
         [Produces(MediaTypeNames.Application.Json)]

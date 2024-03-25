@@ -90,16 +90,13 @@ namespace SuperBarber.Controllers
         [HttpPost]
         [Route("refresh-token")]
         [Produces(MediaTypeNames.Application.Json)]
-        [ProducesResponseType(typeof(ResponseContent<AuthenticationResponse>), 200)]
+        [ProducesResponseType(typeof(ResponseContent), 200)]
         [ProducesDefaultResponseType(typeof(ResponseContent))]
-        public async Task<ResponseContent<AuthenticationResponse>> RefreshToken([FromBody] RefreshTokenRequest request) 
+        public async Task<ResponseContent> RefreshToken() 
         {
-            AuthenticationResponse response = await _userService.RefreshTokenAsync(request);
+            await _userService.RefreshTokenAsync();
 
-            return new ResponseContent<AuthenticationResponse>()
-            {
-                Result = response
-            };
+            return new ResponseContent();
         }
 
         [HttpPost]
