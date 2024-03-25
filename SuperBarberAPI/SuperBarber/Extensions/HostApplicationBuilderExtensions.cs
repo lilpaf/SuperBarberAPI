@@ -125,6 +125,19 @@ namespace SuperBarber.Extensions
 
             return builder;
         }
+        
+        public static IHostApplicationBuilder AddAngularCors(this IHostApplicationBuilder builder)
+        {
+            AngularCorsConfig corsConfig = builder.Configuration.GetSection(nameof(AngularCorsConfig)).Get<AngularCorsConfig>() ??
+                    throw new NotConfiguredException("The kafka producer config is not configured correctly");
+
+            builder.Services.AddCors(options => options.AddPolicy(corsConfig.PolicyName, policy =>
+            {
+                policy.WithOrigins(corsConfig.Url).AllowAnyMethod().AllowAnyHeader();
+            }));
+
+            return builder;
+        }
 
         public static WebApplicationBuilder UseSerilog(this WebApplicationBuilder builder)
         {

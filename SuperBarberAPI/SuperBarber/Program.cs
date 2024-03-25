@@ -38,6 +38,8 @@ builder.AddKafkaProducerSingleton();
 
 builder.UseSerilog();
 
+builder.AddAngularCors();
+
 builder.AddCustomAuthentication();
 
 //This is needed in order to use the ValidateModelStateFilter
@@ -71,7 +73,7 @@ builder.Services.AddScoped<ICityRepository, CityRepository>();
 builder.Services.AddScoped<IWeekDayRepository, WeekDayRepository>();
 builder.Services.AddScoped<IBarberRepository, BarberRepository>();
 
-//Filters
+// Filters
 builder.Services.AddMvc(options =>
 {
     //options.Filters.Add<AutoValidateAntiforgeryTokenAttribute>();
@@ -88,6 +90,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseAngularCors();
 
 app.UseHttpsRedirection();
 

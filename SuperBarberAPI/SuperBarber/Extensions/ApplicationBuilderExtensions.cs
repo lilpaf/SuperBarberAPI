@@ -1,4 +1,7 @@
-﻿using Common.Constants;
+﻿using Business.Models.Exceptions;
+using Common.Configurations;
+using Common.Constants;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Extensions;
@@ -14,6 +17,18 @@ namespace SuperBarber.Extensions
 {
     public static class ApplicationBuilderExtensions
     {
+        public static IApplicationBuilder UseAngularCors(this IApplicationBuilder app)
+        {
+            IConfiguration configuration = app.ApplicationServices.GetRequiredService<IConfiguration>();
+
+            AngularCorsConfig corsConfig = configuration.GetSection(nameof(AngularCorsConfig)).Get<AngularCorsConfig>() ??
+                    throw new NotConfiguredException("The kafka producer config is not configured correctly");
+
+            app.UseCors(corsConfig.PolicyName);
+
+            return app;
+        }
+        
         public static IApplicationBuilder PrepareDataBase(this IApplicationBuilder app)
         {
             using IServiceScope serviceScope = app.ApplicationServices.CreateScope();
