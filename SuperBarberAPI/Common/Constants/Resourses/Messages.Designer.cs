@@ -349,7 +349,7 @@ namespace Common.Constants.Resourses {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to User with this email already exists..
+        ///   Looks up a localized string similar to User with this email dose not exists..
         /// </summary>
         public static string UserWithEmailDoesNotExist {
             get {
