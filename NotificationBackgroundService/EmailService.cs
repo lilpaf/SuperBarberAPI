@@ -1,14 +1,12 @@
 using Confluent.Kafka;
 using Confluent.Kafka.SyncOverAsync;
 using Confluent.SchemaRegistry.Serdes;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MimeKit;
 using MimeKit.Text;
 using NotificationService.Constants;
 using NotificationService.Models.Configurations;
 using NotificationService.Models.Dtos;
-using System.Text.Json;
 using SmtpClient = MailKit.Net.Smtp.SmtpClient;
 
 namespace NotificationService
