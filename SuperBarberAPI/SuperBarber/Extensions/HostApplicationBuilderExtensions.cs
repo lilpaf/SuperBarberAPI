@@ -1,7 +1,10 @@
-﻿using Business.Models.Exceptions;
+﻿using Business.Models.Dtos;
+using Business.Models.Exceptions;
 using Common.Configurations;
 using Common.Constants;
 using Confluent.Kafka;
+using Confluent.SchemaRegistry;
+using Confluent.SchemaRegistry.Serdes;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
@@ -112,15 +115,27 @@ namespace SuperBarber.Extensions
             KafkaProducerConfig kafkaConfig = builder.Configuration.GetSection(nameof(KafkaProducerConfig)).Get<KafkaProducerConfig>() ??
                     throw new NotConfiguredException("The kafka producer config is not configured correctly");
 
+            SchemaConfig schemaConfig = builder.Configuration.GetSection(nameof(SchemaConfig)).Get<SchemaConfig>() ??
+                    throw new NotConfiguredException("The schema registry config is not configured correctly");
+
+            SchemaRegistryConfig schemaRegistryConfig = new()
+            {
+                Url = schemaConfig.Url
+            };
+
+            CachedSchemaRegistryClient schemaRegistry = new (schemaRegistryConfig);
+
             ProducerConfig producerConfig = new()
             {
                 BootstrapServers = kafkaConfig.BootstrapServers,
                 ClientId = kafkaConfig.ClientId
             };
-
+            
             builder.Services.AddSingleton(provider =>
             {
-                return new ProducerBuilder<Null, string>(producerConfig).Build();
+                return new ProducerBuilder<Null, EmailDataDto>(producerConfig)
+                .SetValueSerializer(new JsonSerializer<EmailDataDto>(schemaRegistry))
+                .Build();
             });
 
             return builder;

@@ -1,12 +1,13 @@
 using Confluent.Kafka;
+using Confluent.Kafka.SyncOverAsync;
+using Confluent.SchemaRegistry.Serdes;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MimeKit;
 using MimeKit.Text;
 using NotificationService.Constants;
 using NotificationService.Models.Configurations;
 using NotificationService.Models.Dtos;
-using NotificationService.Models.Exceptions;
-using NotificationService.Resourses;
 using System.Text.Json;
 using SmtpClient = MailKit.Net.Smtp.SmtpClient;
 
@@ -42,24 +43,24 @@ namespace NotificationService
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            using var consumer = new ConsumerBuilder<Ignore, string>(_config).Build();
+            using var consumer = new ConsumerBuilder<Ignore, EmailDataDto>(_config)
+                .SetValueDeserializer(new JsonDeserializer<EmailDataDto>().AsSyncOverAsync())
+                .SetErrorHandler((_, e) => _logger.LogError("Error deserializing Kafka value: {Reason}", e.Reason))
+                .Build();
             
             consumer.Subscribe(_kafkaEmailConfig.Topic);
 
+            _logger.LogInformation("Subscribed to Kafka topic: {Topic}", _kafkaEmailConfig.Topic);
+
             while (!stoppingToken.IsCancellationRequested)
             {
-                ConsumeResult<Ignore, string> message = consumer.Consume(stoppingToken);
+                ConsumeResult<Ignore, EmailDataDto> message = consumer.Consume(stoppingToken);
 
-                _logger.LogInformation("Received email message to send with email data {EmailData}", message.Message.Value);
+                EmailDataDto emailData = message.Message.Value;
 
-                EmailDataDto? emailData = JsonSerializer.Deserialize<EmailDataDto>(message.Message.Value);
-
-                if (emailData is null)
-                {
-                    _logger.LogError("There was an error deserializing the value");
-                    throw new ObjectCanNotBeExtractedException(Messages.ErrorDeserializingValue);
-                }
-
+                _logger.LogInformation("Received email message to send with email data: Recipients: {Recipients}, Subject: {Subject}, Message: {Message}",
+                    emailData.RecipientsEmails, emailData.Subject, emailData.Message);
+                
                 await SendEmailAsync(emailData.RecipientsEmails, emailData.Subject, emailData.Message);
             }
         }
@@ -93,8 +94,6 @@ namespace NotificationService
             catch (Exception exception)
             {
                 _logger.LogError(exception, "Exception occurred when sending the email: {Message}", exception.Message);
-
-                throw new ErrorSendingEmailException(Messages.ErrorSendingEmail);
             }
         }
     }

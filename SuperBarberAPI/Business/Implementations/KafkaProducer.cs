@@ -7,6 +7,7 @@ using Confluent.Kafka;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
+using System.Text;
 using System.Text.Json;
 
 namespace Business.Implementations
@@ -14,12 +15,12 @@ namespace Business.Implementations
     public class KafkaProducer : IKafkaProducer
     {
         private readonly ILogger<KafkaProducer> _logger;
-        private readonly IProducer<Null, string> _producer;
+        private readonly IProducer<Null, EmailDataDto> _producer;
         private readonly KafkaEmailProducerConfig _kafkaEmailProducerConfig;
 
         public KafkaProducer(
             ILogger<KafkaProducer> logger,
-            IProducer<Null, string> producer,
+            IProducer<Null, EmailDataDto> producer,
             IOptions<KafkaEmailProducerConfig> kafkaEmailProducerConfig)
         {
             _logger = logger;
@@ -33,7 +34,7 @@ namespace Business.Implementations
             {
                 string message = JsonSerializer.Serialize(emailData);
 
-                await _producer.ProduceAsync(_kafkaEmailProducerConfig.Topic, new Message<Null, string> { Value = message });
+                await _producer.ProduceAsync(_kafkaEmailProducerConfig.Topic, new Message<Null, EmailDataDto> { Value = emailData });
             }
             catch (Exception exception)
             {

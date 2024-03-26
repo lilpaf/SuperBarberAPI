@@ -10,6 +10,11 @@ builder.Services.Configure<SmtpConfig>(builder.Configuration.GetSection(nameof(S
 builder.Services.Configure<KafkaConsumerConfig>(builder.Configuration.GetSection(nameof(KafkaConsumerConfig)));
 builder.Services.Configure<KafkaEmailConsumerConfig>(builder.Configuration.GetSection(nameof(KafkaEmailConsumerConfig)));
 
+builder.Services.Configure<HostOptions>(hostOptions =>
+{
+    hostOptions.BackgroundServiceExceptionBehavior = BackgroundServiceExceptionBehavior.Ignore;
+});
+
 builder.Services.AddHostedService<EmailService>();
 
 var host = builder.Build();
