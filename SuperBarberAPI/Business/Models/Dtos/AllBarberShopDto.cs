@@ -8,7 +8,7 @@
 
         public required string Address { get; init; }
 
-        public required Dictionary<string, Tuple<string?, string?>> WorkingWeekHoursToday { get; init; }
+        public required Dictionary<string, DayHoursDto> WorkingWeekHoursToday { get; init; }
 
         public required double AverageRating { get; init; }
 

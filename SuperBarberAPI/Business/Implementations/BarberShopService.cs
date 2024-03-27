@@ -20,6 +20,7 @@ namespace Business.Implementations
         private readonly ICityRepository _cityRepository;
         private readonly INeighborhoodRepository _neighborhoodRepository;
         private readonly IWeekDayRepository _weekDayRepository;
+        private readonly IServiceProvider _serviceProvider;
         private readonly ILogger<BarberShopService> _logger;
 
         public BarberShopService(
@@ -27,13 +28,15 @@ namespace Business.Implementations
             IBarberShopRepository barberShopRepository,
             ICityRepository cityRepository,
             INeighborhoodRepository neighborhoodRepository,
-            IWeekDayRepository weekDayRepository)
+            IWeekDayRepository weekDayRepository,
+            IServiceProvider serviceProvider)
         {
             _logger = logger;
             _barberShopRepository = barberShopRepository;
             _cityRepository = cityRepository;
             _neighborhoodRepository = neighborhoodRepository;
             _weekDayRepository = weekDayRepository;
+            _serviceProvider = serviceProvider;
         }
 
         public async Task<AllBarberShopsResponse> GetAllPublicBarberShopsAsync(AllBarberShopRequest request)
@@ -115,7 +118,7 @@ namespace Business.Implementations
             }
 
             //Dictionary<string, string?> workingWeekHours = GetBarberShopWorkingWeekHours(publicBarberShop);
-            Dictionary<string, Tuple<string?, string?>> workingWeekHours = GetWorkingDaysHours(publicBarberShop.BarberShopWorkingDays);
+            Dictionary<string, DayHoursDto> workingWeekHours = GetWorkingDaysHours(publicBarberShop.BarberShopWorkingDays);
 
             return new BarberShopResponse()
             {
@@ -171,7 +174,7 @@ namespace Business.Implementations
                 throw new InvalidArgumentException(Messages.BarberShopDoseNotExist);
             }
 
-            Dictionary<string, Tuple<string?, string?>> workingDays = GetWorkingDaysHours(barberShopFromRepo.BarberShopWorkingDays);
+            Dictionary<string, DayHoursDto> workingDays = GetWorkingDaysHours(barberShopFromRepo.BarberShopWorkingDays);
 
             UpdateBarberShopRequest updatedBarberShop = new()
             {
@@ -186,7 +189,7 @@ namespace Business.Implementations
             patchDoc.ApplyTo(updatedBarberShop);
 
             List<ValidationResult> validationResults = new();
-            ValidationContext validationContext = new(updatedBarberShop, null, null);
+            ValidationContext validationContext = new(updatedBarberShop, _serviceProvider, null);
 
             if (!Validator.TryValidateObject(updatedBarberShop, validationContext, validationResults, true))
             {
@@ -266,39 +269,39 @@ namespace Business.Implementations
             return (startHourParsed, finishHourParsed);
         }
 
-        private Dictionary<string, Tuple<string?, string?>> GetBarberShopWorkingHoursTodayUtc(ICollection<BarberShopWorkingDay> barberShopWorkingDays)
+        private Dictionary<string, DayHoursDto> GetBarberShopWorkingHoursTodayUtc(ICollection<BarberShopWorkingDay> barberShopWorkingDays)
         {
             BarberShopWorkingDay today = barberShopWorkingDays
                 .First(b => b.WeekDay.DayOfWeekEnum == DateTime.UtcNow.DayOfWeek);
 
             string dayOfWeek = today.WeekDay.DayOfWeekName;
-            string? startHour = today.OpeningHour?.ToString();
-            string? finishHour = today.ClosingHour?.ToString();
+            string? openingTime = today.OpeningHour?.ToString();
+            string? closingTime = today.ClosingHour?.ToString();
 
-            return new Dictionary<string, Tuple<string?, string?>>()
+            return new Dictionary<string, DayHoursDto>()
             {
-                { dayOfWeek, Tuple.Create(startHour, finishHour) }
+                { dayOfWeek, new DayHoursDto() { OpeningTime = openingTime, ClosingTime = closingTime } }
             };
         }
 
-        private Dictionary<string, Tuple<string?, string?>> GetWorkingDaysHours(ICollection<BarberShopWorkingDay> workingDays)
+        private Dictionary<string, DayHoursDto> GetWorkingDaysHours(ICollection<BarberShopWorkingDay> workingDays)
         {
-            Dictionary<string, Tuple<string?, string?>> result = new();
+            Dictionary<string, DayHoursDto> result = new();
             
             foreach (var barberShopWorkingDay in workingDays)
             {
                 string weekDayName = barberShopWorkingDay.WeekDay.DayOfWeekName;
 
-                string? openingHour = barberShopWorkingDay.OpeningHour?.ToString(StringDateTimeFormat);
-                string? closingHour = barberShopWorkingDay.ClosingHour?.ToString(StringDateTimeFormat);
+                string? openingTime = barberShopWorkingDay.OpeningHour?.ToString(StringDateTimeFormat);
+                string? closingTime = barberShopWorkingDay.ClosingHour?.ToString(StringDateTimeFormat);
 
-                result.Add(weekDayName, Tuple.Create(openingHour, closingHour));
+                result.Add(weekDayName, new DayHoursDto() { OpeningTime = openingTime, ClosingTime = closingTime });
             }
 
             return result;
         }
 
-        private async Task<HashSet<BarberShopWorkingDay>> SetWorkingDaysHoursAsync(Dictionary<string, Tuple<string?, string?>> workingDaysHours)
+        private async Task<HashSet<BarberShopWorkingDay>> SetWorkingDaysHoursAsync(Dictionary<string, DayHoursDto> workingDaysHours)
         {
             HashSet<BarberShopWorkingDay> result = new();
 
@@ -312,8 +315,8 @@ namespace Business.Implementations
                     throw new InvalidArgumentException(Messages.InvalidAndDateHourFormat);
                 }
 
-                string? openingHour = workingDays.Value.Item1;
-                string? closingHour = workingDays.Value.Item2;
+                string? openingHour = workingDays.Value.OpeningTime;
+                string? closingHour = workingDays.Value.ClosingTime;
 
                 if (openingHour is null || closingHour is null)
                 {

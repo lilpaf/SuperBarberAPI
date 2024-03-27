@@ -23,7 +23,7 @@ namespace Persistence.Implementations
         {
             _logger.LogInformation("Getting week day from SQL Db");
 
-            return await _context.WeekDays.FirstOrDefaultAsync(d => d.DayOfWeekName == day);
+            return await _context.WeekDays.FirstOrDefaultAsync(d => d.DayOfWeekName.ToLower() == day.ToLower());
         }
     }
 }

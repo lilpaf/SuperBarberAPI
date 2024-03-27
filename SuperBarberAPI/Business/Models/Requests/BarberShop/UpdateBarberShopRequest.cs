@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Common.Constants.Resourses;
 using Common.Constants;
-using Common.Attributes;
+using Business.Attributes;
+using Business.Models.Dtos;
 
 namespace Business.Models.Requests.BarberShop
 {
@@ -24,10 +24,8 @@ namespace Business.Models.Requests.BarberShop
         public required string? About { get; init; }
 
         [Required]
-        [ValidWorkingWeekHours(
-            ErrorMessageResourceType = typeof(Messages), 
-            ErrorMessageResourceName = nameof(Messages.InvalidAndDateHourFormat))]
-        public required Dictionary<string, Tuple<string?, string?>> WorkingDaysHours { get; init; }
+        [ValidWorkingWeekHours]
+        public required Dictionary<string, DayHoursDto> WorkingDaysHours { get; init; }
 
         //ToDo fix it
         //[Required]

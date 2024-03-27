@@ -18,9 +18,11 @@
         public const int ServiceNameMaxLength = 50;
         public const int ImageNameMaxLength = 100;
         public const int AboutMaxLength = 200;
-
+       
         public const int DefaultMinLength = 2;
         public const int PriceMinRange = 0;
         //public const int NameMinLength = 2;
+        
+        public const int WorkingDaysHoursLength = 7;
     }
 }

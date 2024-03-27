@@ -1,4 +1,5 @@
-﻿using Common.Attributes;
+﻿using Business.Attributes;
+using Business.Models.Dtos;
 using Common.Constants;
 using Common.Constants.Resourses;
 using System.ComponentModel.DataAnnotations;
@@ -24,10 +25,11 @@ namespace Business.Models.Requests.BarberShop
         public required string? About { get; init; }
 
         [Required]
-        [ValidWorkingWeekHours(
-            ErrorMessageResourceType = typeof(Messages), 
+        [Length(DataConstraints.WorkingDaysHoursLength, DataConstraints.WorkingDaysHoursLength, 
+            ErrorMessageResourceType = typeof(Messages),
             ErrorMessageResourceName = nameof(Messages.InvalidAndDateHourFormat))]
-        public required Dictionary<string, Tuple<string?, string?>> WorkingDaysHours { get; init; }
+        [ValidWorkingWeekHours]
+        public required Dictionary<string, DayHoursDto> WorkingDaysHours { get; init; }
 
         //ToDo fix it
         //[Required]

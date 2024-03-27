@@ -1,4 +1,6 @@
-﻿namespace Business.Models.Responses.BarberShop
+﻿using Business.Models.Dtos;
+
+namespace Business.Models.Responses.BarberShop
 {
     public class BarberShopResponse
     {
@@ -10,7 +12,7 @@
         
         public required string? About { get; init; }
 
-        public required Dictionary<string, Tuple<string?, string?>> WorkingWeekHours { get; init; }
+        public required Dictionary<string, DayHoursDto> WorkingWeekHours { get; init; }
 
         //public required ICollection<BarberShopService> Services { get; init; }
         //public required ICollection<BarberShopBarber> Barbers { get; init; }
