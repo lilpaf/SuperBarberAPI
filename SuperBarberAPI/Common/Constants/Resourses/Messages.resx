@@ -98,6 +98,9 @@
 	<resheader name="writer">
 		<value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.3500.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
 	</resheader>
+	<data name="EndpointResourceNotFound" xml:space="preserve">
+		<value>Sorry, the resource you requested could not be found</value>
+	</data>
 	<data name="InvalidValidationObject" xml:space="preserve">
 		<value>You have entered an invalid information.</value>
 	</data>

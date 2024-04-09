@@ -101,6 +101,7 @@ app.MapControllers();
 
 // Middlewares
 app.UseMiddleware<ExceptionHandlingMiddleware>();
+app.UseMiddleware<NotFoundMiddleware>();
 
 app.Run();
 

@@ -124,6 +124,15 @@ namespace Common.Constants.Resourses {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Sorry, the resource you requested could not be found.
+        /// </summary>
+        public static string EndpointResourceNotFound {
+            get {
+                return ResourceManager.GetString("EndpointResourceNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to There was an error when confirming the email..
         /// </summary>
         public static string ErrorConfirmingEmail {
