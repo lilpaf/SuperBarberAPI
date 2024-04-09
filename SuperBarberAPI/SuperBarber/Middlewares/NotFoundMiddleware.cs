@@ -4,6 +4,7 @@ using Confluent.Kafka;
 using Microsoft.AspNetCore.Http;
 using SuperBarber.Models;
 using System.Net;
+using Microsoft.AspNetCore.Http.Extensions;
 
 namespace SuperBarber.Middlewares
 {
@@ -35,7 +36,9 @@ namespace SuperBarber.Middlewares
                     Error = new(message, statusCode, errorCode)
                 };
 
-                _logger.LogError("Resource not found for request with id {ID}", context.TraceIdentifier);
+                string path = context.Request.GetDisplayUrl();
+
+                _logger.LogError("Resource not found for request with request path: {Path}", path);
 
                 context.Response.StatusCode = response.Error.StatusCode;
                 await context.Response.WriteAsJsonAsync(response);
