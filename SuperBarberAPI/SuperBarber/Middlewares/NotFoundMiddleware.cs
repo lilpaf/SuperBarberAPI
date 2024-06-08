@@ -1,7 +1,5 @@
 ﻿using Common.Constants.Resourses;
 using Common.Constants;
-using Confluent.Kafka;
-using Microsoft.AspNetCore.Http;
 using SuperBarber.Models;
 using System.Net;
 using Microsoft.AspNetCore.Http.Extensions;
