@@ -9,7 +9,11 @@ import { FormsModule, NgForm } from '@angular/forms';
   styleUrl: './home-page.component.css'
 })
 export class HomePageComponent {
+  cities: string[] = [];
+  neigbourhoods
+
+
   onSubmit(form: NgForm) {
-    
+
   }
 }
