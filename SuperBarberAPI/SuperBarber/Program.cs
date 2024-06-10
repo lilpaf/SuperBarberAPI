@@ -14,6 +14,7 @@ using BarberShopService = Business.Implementations.BarberShopService;
 
 var builder = WebApplication.CreateBuilder(args);
 /*
+ * ToDo see if we will keep the repository pattern at all
  * ToDo check if email is confirmed before making orders or registering as barber
  * ToDo schedule sending email
  * ToDo save all cities in a state or something like this in react we will need separate endpoint
