@@ -71,6 +71,7 @@ builder.Services.AddScoped<INeighborhoodRepository, NeighborhoodRepository>();
 builder.Services.AddScoped<ICityRepository, CityRepository>();
 builder.Services.AddScoped<IWeekDayRepository, WeekDayRepository>();
 builder.Services.AddScoped<IBarberRepository, BarberRepository>();
+builder.Services.AddScoped<IRedisRepository, RedisRepository>();
 
 // Filters
 builder.Services.AddMvc(options =>

@@ -1,36 +1,22 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using StackExchange.Redis;
 using Microsoft.Extensions.Logging;
 using Persistence.Contexts;
 using Persistence.Entities;
 using Persistence.Interfaces;
-using Common.Constants;
 
 namespace Persistence.Implementations
 {
     public class CityRepository : ICityRepository
     {
-        private readonly IDatabase _redisDb;
         private readonly SuperBarberDbContext _context;
         private readonly ILogger<CityRepository> _logger;
 
         public CityRepository(
             SuperBarberDbContext context,
-            ILogger<CityRepository> logger,
-            IDatabase redisDb)
+            ILogger<CityRepository> logger)
         {
             _context = context;
             _logger = logger;
-            _redisDb = redisDb;
-        }
-
-        public async Task<IReadOnlyList<string>> GetAllCitiesNameFromRedisAsync()
-        {
-            _logger.LogInformation("Getting all cities from Redis Db");
-
-            RedisValue[] citiesName = await _redisDb.ListRangeAsync(RedisConstants.CitiesKeyRedis);
-
-            return [.. citiesName];            
         }
 
         public async Task<IReadOnlyList<City>> GetAllCitiesAsync()

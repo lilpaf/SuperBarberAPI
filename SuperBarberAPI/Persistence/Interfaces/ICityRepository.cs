@@ -7,7 +7,5 @@ namespace Persistence.Interfaces
         Task<IReadOnlyList<City>> GetAllCitiesAsync();
 
         Task<City?> GetCityByNameAsync(string name);
-
-        Task<IReadOnlyList<string>> GetAllCitiesNameFromRedisAsync();
     }
 }

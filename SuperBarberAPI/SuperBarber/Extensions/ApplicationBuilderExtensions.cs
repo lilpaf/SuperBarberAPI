@@ -8,8 +8,6 @@ using Microsoft.OpenApi.Extensions;
 using Persistence.Contexts;
 using Persistence.Entities;
 using Persistence.Enums;
-using Persistence.Implementations;
-using StackExchange.Redis;
 using SuperBarber.Extensions.DataLoaders;
 using System.ComponentModel.DataAnnotations;
 
@@ -22,7 +20,7 @@ namespace SuperBarber.Extensions
             IConfiguration configuration = app.ApplicationServices.GetRequiredService<IConfiguration>();
 
             AngularCorsConfig corsConfig = configuration.GetSection(nameof(AngularCorsConfig)).Get<AngularCorsConfig>() ??
-                    throw new NotConfiguredException("The kafka producer config is not configured correctly");
+                    throw new NotConfiguredException("The angular cors config is not configured correctly");
 
             app.UseCors(corsConfig.PolicyName);
 
@@ -36,14 +34,13 @@ namespace SuperBarber.Extensions
             IServiceProvider services = serviceScope.ServiceProvider;
 
             SuperBarberDbContext data = services.GetRequiredService<SuperBarberDbContext>();
-            IDatabase cache = services.GetRequiredService<IDatabase>();
 
             data.Database.Migrate();
 
             SeedCategories(data);
             SeedOrderCancellationReasons(data);
-            SeedCities(data, cache);
-            SeedNeighborhoods(data, cache);
+            SeedCities(data);
+            SeedNeighborhoods(data);
             SeedWeekDays(data);
             SeedAdministrator(services);
             SeedBarberRole(services);
@@ -124,7 +121,7 @@ namespace SuperBarber.Extensions
             data.SaveChanges();
         }
 
-        private static void SeedCities(SuperBarberDbContext data, IDatabase cache)
+        private static void SeedCities(SuperBarberDbContext data)
         {
             if (data.Cities.Any())
             {
@@ -139,14 +136,12 @@ namespace SuperBarber.Extensions
                 {
                     Name = city
                 });
-
-                cache.ListRightPush(RedisConstants.CitiesKeyRedis, city);
             }
 
             data.SaveChanges();
         }
 
-        private static void SeedNeighborhoods(SuperBarberDbContext data, IDatabase cache)
+        private static void SeedNeighborhoods(SuperBarberDbContext data)
         {
             if (data.Neighborhoods.Any())
             {
@@ -166,8 +161,6 @@ namespace SuperBarber.Extensions
                         Name = neighborhood,
                         CityId = city.Id
                     });
-
-                    cache.ListRightPush(string.Format(RedisConstants.NeighborhoodsKeyRedis, cityNeighborhoods.Key), neighborhood);
                 }
             }
 
