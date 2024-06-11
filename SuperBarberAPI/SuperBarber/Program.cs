@@ -63,6 +63,7 @@ builder.Services.AddScoped<IBarberShopService, BarberShopService>();
 builder.Services.AddSingleton<IEmailService, EmailService>();
 builder.Services.AddSingleton<IKafkaProducer, KafkaProducer>();
 builder.Services.AddScoped<IBarberService, BarberService>();
+builder.Services.AddScoped<ICityService, CityService>();
 
 // Repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();

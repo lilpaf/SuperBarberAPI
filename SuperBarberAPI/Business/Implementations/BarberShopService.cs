@@ -50,14 +50,6 @@ namespace Business.Implementations
 
             //ToDo may be needed if not delete the method
             //int totalActiveBarberShops = await _barberShopRepository.GetTotalNumberActiveBarberShopsAsync();
-            IReadOnlyList<string> citiesName = await _cityRepository.GetAllCitiesNameFromRedisAsync();
-
-            if (!citiesName.Any())
-            {
-                IReadOnlyList<City> cities = await _cityRepository.GetAllCitiesAsync();
-
-                citiesName = cities.Select(c => c.Name).ToList();
-            }
 
             City? city = await _cityRepository.GetCityByNameAsync(request.City);
 
@@ -65,17 +57,6 @@ namespace Business.Implementations
             {
                 _logger.LogError("{City} city dose not exists", request.City);
                 throw new InvalidArgumentException(Messages.InvalidCity);
-            }
-
-            IReadOnlyList<string> neighborhoodsName = await _neighborhoodRepository
-                .GetAllNeighborhoodsNameByCityNameFromRedisAsync(city.Name);
-
-            if (!neighborhoodsName.Any())
-            {
-                IReadOnlyList<Neighborhood> neighborhoods = await _neighborhoodRepository
-                    .GetAllNeighborhoodsByCityIdAsync(city.Id);
-
-                neighborhoodsName = neighborhoods.Select(n => n.Name).ToList();
             }
 
             IReadOnlyList<BarberShop> publicBarberShops = await _barberShopRepository
@@ -97,9 +78,7 @@ namespace Business.Implementations
             return new AllBarberShopsResponse()
             {
                 City = request.City,
-                Cities = citiesName,
                 Neighborhood = request.Neighborhood,
-                Neighborhoods = neighborhoodsName,
                 BarberShopSearchName = request.BarberShopName,
                 //TotalPages = totalActiveBarberShops / QueryParameterContainer.BarberShopsPerPage, //ToDo may be needed
                 BarberShops = publicBarberShopsDto

@@ -23,15 +23,17 @@ namespace SuperBarber.Controllers
         
         public UserController(IUserService authenticationService, ILogger<UserController> logger)
         {
+            //ToDo this needs to be removed later on just make it to constants
             _controllerRouteTemplate = GetType()
                 .GetCustomAttribute<RouteAttribute>()?.Template ??
                 throw new NotConfiguredException(Messages.RouteTemplateNotConfigured);
-            
+
+            //ToDo this needs to be removed later on just make it to constants
             _emailConfirmationRouteTemplate = typeof(UserController)
                 .GetMethod(nameof(EmailConfirmation))?
                 .GetCustomAttribute<RouteAttribute>()?.Template ??
                 throw new NotConfiguredException(Messages.RouteTemplateNotConfigured);
-            //ToDo this needs to be removed later on
+            //ToDo this needs to be removed later on just make it to constants
             _resetPasswordRouteTemplate = typeof(UserController)
                 .GetMethod(nameof(ResetPassword))?
                 .GetCustomAttribute<RouteAttribute>()?.Template ??
