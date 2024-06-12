@@ -1,0 +1,20 @@
+<div class="row">
+  <form class="form-group col-md-3" (ngSubmit)="onSubmit(form)" #form="ngForm">
+    <legend>Find a barber shop</legend>
+    <div class="mb-3">
+      <label for="city" class="form-label">Select city</label>
+      <select
+        id="city"
+        id="secret"
+        [(ngModel)]="selectedCity"
+        name="city"
+        class="form-select"
+      >
+        <option *ngFor="let city of cities" [ngValue]="city">
+          {{ city.name }}
+        </option>
+      </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Search</button>
+  </form>
+</div>
