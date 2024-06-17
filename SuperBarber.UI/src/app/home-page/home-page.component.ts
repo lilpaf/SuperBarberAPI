@@ -9,11 +9,12 @@ import {
 import { CommonModule } from '@angular/common';
 import { ResponseContent } from '../models/response-content';
 import { ErrorResponse } from '../models/error-response';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 @Component({
   selector: 'app-home-page',
   standalone: true,
-  imports: [FormsModule, HttpClientModule, CommonModule],
+  imports: [FormsModule, HttpClientModule, CommonModule, NgSelectModule],
   templateUrl: './home-page.component.html',
   styleUrl: './home-page.component.css',
 })
@@ -21,10 +22,12 @@ export class HomePageComponent implements OnInit {
   cities: CityDto[] = [];
   selectedCity!: CityDto;
   errorMessage = '';
+  cityLoading = false;
 
   constructor(private httpClient: HttpClient) {}
 
   ngOnInit(): void {
+    this.cityLoading = true;
     //ToDo fix me into service
     this.httpClient
       .get<ResponseContent<CityDto[]>>('https://localhost:7193/cities/all')
@@ -36,7 +39,7 @@ export class HomePageComponent implements OnInit {
           if (sofia) {
             this.selectedCity = sofia;
           }
-
+          this.cityLoading = false;
           console.log(this.cities);
         },
         error: (error: HttpErrorResponse) => {
@@ -44,11 +47,13 @@ export class HomePageComponent implements OnInit {
           this.errorMessage = (error.error as ErrorResponse).errorMessage;
           console.log(this.errorMessage);
           console.log(error);
+          this.cityLoading = false;
         },
       });
   }
 
   onSubmit(form: NgForm) {
+    console.log(form);
     console.log(this.selectedCity);
   }
 }
