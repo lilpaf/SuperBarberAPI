@@ -8,13 +8,13 @@
     <div class="mb-3">
       <label for="city" class="form-label">Select a city</label>
       <ng-select
+        required
         placeholder="Search for a city"
         [(ngModel)]="selectedCity"
         [ngModelOptions]="{ standalone: true }"
         [searchable]="true"
         [loading]="cityLoading"
         id="city"
-        class="select-field"
         (ngModelChange)="getNeighborhood()"
       >
         <ng-option *ngFor="let city of cities" [value]="city">

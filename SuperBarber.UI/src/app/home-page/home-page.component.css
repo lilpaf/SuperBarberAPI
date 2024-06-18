@@ -1,3 +1,12 @@
-.select-field {
+ng-select {
   margin-bottom: 10px;
+}
+
+ng-select.ng-invalid.ng-touched {
+  border: 1px solid red;
+  border-radius: 5px;
+}
+
+input.ng-invalid.ng-touched {
+  border: 1px solid red;
 }
