@@ -1,5 +1,9 @@
 <div class="row">
   <form class="form-group col-md-3" (ngSubmit)="onSubmit(form)" #form="ngForm">
+    <div class="alert alert-danger" role="alert" *ngIf="errorResponse">
+      {{ errorResponse.errorMessage }}
+      {{ errorResponse.errorsMessages }}
+    </div>
     <legend>Find a barber shop</legend>
     <div class="mb-3">
       <label for="city" class="form-label">Select a city</label>
@@ -10,11 +14,34 @@
         [searchable]="true"
         [loading]="cityLoading"
         id="city"
+        class="select-field"
+        (ngModelChange)="getNeighborhood()"
       >
-        <ng-option *ngFor="let city of cities" [value]="city">{{
-          city.name
-        }}</ng-option>
+        <ng-option *ngFor="let city of cities" [value]="city">
+          {{ city.name }}
+        </ng-option>
       </ng-select>
+
+      <div *ngIf="selectedCity && selectedCity.neighborhoods">
+        <label for="neighborhoods" class="form-label"
+          >Select a neighborhood</label
+        >
+        <ng-select
+          placeholder="Search for a neighborhood"
+          [(ngModel)]="selectedNeighborhood"
+          [ngModelOptions]="{ standalone: true }"
+          [searchable]="true"
+          [loading]="cityLoading"
+          id="neighborhood"
+        >
+          <ng-option
+            *ngFor="let neighborhood of selectedCity.neighborhoods"
+            [value]="neighborhood"
+          >
+            {{ neighborhood.name }}
+          </ng-option>
+        </ng-select>
+      </div>
     </div>
     <button type="submit" class="btn btn-primary">Search</button>
   </form>

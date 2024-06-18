@@ -10,6 +10,7 @@ import { CommonModule } from '@angular/common';
 import { ResponseContent } from '../models/response-content';
 import { ErrorResponse } from '../models/error-response';
 import { NgSelectModule } from '@ng-select/ng-select';
+import { NeighborhoodDto } from './models/neighborhood-dto';
 
 @Component({
   selector: 'app-home-page',
@@ -21,8 +22,10 @@ import { NgSelectModule } from '@ng-select/ng-select';
 export class HomePageComponent implements OnInit {
   cities: CityDto[] = [];
   selectedCity!: CityDto;
-  errorMessage = '';
+  selectedNeighborhood?: NeighborhoodDto | null;
+  errorResponse!: ErrorResponse;
   cityLoading = false;
+  neighborhoodLoading = false;
 
   constructor(private httpClient: HttpClient) {}
 
@@ -38,22 +41,37 @@ export class HomePageComponent implements OnInit {
 
           if (sofia) {
             this.selectedCity = sofia;
+            this.getNeighborhood();
           }
+
           this.cityLoading = false;
           console.log(this.cities);
         },
         error: (error: HttpErrorResponse) => {
-          //ToDo fix me
-          this.errorMessage = (error.error as ErrorResponse).errorMessage;
-          console.log(this.errorMessage);
+          this.errorResponse = error.error.error as ErrorResponse;
+          console.log(this.errorResponse);
           console.log(error);
           this.cityLoading = false;
         },
       });
   }
 
+  getNeighborhood() {
+    //ToDo undefined maybe?
+    let neighborhood = null;
+
+    if (this.selectedCity.neighborhoods) {
+      neighborhood = this.selectedCity.neighborhoods.find(
+        (x) => x.name === 'Център'
+      );
+    }
+
+    this.selectedNeighborhood = neighborhood;
+  }
+
   onSubmit(form: NgForm) {
     console.log(form);
     console.log(this.selectedCity);
+    console.log(this.selectedNeighborhood);
   }
 }
