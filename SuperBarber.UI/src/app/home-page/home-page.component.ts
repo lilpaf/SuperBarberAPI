@@ -6,16 +6,27 @@ import {
   HttpClientModule,
   HttpErrorResponse,
 } from '@angular/common/http';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe, formatDate } from '@angular/common';
 import { ResponseContent } from '../models/response-content';
 import { ErrorResponse } from '../models/error-response';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { NeighborhoodDto } from './models/neighborhood-dto';
+import {
+  NgbCalendar,
+  NgbDatepickerModule,
+  NgbDateStruct,
+} from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-home-page',
   standalone: true,
-  imports: [FormsModule, HttpClientModule, CommonModule, NgSelectModule],
+  imports: [
+    FormsModule,
+    HttpClientModule,
+    CommonModule,
+    NgSelectModule,
+    NgbDatepickerModule,
+  ],
   templateUrl: './home-page.component.html',
   styleUrl: './home-page.component.css',
 })
@@ -26,6 +37,8 @@ export class HomePageComponent implements OnInit {
   errorResponse!: ErrorResponse;
   cityLoading = false;
   neighborhoodLoading = false;
+  today = inject(NgbCalendar).getToday();
+  model: NgbDateStruct;
 
   constructor(private httpClient: HttpClient) {}
 
