@@ -1,0 +1,31 @@
+<div class="row mb-3 mt-2">
+  <div class="col-md-6">
+    <label for="startHour" class="form-label">Start Hour</label>
+    <ng-select
+      [(ngModel)]="startTime"
+      [ngModelOptions]="{ standalone: true }"
+      [searchable]="false"
+      id="startHour"
+      (change)="validateTime()"
+    >
+      <ng-option *ngFor="let hour of startHours" [value]="hour">
+        {{ hour }}
+      </ng-option>
+    </ng-select>
+  </div>
+
+  <div class="col-md-6">
+    <label for="endHour" class="form-label">End Hour</label>
+    <ng-select
+      [(ngModel)]="endTime"
+      [ngModelOptions]="{ standalone: true }"
+      [searchable]="false"
+      id="endHour"
+      (change)="validateTime()"
+    >
+      <ng-option *ngFor="let hour of endHours" [value]="hour">
+        {{ hour }}
+      </ng-option>
+    </ng-select>
+  </div>
+</div>
