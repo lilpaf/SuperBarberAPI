@@ -91,6 +91,17 @@ namespace Persistence.Implementations
                 .Where(b => b.IsPublic && !b.IsDeleted && b.City.Name == queryParams.City)
                 .AsQueryable();
 
+            if (queryParams.Date != null)
+            {
+                DateTime date = queryParams.Date.Value;
+
+                barberShopQuery
+                    .Where(b => b.BarberShopWorkingDays
+                    .Any(d => d.WeekDay.DayOfWeekEnum == date.DayOfWeek
+                        && d.OpeningHour != null
+                        && d.ClosingHour != null));
+            }
+
             if (!string.IsNullOrEmpty(queryParams.Neighborhood))
             {
                 barberShopQuery.Where(b => b.Neighborhood != null && b.Neighborhood.Name == queryParams.Neighborhood);
@@ -100,13 +111,13 @@ namespace Persistence.Implementations
             {
                 string searchName = queryParams.SearchName.Replace(" ", string.Empty);
 
-                barberShopQuery.Where(b => b.Name.Replace(" ", string.Empty)
+    barberShopQuery.Where(b => b.Name.Replace(" ", string.Empty)
                 .Contains(searchName, StringComparison.InvariantCultureIgnoreCase));
             }
 
-            barberShopQuery.Skip(queryParams.SkipCount);
+barberShopQuery.Skip(queryParams.SkipCount);
 
-            return barberShopQuery;
+return barberShopQuery;
         }
     }
 }

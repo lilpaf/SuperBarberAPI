@@ -42,7 +42,7 @@ namespace SuperBarber.Controllers
         [Produces(MediaTypeNames.Application.Json)]
         [ProducesResponseType(typeof(ResponseContent<AllBarbersResponse>), 200)]
         [ProducesDefaultResponseType(typeof(ResponseContent))]
-        public async Task<ResponseContent<AllBarbersResponse>> Register([FromQuery] AllBarbersRequest request)
+        public async Task<ResponseContent<AllBarbersResponse>> GetAll([FromQuery] AllBarbersRequest request)
         {
             AllBarbersResponse response = await _barberService.GetAllAsync(request);
 

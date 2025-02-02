@@ -22,7 +22,9 @@
         public const int DefaultMinLength = 2;
         public const int PriceMinRange = 0;
         //public const int NameMinLength = 2;
-        
+
         public const int WorkingDaysHoursLength = 7;
+
+        public const string DateFormat = "yyyy-MM-dd";
     }
 }

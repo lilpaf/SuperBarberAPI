@@ -1,8 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HourValidatorService } from './hour-validator.service';
 import { NgSelectModule } from '@ng-select/ng-select';
+import { DayHoursDto } from '../models/day-hours-dto';
 
 @Component({
   selector: 'app-hour-range',
@@ -14,8 +15,9 @@ import { NgSelectModule } from '@ng-select/ng-select';
 export class HourRangeComponent implements OnInit {
   startHours: string[] = [];
   endHours: string[] = [];
-  startTime!: string;
-  endTime!: string;
+  startTime?: string;
+  endTime?: string;
+  @Output() timeSelectedEvent = new EventEmitter<DayHoursDto>();
 
   constructor(private hourValidatorService: HourValidatorService) {}
 
@@ -39,7 +41,12 @@ export class HourRangeComponent implements OnInit {
     }
   }
 
-  validateTime() {
+  timeSelected() {
     this.hourValidatorService.validateRange(this.startTime, this.endTime);
+    const value: DayHoursDto = {
+      openingTime: this.startTime,
+      closingTime: this.endTime,
+    };
+    this.timeSelectedEvent.emit(value);
   }
 }

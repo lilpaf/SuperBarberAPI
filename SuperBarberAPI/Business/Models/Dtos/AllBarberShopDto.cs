@@ -8,8 +8,6 @@
 
         public required string Address { get; init; }
 
-        public required Dictionary<string, DayHoursDto> WorkingWeekHoursToday { get; init; }
-
         public required double AverageRating { get; init; }
 
         //ToDo fix it

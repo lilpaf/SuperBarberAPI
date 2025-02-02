@@ -185,8 +185,8 @@
 	<data name="ConfirmationPasswordDoNotMatch" xml:space="preserve">
 		<value>The new password and confirmation password do not match.</value>
 	</data>
-	<data name="InvalidAndDateHourFormat" xml:space="preserve">
-		<value>Invalid date or/and hour date format.</value>
+	<data name="InvalidDateOrHourFormat" xml:space="preserve">
+		<value>Invalid date or/and hour format.</value>
 	</data>
 	<data name="BarberShopDoseNotExist" xml:space="preserve">
 		<value>Barber shop dose not exists.</value>

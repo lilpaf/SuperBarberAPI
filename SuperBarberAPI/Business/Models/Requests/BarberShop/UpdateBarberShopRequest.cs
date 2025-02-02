@@ -24,7 +24,8 @@ namespace Business.Models.Requests.BarberShop
         public required string? About { get; init; }
 
         [Required]
-        [ValidWorkingWeekHours]
+        [ValidWorkingWeek]
+        [HoursFormat]
         public required Dictionary<string, DayHoursDto> WorkingDaysHours { get; init; }
 
         //ToDo fix it

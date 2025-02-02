@@ -178,20 +178,20 @@ namespace Common.Constants.Resourses {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Invalid date or/and hour date format..
-        /// </summary>
-        public static string InvalidAndDateHourFormat {
-            get {
-                return ResourceManager.GetString("InvalidAndDateHourFormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to City dose not exists..
         /// </summary>
         public static string InvalidCity {
             get {
                 return ResourceManager.GetString("InvalidCity", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid date or/and hour format..
+        /// </summary>
+        public static string InvalidDateOrHourFormat {
+            get {
+                return ResourceManager.GetString("InvalidDateOrHourFormat", resourceCulture);
             }
         }
         

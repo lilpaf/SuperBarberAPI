@@ -1,0 +1,17 @@
+<div
+  *ngIf="errorMessages.length > 0"
+  class="alert alert-danger alert-dismissible fade show"
+  role="alert"
+>
+  <ul *ngFor="let errorMessage of errorMessages">
+    {{
+      errorMessage
+    }}
+  </ul>
+  <button
+    type="button"
+    class="btn-close"
+    aria-label="Close"
+    (click)="closeError()"
+  ></button>
+</div>

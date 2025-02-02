@@ -27,8 +27,9 @@ namespace Business.Models.Requests.BarberShop
         [Required]
         [Length(DataConstraints.WorkingDaysHoursLength, DataConstraints.WorkingDaysHoursLength, 
             ErrorMessageResourceType = typeof(Messages),
-            ErrorMessageResourceName = nameof(Messages.InvalidAndDateHourFormat))]
-        [ValidWorkingWeekHours]
+            ErrorMessageResourceName = nameof(Messages.InvalidDateOrHourFormat))]
+        [ValidWorkingWeek]
+        [HoursFormat]
         public required Dictionary<string, DayHoursDto> WorkingDaysHours { get; init; }
 
         //ToDo fix it

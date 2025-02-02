@@ -27,5 +27,7 @@
         public string? Neighborhood { get; init; }
 
         public string? SearchName { get; init; }
+        
+        public DateTime? Date { get; init; }
     }
 }

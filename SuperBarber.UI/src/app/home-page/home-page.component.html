@@ -1,9 +1,5 @@
 <div class="row">
   <form class="form-group col-md-3" (ngSubmit)="onSubmit(form)" #form="ngForm">
-    <div class="alert alert-danger" role="alert" *ngIf="errorResponse">
-      {{ errorResponse.errorMessage }}
-      {{ errorResponse.errorsMessages }}
-    </div>
     <legend>Find a barber shop</legend>
     <div class="mb-3">
       <label for="city" class="form-label">Select a city</label>
@@ -42,44 +38,47 @@
           </ng-option>
         </ng-select>
       </div>
-        <label for="dp" class="form-label">Select a date</label>
-        <div class="input-group">
-          <input
-            required
-            [minDate]="today"
-            [maxDate]="maxDate"
-            class="form-control"
-            placeholder="yyyy-mm-dd"
-            name="dp"
-            [(ngModel)]="date"
-            ngbDatepicker
-            [footerTemplate]="footerTemplate"
-            #datePicker="ngbDatepicker"
-          />
+      <label for="dp" class="form-label">Select a date</label>
+      <div class="input-group">
+        <input
+          required
+          [minDate]="today"
+          [maxDate]="maxDate"
+          class="form-control"
+          placeholder="yyyy-mm-dd"
+          name="dp"
+          [(ngModel)]="date"
+          ngbDatepicker
+          [footerTemplate]="footerTemplate"
+          #datePicker="ngbDatepicker"
+        />
+        <button
+          class="btn btn-outline-secondary bi bi-calendar3"
+          (click)="onCalendarButtonClicked(datePicker)"
+          type="button"
+        ></button>
+        <ng-template #footerTemplate>
+          <hr class="my-0" />
           <button
-            class="btn btn-outline-secondary bi bi-calendar3"
-            (click)="onCalendarButtonClicked(datePicker)"
-            type="button"
-          ></button>
-          <ng-template #footerTemplate>
-            <hr class="my-0" />
-            <button
-              class="btn btn-primary btn-sm m-2 float-start"
-              (click)="onTodayClicked(datePicker)"
-            >
-              Today
-            </button>
-            <button
-              class="btn btn-secondary btn-sm m-2 float-end"
-              (click)="closeCalendar(datePicker)"
-            >
-              Close
-            </button>
-          </ng-template>
-        </div>
-        <app-hour-range></app-hour-range>
+            class="btn btn-primary btn-sm m-2 float-start"
+            (click)="onTodayClicked(datePicker)"
+          >
+            Today
+          </button>
+          <button
+            class="btn btn-secondary btn-sm m-2 float-end"
+            (click)="closeCalendar(datePicker)"
+          >
+            Close
+          </button>
+        </ng-template>
       </div>
-    <button type="submit" class="btn btn-primary" [disabled]="form.invalid || !this.timeIsValid">
+    </div>
+    <button
+      type="submit"
+      class="btn btn-primary"
+      [disabled]="form.invalid"
+    >
       Search
     </button>
   </form>

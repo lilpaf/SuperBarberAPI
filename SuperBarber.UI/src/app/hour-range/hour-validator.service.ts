@@ -7,7 +7,7 @@ import { BehaviorSubject } from 'rxjs';
 export class HourValidatorService {
   validationResult = new BehaviorSubject<boolean>(true);
 
-  validateRange(startTime: string, endTime: string) {
+  validateRange(startTime?: string, endTime?: string) {
     if (startTime && endTime) {
       const startHour = this.parseHour(startTime);
       const startMin = this.parseMinutes(startTime);

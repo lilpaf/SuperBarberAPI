@@ -3,6 +3,7 @@ using Business.Models.Dtos;
 using Business.Models.Exceptions;
 using Business.Models.Requests.BarberShop;
 using Business.Models.Responses.BarberShop;
+using Common.Constants;
 using Common.Constants.Resourses;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.Extensions.Logging;
@@ -10,12 +11,13 @@ using Persistence.Entities;
 using Persistence.Interfaces;
 using Persistence.Models;
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 
 namespace Business.Implementations
 {
     public class BarberShopService : IBarberShopService
     {
-        private const string StringDateTimeFormat = @"hh\:mm";
+        private const string OpeningAndClosingHourFormat = @"hh\:mm";
         private readonly IBarberShopRepository _barberShopRepository;
         private readonly ICityRepository _cityRepository;
         private readonly INeighborhoodRepository _neighborhoodRepository;
@@ -41,13 +43,6 @@ namespace Business.Implementations
 
         public async Task<AllBarberShopsResponse> GetAllPublicBarberShopsAsync(AllBarberShopRequest request)
         {
-            QueryParameterContainer queryParams = new()
-            {
-                City = request.City,
-                Neighborhood = request.Neighborhood,
-                SearchName = request.BarberShopName
-            };
-
             //ToDo may be needed if not delete the method
             //int totalActiveBarberShops = await _barberShopRepository.GetTotalNumberActiveBarberShopsAsync();
 
@@ -59,6 +54,16 @@ namespace Business.Implementations
                 throw new InvalidArgumentException(Messages.InvalidCity);
             }
 
+            DateTime requestedDate = DateTime.ParseExact(request.Date, DataConstraints.DateFormat, CultureInfo.InvariantCulture, DateTimeStyles.None);
+
+            QueryParameterContainer queryParams = new()
+            {
+                City = request.City,
+                Neighborhood = request.Neighborhood,
+                SearchName = request.BarberShopName,
+                Date = requestedDate,
+            };
+
             IReadOnlyList<BarberShop> publicBarberShops = await _barberShopRepository
                 .GetAllPublicBarberShopsWithCitiesNeighborhoodsAndWorkingDaysAsync(queryParams);
 
@@ -68,7 +73,6 @@ namespace Business.Implementations
                     Id = b.Id,
                     Name = b.Name,
                     Address = b.Address,
-                    WorkingWeekHoursToday = GetBarberShopWorkingHoursTodayUtc(b.BarberShopWorkingDays),
                     AverageRating = b.AverageRating,
                     //ToDo fix it
                     //ImageName = b.ImageName
@@ -77,9 +81,6 @@ namespace Business.Implementations
 
             return new AllBarberShopsResponse()
             {
-                City = request.City,
-                Neighborhood = request.Neighborhood,
-                BarberShopSearchName = request.BarberShopName,
                 //TotalPages = totalActiveBarberShops / QueryParameterContainer.BarberShopsPerPage, //ToDo may be needed
                 BarberShops = publicBarberShopsDto
             };
@@ -248,21 +249,6 @@ namespace Business.Implementations
             return (startHourParsed, finishHourParsed);
         }
 
-        private Dictionary<string, DayHoursDto> GetBarberShopWorkingHoursTodayUtc(ICollection<BarberShopWorkingDay> barberShopWorkingDays)
-        {
-            BarberShopWorkingDay today = barberShopWorkingDays
-                .First(b => b.WeekDay.DayOfWeekEnum == DateTime.UtcNow.DayOfWeek);
-
-            string dayOfWeek = today.WeekDay.DayOfWeekName;
-            string? openingTime = today.OpeningHour?.ToString();
-            string? closingTime = today.ClosingHour?.ToString();
-
-            return new Dictionary<string, DayHoursDto>()
-            {
-                { dayOfWeek, new DayHoursDto() { OpeningTime = openingTime, ClosingTime = closingTime } }
-            };
-        }
-
         private Dictionary<string, DayHoursDto> GetWorkingDaysHours(ICollection<BarberShopWorkingDay> workingDays)
         {
             Dictionary<string, DayHoursDto> result = new();
@@ -271,8 +257,8 @@ namespace Business.Implementations
             {
                 string weekDayName = barberShopWorkingDay.WeekDay.DayOfWeekName;
 
-                string? openingTime = barberShopWorkingDay.OpeningHour?.ToString(StringDateTimeFormat);
-                string? closingTime = barberShopWorkingDay.ClosingHour?.ToString(StringDateTimeFormat);
+                string? openingTime = barberShopWorkingDay.OpeningHour?.ToString(OpeningAndClosingHourFormat);
+                string? closingTime = barberShopWorkingDay.ClosingHour?.ToString(OpeningAndClosingHourFormat);
 
                 result.Add(weekDayName, new DayHoursDto() { OpeningTime = openingTime, ClosingTime = closingTime });
             }
@@ -291,7 +277,7 @@ namespace Business.Implementations
                 if (weekDay is null)
                 {
                     _logger.LogError("Week day dose not exists with this week day name {Id}", workingDays.Key);
-                    throw new InvalidArgumentException(Messages.InvalidAndDateHourFormat);
+                    throw new InvalidArgumentException(Messages.InvalidDateOrHourFormat);
                 }
 
                 string? openingHour = workingDays.Value.OpeningTime;
