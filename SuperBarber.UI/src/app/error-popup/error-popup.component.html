@@ -1,17 +1,21 @@
 <div
+  class="d-flex justify-content-center mt-3"
   *ngIf="errorMessages.length > 0"
-  class="alert alert-danger alert-dismissible fade show"
-  role="alert"
 >
-  <ul *ngFor="let errorMessage of errorMessages">
-    {{
-      errorMessage
-    }}
-  </ul>
-  <button
-    type="button"
-    class="btn-close"
-    aria-label="Close"
-    (click)="closeError()"
-  ></button>
+  <div
+    class="alert alert-danger text-center show position-relative"
+    role="alert"
+  >
+    <button
+      type="button"
+      class="btn-close position-absolute top-0 end-0 m-2 p-0"
+      aria-label="Close"
+      (click)="closeError()"
+    ></button>
+    <ul *ngFor="let errorMessage of errorMessages" class="me-4">
+      {{
+        errorMessage
+      }}
+    </ul>
+  </div>
 </div>

@@ -31,7 +31,13 @@
     </ul>
 
     <div *ngIf="!showProfile" class="text-end">
-      <button type="button" class="btn btn-outline-light me-2">Login</button>
+      <button
+        type="button"
+        routerLink="/login"
+        class="btn btn-outline-light me-2"
+      >
+        Login
+      </button>
       <button type="button" class="btn-sign-up">Sign-up</button>
     </div>
     <div *ngIf="showProfile">

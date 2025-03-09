@@ -1,5 +1,9 @@
 <div class="row">
-  <form class="form-group col-md-3" (ngSubmit)="onSubmit(form)" #form="ngForm">
+  <form
+    class="form-group col-md-3 mt-3"
+    (ngSubmit)="onSubmit(form)"
+    #form="ngForm"
+  >
     <legend>Find a barber shop</legend>
     <div class="mb-3">
       <label for="city" class="form-label">Select a city</label>
@@ -7,11 +11,11 @@
         required
         placeholder="Search for a city"
         [(ngModel)]="selectedCity"
-        [ngModelOptions]="{ standalone: true }"
         [searchable]="true"
         [loading]="cityLoading"
         id="city"
         (ngModelChange)="getNeighborhood()"
+        name="city"
       >
         <ng-option *ngFor="let city of cities" [value]="city">
           {{ city.name }}
@@ -25,10 +29,10 @@
         <ng-select
           placeholder="Search for a neighborhood"
           [(ngModel)]="selectedNeighborhood"
-          [ngModelOptions]="{ standalone: true }"
           [searchable]="true"
           [loading]="cityLoading"
           id="neighborhood"
+          name="neighborhood"
         >
           <ng-option
             *ngFor="let neighborhood of selectedCity.neighborhoods"
@@ -51,6 +55,7 @@
           ngbDatepicker
           [footerTemplate]="footerTemplate"
           #datePicker="ngbDatepicker"
+          name="date"
         />
         <button
           class="btn btn-outline-secondary bi bi-calendar3"
@@ -74,11 +79,7 @@
         </ng-template>
       </div>
     </div>
-    <button
-      type="submit"
-      class="btn btn-primary"
-      [disabled]="form.invalid"
-    >
+    <button type="submit" class="btn btn-primary" [disabled]="form.invalid">
       Search
     </button>
   </form>

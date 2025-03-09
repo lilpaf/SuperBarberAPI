@@ -111,13 +111,13 @@ namespace Persistence.Implementations
             {
                 string searchName = queryParams.SearchName.Replace(" ", string.Empty);
 
-    barberShopQuery.Where(b => b.Name.Replace(" ", string.Empty)
-                .Contains(searchName, StringComparison.InvariantCultureIgnoreCase));
+                barberShopQuery.Where(b => b.Name.Replace(" ", string.Empty)
+                            .Contains(searchName, StringComparison.InvariantCultureIgnoreCase));
             }
 
-barberShopQuery.Skip(queryParams.SkipCount);
+            barberShopQuery.Skip(queryParams.SkipCount);
 
-return barberShopQuery;
+            return barberShopQuery;
         }
     }
 }

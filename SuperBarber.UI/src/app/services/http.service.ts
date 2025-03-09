@@ -10,6 +10,8 @@ import { ErrorResponse } from '../models/error-response';
 import { ResponseContent } from '../models/response-content';
 import { BarbershopsListRequest } from '../models/barbershops-list-request';
 import { ListBarberShopsResponseDto } from '../models/list-barber-shops-response';
+import { LoginRequest } from '../authentication/models/login-request';
+import { AuthenticationResponse } from '../authentication/models/authentication-response';
 
 @Injectable({
   providedIn: 'root',
@@ -19,6 +21,13 @@ export class HttpService {
 
   constructor(private httpClient: HttpClient) {
     this.apiUrl = environment.apiUrl;
+  }
+
+  login(request: LoginRequest) {
+    return this.httpClient.post<ResponseContent<AuthenticationResponse>>(
+      `${this.apiUrl}/user/login`,
+      request
+    );
   }
 
   getAllCitiesAndNeighborhoods() {

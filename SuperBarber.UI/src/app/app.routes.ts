@@ -1,3 +1,4 @@
+import { LoginComponent } from './authentication/login/login.component';
 import { Routes } from '@angular/router';
 import { HomePageComponent } from './home-page/home-page.component';
 import { BarbershopsListComponent } from './barbershops-list/barbershops-list.component';
@@ -9,4 +10,5 @@ export const routes: Routes = [
     path: 'barber-shops',
     component: BarbershopsListComponent,
   },
+  { path: 'login', component: LoginComponent },
 ];
